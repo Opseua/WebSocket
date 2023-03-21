@@ -27,8 +27,7 @@ app.get('/receber-dados', (req, res) => {
         'Cache-Control': 'no-cache',
         'Connection': 'keep-alive'
     });
- 
-    const mensagemDeBoasVindas = 'Conectado ao servidor SSE';
+
     res.write(`Conectado ao servidor SSE\n\n`);
 
     app.on('enviar-dados', (dados) => {
@@ -38,4 +37,9 @@ app.get('/receber-dados', (req, res) => {
 
 wss.on('connection', (ws) => {
     ws.send('Conectado ao servidor WebSocket');
+
+    ws.on('message', (message) => {
+        app.emit('enviar-dados', message);
+    });
 });
+
