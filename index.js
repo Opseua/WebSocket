@@ -2,12 +2,14 @@ const express = require('express');
 const WebSocket = require('ws');
 const cors = require('cors');
 
+const port = process.env.PORT || 3333;
+
 const app = express();
 app.use(express.text());
 app.use(cors());
 
-const server = app.listen(3000, () => {
-    console.log('Servidor Express iniciado na porta 3000');
+const server = app.listen(port, () => {
+    console.log(`Servidor Express iniciado na porta ${port}`);
 });
 
 const wss = new WebSocket.Server({ server });
