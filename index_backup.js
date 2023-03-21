@@ -27,7 +27,7 @@ app.get('/receber-dados', (req, res) => {
         'Cache-Control': 'no-cache',
         'Connection': 'keep-alive'
     });
-
+ 
     const mensagemDeBoasVindas = 'Conectado ao servidor SSE';
     res.write(`Conectado ao servidor SSE\n\n`);
 

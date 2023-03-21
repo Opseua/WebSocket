@@ -42,3 +42,4 @@ wss.on('connection', (ws) => {
         app.emit('enviar-dados', message);
     });
 });
+
