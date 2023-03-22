@@ -11,28 +11,10 @@ app.use(express.text());
 app.use(cors());
 
 const server = app.listen(port, () => {
-    console.log(`Servidor Express iniciado na porta ${port}`);
+    console.log(`RODANDO NA PORTA ${port}`);
 });
 
-
-/* 
-const express = require('express');
-const WebSocket = require('ws');
-const cors = require('cors');
-
-const dotenv = require('dotenv');
-dotenv.config();
-const port = process.env.PORT || 3333;
-
-const app = express();
-app.use(express.text());
-app.use(cors());
-
-const server = app.listen(port, () => {
-    console.log(`Servidor Express iniciado na porta ${port}`);
-});
-
-const wss = new WebSocket.Server({ server });
+ const wss = new WebSocket.Server({ server });
 
 app.post('/enviar-dados', (req, res) => {
     const dados = req.body;
@@ -66,4 +48,4 @@ wss.on('connection', (ws) => {
         app.emit('enviar-dados', message);
     });
 });
- */
+ 
