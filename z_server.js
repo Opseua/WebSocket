@@ -1,12 +1,3 @@
-import fetch from 'node-fetch';
-import axios from 'axios';
-import express from 'express';
-import cors from 'cors';
-
-import dotenv from 'dotenv';
-dotenv.config();
-const port = process.env.PORT || 3333;
-
 console.log('1111');
 /* 
 const express = require('express');
