@@ -1,21 +1,18 @@
-import fetch from 'node-fetch';
-import axios from 'axios';
-import express from 'express';
-import cors from 'cors';
+const express = require('express');
+const WebSocket = require('ws');
+const cors = require('cors');
 
-import dotenv from 'dotenv';
+const dotenv = require('dotenv');
 dotenv.config();
 const port = process.env.PORT || 3333;
-
-console.log('1111');
-
 
 const app = express();
 app.use(express.text());
 app.use(cors());
-app.listen(port, () => {
-    console.log(`Rodando na porta ${port}`);
-  });
+
+const server = app.listen(port, () => {
+    console.log(`Servidor Express iniciado na porta ${port}`);
+});
 
 
 /* 
