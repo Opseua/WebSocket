@@ -14,7 +14,7 @@ const server = app.listen(port, () => {
     console.log(`RODANDO NA PORTA ${port}`);
 });
 
- const wss = new WebSocket.Server({ server });
+const wss = new WebSocket.Server({ server });
 
 app.post('/enviar-dados', (req, res) => {
     const dados = req.body;
@@ -34,18 +34,27 @@ app.get('/receber-dados', (req, res) => {
         'Connection': 'keep-alive'
     });
 
-    res.write(`Conectado ao servidor SSE\n\n`);
+    res.write(`SSE: CONECTADO\n\n`);
+    console.log('SSE: NOVA CONEXAO\n\n');
 
     app.on('enviar-dados', (dados) => {
         res.write(`${dados}\n\n`);
     });
+
+    req.socket.on('close', () => {
+        console.log('SSE: SERVIDOR PAROU');
+    });
 });
 
 wss.on('connection', (ws) => {
-    ws.send('Conectado ao servidor WebSocket');
+    ws.send('WEBSOCKET: CONECTADO');
+    console.log('WEBSOCKET: NOVA CONEXAO\n\n');
 
     ws.on('message', (message) => {
         app.emit('enviar-dados', message);
     });
+
+    ws.on('close', () => {
+        console.log('WEBSOCKET: SERVIDOR PAROU');
+    });
 });
- 
