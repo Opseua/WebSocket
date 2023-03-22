@@ -8,6 +8,16 @@ dotenv.config();
 const port = process.env.PORT || 3333;
 
 console.log('1111');
+
+
+const app = express();
+app.use(express.text());
+app.use(cors());
+app.listen(port, () => {
+    console.log(`Rodando na porta ${port}`);
+  });
+
+
 /* 
 const express = require('express');
 const WebSocket = require('ws');
