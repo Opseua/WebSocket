@@ -34,27 +34,27 @@ app.get('/receber-dados', (req, res) => {
         'Connection': 'keep-alive'
     });
 
-    res.write(`SSE: CONECTADO\n\n`);
-    console.log('SSE: NOVA CONEXAO\n\n');
+    res.write(`SSE: CONECTADO\n`);
+    console.log('SSE: NOVA CONEXAO\n');
 
     app.on('enviar-dados', (dados) => {
-        res.write(`${dados}\n\n`);
+        res.write(`${dados}\n`);
     });
 
     req.socket.on('close', () => {
-        console.log('SSE: SERVIDOR PAROU');
+        console.log('SSE: SERVIDOR PAROU\n');
     });
 });
 
 wss.on('connection', (ws) => {
-    ws.send('WEBSOCKET: CONECTADO');
-    console.log('WEBSOCKET: NOVA CONEXAO\n\n');
+    ws.send('WEBSOCKET: CONECTADO\n');
+    console.log('WEBSOCKET: NOVA CONEXAO\n');
 
     ws.on('message', (message) => {
         app.emit('enviar-dados', message);
     });
 
     ws.on('close', () => {
-        console.log('WEBSOCKET: SERVIDOR PAROU');
+        console.log('WEBSOCKET: SERVIDOR PAROU\n');
     });
 });
