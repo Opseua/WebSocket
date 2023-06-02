@@ -1,3 +1,5 @@
+const { clearConsole } = require('./clearConsole.js');
+
 const WebSocketServer = require('ws');
 
 const port = 8888;
