@@ -1,4 +1,4 @@
-// import { clearConsole } from './clearConsole.js';
+//const clearConsole = await import('./clearConsole.js');
 
 let messageCount = 0;
 
@@ -8,7 +8,7 @@ console.log = async function () {
 
     clearConsole.apply(console, arguments);
     messageCount++;
-    if (messageCount >= 100) {
+    if (messageCount >= 300) {
         console.clear();
         messageCount = 0;
         console.log('CONSOLE LIMPO!')
@@ -16,4 +16,4 @@ console.log = async function () {
 
 };
 
-export { clearConsole, messageCount };
+export default clearConsole

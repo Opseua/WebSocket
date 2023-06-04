@@ -1,7 +1,6 @@
-import { clearConsole } from './clearConsole.js';
+const clearConsole = await import('./clearConsole.js');
 const imp1 = () => import('express').then(module => module.default);
 const express = await imp1();
-//import bodyParser from 'body-parser';
 const imp2 = () => import('body-parser').then(module => module.default);
 const bodyParser = await imp2();
 import WebSocket from 'isomorphic-ws';

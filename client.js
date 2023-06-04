@@ -1,4 +1,4 @@
-import { clearConsole } from './clearConsole.js';
+const clearConsole = await import('./clearConsole.js');
 
 let WebSocket;
 if (typeof window === 'undefined') { // NODEJS
