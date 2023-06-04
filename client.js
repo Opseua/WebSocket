@@ -58,8 +58,7 @@ async function client(inf) {
             console.error(`BACKGROUND: ERRO W2 | ${error.message}`);
         });
     }
-    //web2();
+    web2();
 
 }
 
-export { client }

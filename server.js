@@ -53,9 +53,3 @@ wss.on('connection', ws => {
 });
 
 
-async function aaaaaaa() {
-
-}
-
-
-const teste = await aaaaaaa()
