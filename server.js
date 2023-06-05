@@ -1,5 +1,28 @@
-// * Microsoft Graph
+await import('../Microsoft_Graph_API/src/services/excel/updateRange.js');
+await import('../Chrome_Extension/globalObject.js');
+addListener(monitorGlobalObject);
+async function monitorGlobalObject(value) {
+    console.log('Valor de globalObject alterado: 1', value.inf);
+}
+await new Promise(resolve => setTimeout(resolve, (2000)));
+globalObject.inf = true;
+
+// *****************************************************************
+
+const { globalObject } = await import('./globalObject.js');
+console.log(globalObject.inf);
+await new Promise(resolve => setTimeout(resolve, (2000)));
+globalObject.inf = 'NOVO VALOR';
+await new Promise(resolve => setTimeout(resolve, (2000)));
+console.log(globalObject.inf)
+
+const imp9 = () => import('fs').then(module => module.default);
+const fs = await imp9();
+const configFile = fs.readFileSync('config.json');
+const config = JSON.parse(configFile);
 const microsoft = async (i) => (await import('../Microsoft_Graph_API/src/services/excel/updateRange.js')).default(i);
+
+
 
 const clearConsole = await import('./clearConsole.js');
 const imp1 = () => import('express').then(module => module.default);
@@ -10,42 +33,54 @@ import WebSocket from 'isomorphic-ws';
 
 const port = 8888;
 const app = express();
-const server = app.listen(port, () => {
+
+const server = app.listen(port, async () => {
     console.log(`RODANDO NA PORTA: ${port}`);
 });
 app.use(bodyParser.text());
 async function sendMessage(message, sender) {
-    wss.clients.forEach(client => {
+    for (const client of wss.clients) {
         if (client !== sender) {
             client.send(message);
         }
-    });
+    }
 }
-app.get('/get/*', (req, res) => {
+app.get('/get/*', async (req, res) => {
     const message = req.params[0];
     sendMessage(message, null);
-    res.sendStatus(200).send('Requisição GET bem sucedida');
+    res.status(200).send('Requisição GET bem sucedida');
 });
-app.post('/post', (req, res) => {
+app.post('/post', async (req, res) => {
     const message = req.body;
     sendMessage(message, null);
-    res.sendStatus(200).send('Requisição POST bem sucedida');
+    res.status(200).send('Requisição POST bem sucedida');
 });
 
 const wss = new WebSocket.Server({ server });
-wss.on('connection', ws => {
+wss.on('connection', async ws => {
     console.log('NOVO CLIENTE CONECTADO');
-    ws.on('message', data => {
+    ws.on('message', async data => {
         const message = data.toString();
-        sendMessage(message, ws);
+        ws.send('Requisição WEBSOCKET bem sucedida');
+
+        await microsoft({ 'sheetTabName': 'HAUPC', 'send': message, 'qtd': 0 })
+
+        wss.clients.forEach(async client => {
+            if (client !== ws) {
+                client.send(message);
+            }
+        });
     });
-    ws.on('close', () => {
+    ws.on('close', async () => {
         console.log('CLIENTE DESCONECTADO');
     });
-    ws.onerror = function () {
+    ws.onerror = async function () {
         console.log('ERRO');
     };
 });
+
+
+
 
 
 
