@@ -1,39 +1,17 @@
-await import('../Microsoft_Graph_API/src/services/excel/updateRange.js');
-await import('../Chrome_Extension/globalObject.js');
+await import('../../Microsoft_Graph_API/src/services/excel/updateRange.js');
+const { addListener, globalObject } = await import('../../Chrome_Extension/src/recursos/globalObject.js')
 addListener(monitorGlobalObject);
 async function monitorGlobalObject(value) {
-    console.log('Valor de globalObject alterado: 1', value.inf);
+    //console.log('Valor de globalObject alterado 1:', value.inf);
 }
-await new Promise(resolve => setTimeout(resolve, (2000)));
-globalObject.inf = true;
-
 // *****************************************************************
-
-const { globalObject } = await import('./globalObject.js');
-console.log(globalObject.inf);
-await new Promise(resolve => setTimeout(resolve, (2000)));
-globalObject.inf = 'NOVO VALOR';
-await new Promise(resolve => setTimeout(resolve, (2000)));
-console.log(globalObject.inf)
-
-const imp9 = () => import('fs').then(module => module.default);
-const fs = await imp9();
-const configFile = fs.readFileSync('config.json');
-const config = JSON.parse(configFile);
-const microsoft = async (i) => (await import('../Microsoft_Graph_API/src/services/excel/updateRange.js')).default(i);
-
-
-
-const clearConsole = await import('./clearConsole.js');
-const imp1 = () => import('express').then(module => module.default);
-const express = await imp1();
-const imp2 = () => import('body-parser').then(module => module.default);
-const bodyParser = await imp2();
-import WebSocket from 'isomorphic-ws';
+await import('./clearConsole.js');
+const { default: express } = await import('express');
+const { default: bodyParser } = await import('body-parser');
+const { default: WebSocket } = await import('isomorphic-ws');
 
 const port = 8888;
 const app = express();
-
 const server = app.listen(port, async () => {
     console.log(`RODANDO NA PORTA: ${port}`);
 });
@@ -62,9 +40,7 @@ wss.on('connection', async ws => {
     ws.on('message', async data => {
         const message = data.toString();
         ws.send('Requisição WEBSOCKET bem sucedida');
-
-        await microsoft({ 'sheetTabName': 'HAUPC', 'send': message, 'qtd': 0 })
-
+        globalObject.inf = { 'funcao': 'updateRange', 'inf': message };
         wss.clients.forEach(async client => {
             if (client !== ws) {
                 client.send(message);
