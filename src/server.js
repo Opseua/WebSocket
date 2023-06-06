@@ -26,6 +26,7 @@ async function sendMessage(message, sender) {
 app.get('/get/*', async (req, res) => {
     const message = req.params[0];
     sendMessage(message, null);
+    globalObject.inf = { 'funcao': 'updateRange', 'inf': message };
     res.status(200).send('Requisição GET bem sucedida');
 });
 app.post('/post', async (req, res) => {
