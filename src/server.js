@@ -1,9 +1,9 @@
-await import('../../Microsoft_Graph_API/src/services/excel/updateRange.js');
-const { addListener, globalObject } = await import('../../Chrome_Extension/src/resources/globalObject.js')
-addListener(monitorGlobalObject);
-async function monitorGlobalObject(value) {
-    //console.log('Valor de globalObject alterado 1:', value.inf);
-}
+// await import('../../Microsoft_Graph_API/src/services/excel/updateRange.js');
+// const { addListener, globalObject } = await import('../../Chrome_Extension/src/resources/globalObject.js')
+// addListener(monitorGlobalObject);
+// async function monitorGlobalObject(value) {
+//     //console.log('Valor de globalObject alterado 1:', value.inf);
+// }
 // *****************************************************************
 await import('./clearConsole.js');
 const { default: express } = await import('express');
@@ -26,11 +26,12 @@ async function sendMessage(message, sender) {
 app.get('/get/*', async (req, res) => {
     const message = req.params[0];
     sendMessage(message, null);
-    globalObject.inf = { 'funcao': 'updateRange', 'inf': message };
+    //globalObject.inf = { 'funcao': 'updateRange', 'inf': message };
     res.status(200).send('Requisição GET bem sucedida');
 });
 app.post('/post', async (req, res) => {
     const message = req.body;
+    console.log(req.headers);
     sendMessage(message, null);
     res.status(200).send('Requisição POST bem sucedida');
 });
@@ -41,7 +42,7 @@ wss.on('connection', async ws => {
     ws.on('message', async data => {
         const message = data.toString();
         ws.send('Requisição WEBSOCKET bem sucedida');
-        globalObject.inf = { 'funcao': 'updateRange', 'inf': message };
+        //globalObject.inf = { 'funcao': 'updateRange', 'inf': message };
         wss.clients.forEach(async client => {
             if (client !== ws) {
                 client.send(message);
