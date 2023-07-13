@@ -12,9 +12,11 @@ if (typeof window === 'undefined') { // NODEJS
 async function client(inf) {
 
     const port = 8888;
+    const retConfigJson = await fetch('D:/ARQUIVOS/BIBLIOTECAS/1_PROJETOS/Chrome_Extension/src/config.json');
+    const config = await retConfigJson.json();
     let ws1;
     async function web1() {
-        ws1 = new WebS(`wss://ntfy.sh/OPSEUA/ws`);
+        ws1 = new WebS(`${config.ws1}`);
         ws1.addEventListener('open', async function (event) { // CONEXAO: ONLINE - WS1
             console.log(`BACKGROUND: CONEXAO ESTABELECIDA - WS1`);
             // setTimeout(function () {
@@ -39,7 +41,7 @@ async function client(inf) {
 
     let ws2;
     async function web2() {
-        ws2 = new WebS(`ws://18.119.140.20:${port}`);
+        ws2 = new WebS(`${config.ws2}:${port}`);
         ws2.addEventListener('open', async function (event) { // CONEXAO: ONLINE - WS2
             console.log(`BACKGROUND: CONEXAO ESTABELECIDA - WS2`)
             // setTimeout(function () {
