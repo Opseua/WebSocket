@@ -23,12 +23,14 @@ async function server(inf) {
         app.get('/get/*', async (req, res) => {
             const message = req.params[0];
             sendMessage(message, null);
+            res.setHeader('Access-Control-Allow-Origin', '*');
             res.status(200).send('Requisição GET bem sucedida');
         });
         app.post('/post', async (req, res) => {
             const message = req.body;
             console.log(req.headers);
             sendMessage(message, null);
+            res.setHeader('Access-Control-Allow-Origin', '*');
             res.status(200).send('Requisição POST bem sucedida');
         });
 
