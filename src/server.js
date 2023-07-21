@@ -1,13 +1,26 @@
 await import('./clearConsole.js');
+const { configStorage } = await import('../../Chrome_Extension/src/resources/functions.js');
 const { default: express } = await import('express');
 const { default: bodyParser } = await import('body-parser');
 const { default: WebSocket } = await import('isomorphic-ws');
 
 async function server(inf) {
     let ret = { 'ret': false };
-    try {
 
-        const port = 8888;
+    const retConfigJson = await fetch('./config.json');
+    const config = await retConfigJson.json();
+    console.log(config)
+
+
+    return
+
+    try {
+        const infConfigStorage = { 'path': '/config.json', 'action': 'get', 'key': 'port' }
+        const retConfigStorage = await configStorage(infConfigStorage)
+        const port = retConfigStorage.res;
+        if (!retConfigStorage.ret) {
+            return
+        }
         const app = express();
         const server = app.listen(port, async () => {
             console.log(`RODANDO NA PORTA: ${port}`);
@@ -53,7 +66,6 @@ async function server(inf) {
                 console.log('ERRO');
             };
         });
-
     } catch (e) {
         ret['msg'] = `SERVER: ERRO | ${e}`
     }
