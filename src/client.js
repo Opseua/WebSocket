@@ -14,7 +14,7 @@ async function client(inf) {
     try {
 
         const port = 8888;
-        const retConfigJson = await fetch('D:/ARQUIVOS/BIBLIOTECAS/1_PROJETOS/Chrome_Extension/src/config.json');
+        const retConfigJson = await fetch('D:/ARQUIVOS/BIBLIOTECAS/PROJETOS/Chrome_Extension/src/config.json');
         const config = await retConfigJson.json();
         let ws1;
         async function web1() {
