@@ -1,4 +1,4 @@
-node_modules
+*node_modules*
 *.z_tempCodeRunner*
-config.json
+*config.json*
 
