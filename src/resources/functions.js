@@ -19,16 +19,17 @@
 // const retFileRead = await fileRead(infFileRead)
 // console.log(retFileRead)
 // - # -         - # -     - # -     - # -     - # -     - # -     - # -     - # -  
-// const infConfigStorage = { 'path': '/src/config.json', 'action': 'set', 'key': 'NomeDaChave', 'value': 'Valor da chave' }
-// const retConfigStorage = await configStorage(infConfigStorage)
+// let infConfigStorage, retConfigStorage
+// infConfigStorage = { 'path': '/src/config.json', 'action': 'set', 'key': 'NomeDaChave', 'value': 'Valor da chave' }
+// retConfigStorage = await configStorage(infConfigStorage)
 // console.log(retConfigStorage)
 
-// const infConfigStorage = { 'path': '/src/config.json', 'action': 'get', 'key': 'NomeDaChave' }
-// const retConfigStorage = await configStorage(infConfigStorage)
+// infConfigStorage = { 'path': '/src/config.json', 'action': 'get', 'key': 'NomeDaChave' }
+// retConfigStorage = await configStorage(infConfigStorage)
 // console.log(retConfigStorage)
 
-// const infConfigStorage = { 'path': '/src/config.json', 'action': 'del', 'key': 'NomeDaChave' }
-// const retConfigStorage = await configStorage(infConfigStorage)
+// infConfigStorage = { 'path': '/src/config.json', 'action': 'del', 'key': 'NomeDaChave' }
+// retConfigStorage = await configStorage(infConfigStorage)
 // console.log(retConfigStorage)
 // - # -         - # -     - # -     - # -     - # -     - # -     - # -     - # -  
 // const RetDateHour = dateHour()
@@ -50,11 +51,11 @@
 //     const infRandom = { 'min': 1, 'max': 5, 'await': true }
 //     const retRandom = await random(infRandom)
 //   }
-//   console.log("Loop concluído!");
+//   console.log('Loop concluído!');
 // }
 // runLoop();
 // - # -         - # -     - # -     - # -     - # -     - # -     - # -     - # - 
-// const infRegex = { 'simple': true, 'pattern': 'UM(.*?)TRES', 'text': 'UMDOISTRES' }
+// const infRegex = { 'pattern': 'UM(.*?)TRES', 'text': 'UMDOISTRES' }
 // const infRegex = { 'simple': true, 'pattern': '*DOIS*', 'text': 'UMDOISTRES' }
 // const retRegex = regex(infRegex)
 // console.log(retRegex)
@@ -107,44 +108,8 @@ async function api(inf) {
             }
         }
     } catch (e) {
-        ret['msg'] = `API: ERRO | ${e}`
+        ret['msg'] = regexE({ 'e': e }).res
     }
-
-    // if (typeof UrlFetchApp !== 'undefined') { // ################ GOOGLE APP SCRIPT
-    //   try {
-    //     const req = UrlFetchApp.fetch(inf.url, {
-    //       'method': inf.method,
-    //       'payload': inf.method === 'POST' || inf.method === 'PATCH' ? typeof inf.body === 'object' ? JSON.stringify(inf.body) : inf.body : null,
-    //       'headers': inf.headers,
-    //       redirect: 'follow',
-    //       keepalive: true,
-    //       muteHttpExceptions: true,
-    //       validateHttpsCertificates: true,
-    //     });
-
-    //     ret['ret'] = true;
-    //     ret['msg'] = 'API: OK';
-    //     ret['res'] = req.getContentText();
-    //   } catch (e) {
-    //     ret['msg'] = `API: ERRO | ${e.message}`;
-    //   }
-    // } else { // ######################################### NODEJS ou CHROME
-    //   try {
-    //     const req = await fetch(inf.url, {
-    //       method: inf.method,
-    //       body: inf.method === 'POST' || inf.method === 'PATCH' ? typeof inf.body === 'object' ? JSON.stringify(inf.body) : inf.body : null,
-    //       headers: inf.headers,
-    //       redirect: 'follow',
-    //       keepalive: true
-    //     });
-
-    //     ret['ret'] = true;
-    //     ret['msg'] = 'API: OK';
-    //     ret['res'] = await req.text();
-    //   } catch (e) {
-    //     ret['msg'] = `API: ERRO | ${e}`;
-    //   }
-    // }
 
     if (!ret.ret) { console.log(ret.msg) }
     return ret
@@ -165,7 +130,8 @@ async function nodeOrBrowser() {
         ret['ret'] = true;
         ret['msg'] = 'NODE OR BROWSER: OK';
     } catch (e) {
-        ret['msg'] = `NODE OR BROWSER: ERRO | ${e.message}`;
+        //ret['msg'] = `NODE OR BROWSER: ERRO | ${e.message}`;
+        ret['msg'] = regexE({ 'e': e.message }).res
     }
 
     if (!ret.ret) { console.log(ret.msg) }
@@ -204,7 +170,7 @@ async function fileInf(inf) { // ## CHROME NAO!
         ret['msg'] = 'FILE INF: OK';
         ret['res'] = retFileInf
     } catch (e) {
-        ret['msg'] = `FILE INF: ERRO | ${e}`;
+        ret['msg'] = regexE({ 'e': e }).res;
     }
 
     if (!ret.ret) { console.log(ret.msg) }
@@ -215,11 +181,14 @@ async function fileWrite(inf) {
     let ret = { 'ret': false };
     try {
         if (inf.file == undefined || inf.file == '') {
-            ret['msg'] = `INFORMAR O "file"`;
+            //ret['msg'] = `INFORMAR O 'file'`;
+            ret['msg'] = `\n #### ERRO ####  FILE WRITE \n INFORMAR O 'file' \n\n`;
         } else if (typeof inf.rewrite !== 'boolean') {
-            ret['msg'] = `INFORMAR O "rewrite" TRUE ou FALSE`;
+            //ret['msg'] = `INFORMAR O 'rewrite' TRUE ou FALSE`;
+            ret['msg'] = `\n #### ERRO ####  FILE WRITE \n INFORMAR O 'rewrite' TRUE ou FALSE \n\n`;
         } else if (inf.text == undefined || inf.text == '') {
-            ret['msg'] = `INFORMAR O "text"`;
+            //ret['msg'] = `INFORMAR O 'text'`;
+            ret['msg'] = `\n #### ERRO ####  FILE WRITE \n INFORMAR O 'text' \n\n`;
         } else {
 
             const resNodeOrBrowser = await nodeOrBrowser()
@@ -260,7 +229,7 @@ async function fileWrite(inf) {
             ret['msg'] = `FILE WRITE: OK`;
         }
     } catch (e) {
-        ret['msg'] = `FILE WRITE: ERRO | ${e}`;
+        ret['msg'] = regexE({ 'e': e }).res;
     }
 
     if (!ret.ret) { console.log(ret.msg) }
@@ -286,7 +255,7 @@ async function fileRead(inf) {
         ret['msg'] = `FILE READ: OK`;
         ret['res'] = retFetch;
     } catch (e) {
-        ret['msg'] = `FILE READ: ERRO | ${e}`;
+        ret['msg'] = regexE({ 'e': e }).res;
     }
 
     if (!ret.ret) { console.log(ret.msg) }
@@ -306,14 +275,17 @@ async function configStorage(inf) {
                     return new Promise((resolve) => {
                         const data = {};
                         if (!inf.key) {
-                            ret['msg'] = 'STORAGE SET: ERRO | INFORMAR A "key"';
+                            //ret['msg'] = 'STORAGE SET: ERRO | INFORMAR A "key"';
+                            ret['msg'] = `\n #### ERRO ####  STORAGE SET \n INFORMAR A 'key' \n\n`;
                         } else if (!inf.value) {
-                            ret['msg'] = 'STORAGE SET: ERRO | INFORMAR O "value"';
+                            //ret['msg'] = 'STORAGE SET: ERRO | INFORMAR O "value"';
+                            ret['msg'] = `\n #### ERRO ####  STORAGE SET \n INFORMAR O 'value' \n\n`;
                         } else {
                             data[inf.key] = inf.value;
                             chrome.storage.local.set(data, async () => {
                                 if (chrome.runtime.lastError) {
-                                    ret['msg'] = `STORAGE SET: ERRO | ${chrome.runtime.lastError}`;
+                                    //ret['msg'] = `STORAGE SET: ERRO | ${chrome.runtime.lastError}`;
+                                    ret['msg'] = `\n #### ERRO ####  STORAGE SET \n ${chrome.runtime.lastError} \n\n`;
                                 } else {
                                     ret['ret'] = true;
                                     ret['msg'] = 'STORAGE SET: OK';
@@ -332,11 +304,13 @@ async function configStorage(inf) {
                 async function storageGet(inf) {
                     return new Promise((resolve) => {
                         if (!inf.key) {
-                            ret['msg'] = 'STORAGE GET: ERRO | INFORMAR A "key"';
+                            //ret['msg'] = 'STORAGE GET: ERRO | INFORMAR A "key"';
+                            ret['msg'] = `\n #### ERRO ####  STORAGE GET \n INFORMAR A 'key' \n\n`;
                         } else {
                             chrome.storage.local.get(inf.key, async (result) => {
                                 if (chrome.runtime.lastError) {
-                                    ret['msg'] = `STORAGE GET: ERRO | ${chrome.runtime.lastError}`;
+                                    //ret['msg'] = `STORAGE GET: ERRO | ${chrome.runtime.lastError}`;
+                                    ret['msg'] = `\n #### ERRO ####  STORAGE GET \n ${chrome.runtime.lastError} \n\n`;
                                 } else if (Object.keys(result).length === 0) {
                                     async function checkConfig() {
                                         const retConfigJson = await fetch(`${inf.path}`);
@@ -347,7 +321,8 @@ async function configStorage(inf) {
                                             return new Promise((resolve) => {
                                                 chrome.storage.local.set(data, async () => {
                                                     if (chrome.runtime.lastError) {
-                                                        ret['msg'] = `STORAGE SET*: ERRO | ${chrome.runtime.lastError}`;
+                                                        //ret['msg'] = `STORAGE SET*: ERRO | ${chrome.runtime.lastError}`;
+                                                        ret['msg'] = `\n #### ERRO ####  STORAGE SET* \n ${chrome.runtime.lastError} \n\n`;
                                                     } else {
                                                         ret['ret'] = true;
                                                         ret['msg'] = 'STORAGE GET: OK';
@@ -358,7 +333,10 @@ async function configStorage(inf) {
                                                 return;
                                             })
                                         }
-                                        else { ret['msg'] = `STORAGE GET: ERRO | CHAVE '${inf.key}' NAO ENCONTRADA`; }
+                                        else {
+                                            //ret['msg'] = `STORAGE GET: ERRO | CHAVE '${inf.key}' NAO ENCONTRADA`;
+                                            ret['msg'] = `\n #### ERRO ####  STORAGE GET \n CHAVE '${inf.key}' NAO ENCONTRADA \n\n`;
+                                        }
                                         return ret;
                                     }
                                     await checkConfig()
@@ -381,15 +359,18 @@ async function configStorage(inf) {
                 async function storageDel(inf) {
                     return new Promise((resolve) => {
                         if (!inf.key) {
-                            ret['msg'] = 'STORAGE DEL: ERRO | INFORMAR A "key"';
+                            //ret['msg'] = 'STORAGE DEL: ERRO | INFORMAR A "key"';
+                            ret['msg'] = `\n #### ERRO ####  STORAGE DEL \n INFORMAR A 'key' \n\n`;
                         } else {
                             chrome.storage.local.get(inf.key, async (result) => {
                                 if (chrome.runtime.lastError) {
-                                    ret['msg'] = `STORAGE DEL: ERRO | ${chrome.runtime.lastError}`;
+                                    //ret['msg'] = `STORAGE DEL: ERRO | ${chrome.runtime.lastError}`;
+                                    ret['msg'] = `\n #### ERRO ####  STORAGE DEL \n ${chrome.runtime.lastError} \n\n`;
                                 } else if (Object.keys(result).length === 0) {
-                                    ret['msg'] = `STORAGE DEL: ERRO | CHAVE '${inf.key}' NAO ENCONTRADA`;
+                                    //ret['msg'] = `STORAGE DEL: ERRO | CHAVE '${inf.key}' NAO ENCONTRADA`;
+                                    ret['msg'] = `\n #### ERRO ####  STORAGE DEL \n CHAVE '${inf.key}' NAO ENCONTRADA \n\n`;
                                 } else {
-                                    chrome.storage.local.remove(inf.key, () => { });
+                                    chrome.storage.local.remove(inf.key, async () => { });
                                     ret['ret'] = true;
                                     ret['msg'] = 'STORAGE DEL: OK';
                                 }
@@ -416,9 +397,11 @@ async function configStorage(inf) {
             if (inf.action == 'set') { // CONFIG: SET
                 try {
                     if (!inf.key) {
-                        ret['msg'] = 'CONFIG SET: ERRO | INFORMAR A "key"';
+                        //ret['msg'] = 'CONFIG SET: ERRO | INFORMAR A "key"';
+                        ret['msg'] = `\n #### ERRO ####  CONFIG SET \n INFORMAR A 'key' \n\n`;
                     } else if (!inf.value) {
-                        ret['msg'] = 'CONFIG SET: ERRO | INFORMAR O "value"';
+                        //ret['msg'] = 'CONFIG SET: ERRO | INFORMAR O "value"';
+                        ret['msg'] = `\n #### ERRO ####  CONFIG SET \n INFORMAR O 'value' \n\n`;
                     } else {
                         ret['ret'] = true;
                         ret['msg'] = `CONFIG SET: OK`;
@@ -426,32 +409,35 @@ async function configStorage(inf) {
                         fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
                     }
                 } catch (e) {
-                    ret['msg'] = `CONFIG SET: ERRO | ${e}`;
+                    ret['msg'] = regexE({ 'e': e }).res;
                 }
             }
 
             if (inf.action == 'get') { // CONFIG NODE: GET
                 try {
                     if (!inf.key) {
-                        ret['msg'] = 'CONFIG GET: ERRO | INFORMAR A "key"';
+                        //ret['msg'] = 'CONFIG GET: ERRO | INFORMAR A "key"';
+                        ret['msg'] = `\n #### ERRO ####  CONFIG GET \n INFORMAR A 'key' \n\n`;
                     } else {
                         if (config[inf.key]) {
                             ret['ret'] = true;
                             ret['msg'] = `CONFIG GET: OK`;
                             ret['res'] = config[inf.key];
                         } else {
-                            ret['msg'] = `CONFIG GET: ERRO | CHAVE '${inf.key}' NAO ENCONTRADA`;
+                            //ret['msg'] = `CONFIG GET: ERRO | CHAVE '${inf.key}' NAO ENCONTRADA`;
+                            ret['msg'] = `\n #### ERRO ####  CONFIG GET \n CHAVE '${inf.key}' NAO ENCONTRADA \n\n`;
                         }
                     }
                 } catch (e) {
-                    ret['msg'] = `CONFIG GET: ERRO | ${e}`;
+                    ret['msg'] = regexE({ 'e': e }).res;
                 }
             }
 
             if (inf.action == 'del') { // CONFIG NODE: DEL
                 try {
                     if (!inf.key) {
-                        ret['msg'] = 'CONFIG DEL: ERRO | INFORMAR A "key"';
+                        //ret['msg'] = 'CONFIG DEL: ERRO | INFORMAR A "key"';
+                        ret['msg'] = `\n #### ERRO ####  CONFIG DEL \n INFORMAR A 'key' \n\n`;
                     } else {
                         if (config[inf.key]) {
                             ret['ret'] = true;
@@ -459,18 +445,19 @@ async function configStorage(inf) {
                             delete config[inf.key];
                             fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
                         } else {
-                            ret['msg'] = `CONFIG DEL: ERRO | CHAVE '${inf.key}' NAO ENCONTRADA`;
+                            //ret['msg'] = `CONFIG DEL: ERRO | CHAVE '${inf.key}' NAO ENCONTRADA`;
+                            ret['msg'] = `\n #### ERRO ####  CONFIG DEL \n CHAVE '${inf.key}' NAO ENCONTRADA \n\n`;
                         }
                     }
                 } catch (e) {
-                    ret['msg'] = `CONFIG DEL: ERRO | ${e}`;
+                    ret['msg'] = regexE({ 'e': e }).res;
                 }
             }
 
         }
     }
     catch (e) {
-        ret['msg'] = `CONFIG STORAGE: ERRO | ${e}`;
+        ret['msg'] = regexE({ 'e': e }).res;
     }
 
     if (!ret.ret) { console.log(ret.msg) }
@@ -496,7 +483,7 @@ function dateHour() { // NAO POR COMO 'async'!!!
         ret['res'] = retDate;
     }
     catch (e) {
-        ret['msg'] = `DATE HOUR: ERRO | ${e}`;
+        ret['msg'] = regexE({ 'e': e }).res;
     }
 
     if (!ret.ret) { console.log(ret.msg) }
@@ -517,7 +504,8 @@ function regex(inf) {
                 }
             } else {
                 ret['ret'] = true;
-                ret['msg'] = `REGEX: ERRO | PADRAO '${inf.pattern}' NAO ENCONTRADO`;
+                //ret['msg'] = `REGEX: ERRO | PADRAO '${inf.pattern}' NAO ENCONTRADO`;
+                ret['msg'] = `\n #### ERRO ####  REGEX \n PADRAO '${inf.pattern}' NAO ENCONTRADO \n\n`;
                 ret['res'] = { 'bolean': false }
             }
         } else {
@@ -539,13 +527,14 @@ function regex(inf) {
                     }
                 } else {
                     ret['ret'] = true;
-                    ret['msg'] = `REGEX: ERRO | PADRAO '${inf.pattern}' NAO ENCONTRADO`;
+                    //ret['msg'] = `REGEX: ERRO | PADRAO '${inf.pattern}' NAO ENCONTRADO`;
+                    ret['msg'] = `\n #### ERRO ####  REGEX \n PADRAO '${inf.pattern}' NAO ENCONTRADO \n\n`;
                     ret['res'] = { 'bolean': false }
                 }
             }
         }
     } catch (e) {
-        ret['msg'] = `REGEX: ERRO | ${e}`
+        ret['msg'] = regexE({ 'e': e }).res
     }
 
     if (!ret.ret) { console.log(ret.msg) }
@@ -567,7 +556,7 @@ async function random(inf) {
         ret['msg'] = `RANDON: OK`;
         ret['res'] = number / 1000;
     } catch (e) {
-        ret['msg'] = `RANDON: ERRO | ${e}`
+        ret['msg'] = regexE({ 'e': e }).res
     }
 
     if (!ret.ret) { console.log(ret.msg) }
@@ -588,12 +577,31 @@ function removeListener(listener) { listeners.delete(listener) }
 async function globalChanged(i) { if (i.alert !== false) { console.log('globalObject ALTERADO →', i) } }
 // ############### ###############
 
-export { api, nodeOrBrowser, fileInf, fileWrite, fileRead, configStorage, dateHour, regex, random, globalObject, addListener };
+function regexE(inf) {
+    let ret = { 'ret': false };
+    try {
+        ret['ret'] = true;
+        ret['msg'] = `REGEX E: OK`;
+        const match = inf.e.stack.match(/(\w+\.\w+):(\d+):\d+/);
+        if (match && match.length === 3) {
+            ret['res'] = `\n #### ERRO ####  ${match[1]} [${match[2]}] \n ${inf.e.toString()} \n\n`
+        } else {
+            ret['res'] = `\n #### ERRO ####  NAO IDENTIFICADO [NAO IDENTIFICADA] \n ${inf.e.toString()} \n\n`
+        }
+    } catch (e) {
+        const match = e.stack.match(/(\w+\.\w+):(\d+):\d+/);
+        ret['msg'] = `\n #### ERRO ####  ${match[1]} [${match[2]}] \n ${e.toString()} \n\n`
+    }
 
-if (typeof window !== 'undefined') { // CHOME
+    if (!ret.ret) { console.log(ret.msg) }
+    return ret
+}
+
+// export { api, nodeOrBrowser, fileInf, fileWrite, fileRead, configStorage, dateHour, regex, random, globalObject, addListener, regexE };
+
+if (typeof window !== 'undefined') { // CHROME
     window['api'] = api;
     window['nodeOrBrowser'] = nodeOrBrowser;
-    window['fileInf'] = fileInf;
     window['fileWrite'] = fileWrite;
     window['fileRead'] = fileRead;
     window['configStorage'] = configStorage;
@@ -602,10 +610,11 @@ if (typeof window !== 'undefined') { // CHOME
     window['random'] = random;
     window['globalObject'] = globalObject;
     window['addListener'] = addListener;
+    window['regexE'] = regexE;
 } else if (typeof global !== 'undefined') { // NODE
+    global['fileInf'] = fileInf;
     global['api'] = api;
     global['nodeOrBrowser'] = nodeOrBrowser;
-    global['fileInf'] = fileInf;
     global['fileWrite'] = fileWrite;
     global['fileRead'] = fileRead;
     global['configStorage'] = configStorage;
@@ -614,6 +623,7 @@ if (typeof window !== 'undefined') { // CHOME
     global['random'] = random;
     global['globalObject'] = globalObject;
     global['addListener'] = addListener;
+    global['regexE'] = regexE;
 }
 
 
@@ -641,7 +651,7 @@ if (typeof window !== 'undefined') { // CHOME
 //         ret['res'] = Number(response.data.values[0][0]);
 
 //     } catch (e) {
-//         ret['msg'] = `LAST LIN: ERRO | ${e}`
+//         ret['msg'] = regexE({ 'e': e }).res
 //     }
 
 //     if (!ret.ret) { console.log(ret.msg) }
@@ -660,7 +670,7 @@ if (typeof window !== 'undefined') { // CHOME
 //         ret['res'] = response.data.values;
 
 //     } catch (e) {
-//         ret['msg'] = `DATA GET: ERRO | ${e}`
+//         ret['msg'] = regexE({ 'e': e }).res
 //     }
 
 //     if (!ret.ret) { console.log(ret.msg) }
@@ -684,7 +694,7 @@ if (typeof window !== 'undefined') { // CHOME
 //         ret['msg'] = `DATA SEND: OK`;
 
 //     } catch (e) {
-//         ret['msg'] = `DATA SEND: ERRO | ${e}`
+//         ret['msg'] = regexE({ 'e': e }).res
 //     }
 
 //     if (!ret.ret) { console.log(ret.msg) }
@@ -749,7 +759,7 @@ if (typeof window !== 'undefined') { // CHOME
 
 //         }
 //     } catch (e) {
-//         ret['msg'] = `FUNCTIONS: ERRO | ${e}`
+//         ret['msg'] = regexE({ 'e': e }).res
 //     }
 
 //     if (!ret.ret) { console.log(ret.msg) }

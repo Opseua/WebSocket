@@ -1,5 +1,6 @@
 //await import('./clearConsole.js');
 
+console.clear()
 let messageCount = 0;
 
 const clearConsole = console.log;
