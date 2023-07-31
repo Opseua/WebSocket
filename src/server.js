@@ -6,8 +6,6 @@ const { default: WebSocket } = await import('isomorphic-ws');
 async function server(inf) {
     let ret = { 'ret': false };
     try {
-        const infConfigStorage = { 'path': '/src/config.json', 'action': 'get', 'key': 'websocket' }
-        const retConfigStorage = await configStorage(infConfigStorage)
         const port = retConfigStorage.res.port
         const clients = new Set();
         const rooms = {};
