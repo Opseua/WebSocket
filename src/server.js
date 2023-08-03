@@ -2,10 +2,13 @@ await import('./clearConsole.js');
 await import('./resources/functions.js');
 const { default: http } = await import('http');
 const { default: WebSocket } = await import('isomorphic-ws');
+let WebS = WebSocket;
 
 async function server(inf) {
     let ret = { 'ret': false };
     try {
+        const infConfigStorage = { 'path': '/src/config.json', 'action': 'get', 'key': 'websocket' }
+        const retConfigStorage = await configStorage(infConfigStorage)
         const port = retConfigStorage.res.port
         const clients = new Set();
         const rooms = {};
@@ -85,7 +88,7 @@ async function server(inf) {
             }
         });
 
-        const wss = new WebSocket.Server({ server });
+        const wss = new WebS.Server({ server });
         wss.on('connection', (client, req) => {
             clients.add(client);
             const urlParts = req.url.split('/');
@@ -97,13 +100,12 @@ async function server(inf) {
             rooms[room].add(client);
             client.on('message', async (message) => {
                 const text = message.toString('utf-8');
-                if (rooms[room].size == 1) {
-                    client.send(`WEBSOCKET: NENHUM CLIENTE '${room}'`)
-                    return
+                if (text.length == 0) {
+                    client.send(`WEBSOCKET:  ERRO | MENSAGEM VAZIA '${room}'`)
                 } else {
                     sendRoom(room, text, client);
-                    return
                 }
+                return
             });
             client.on('close', () => {
                 console.log(`WEBSOCKET: CLIENTE DESCONECTADO '${room}'`);
