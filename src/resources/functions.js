@@ -595,9 +595,7 @@ function regexE(inf) {
 
     if (!ret.ret) { console.log(ret.msg) }
     return ret
-}
-
-// export { api, nodeOrBrowser, fileInf, fileWrite, fileRead, configStorage, dateHour, regex, random, globalObject, addListener, regexE };
+};
 
 if (typeof window !== 'undefined') { // CHROME
     window['api'] = api;
