@@ -1,4 +1,6 @@
 *node_modules*
+*__pycache__*
+*.vscode*
 *.z_tempCodeRunner*
 *config.json*
-
+*log*
