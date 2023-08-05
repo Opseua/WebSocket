@@ -39,6 +39,9 @@
 // const retRandom = await random(infRandom)
 // console.log(retRandom)
 // - # -         - # -     - # -     - # -     - # -     - # -     - # -     - # - 
+// for (let i = 0; i < 10; i++) {
+//     console.log(`Iteração ${i + 1}`);
+// }
 // const loop = ['A', 'B', 'C', 'D', 'E'];
 // let i = 0;
 // async function runLoop() {
@@ -130,7 +133,6 @@ async function nodeOrBrowser() {
         ret['ret'] = true;
         ret['msg'] = 'NODE OR BROWSER: OK';
     } catch (e) {
-        //ret['msg'] = `NODE OR BROWSER: ERRO | ${e.message}`;
         ret['msg'] = regexE({ 'e': e.message }).res
     }
 
@@ -181,13 +183,10 @@ async function fileWrite(inf) {
     let ret = { 'ret': false };
     try {
         if (inf.file == undefined || inf.file == '') {
-            //ret['msg'] = `INFORMAR O 'file'`;
             ret['msg'] = `\n #### ERRO ####  FILE WRITE \n INFORMAR O 'file' \n\n`;
         } else if (typeof inf.rewrite !== 'boolean') {
-            //ret['msg'] = `INFORMAR O 'rewrite' TRUE ou FALSE`;
             ret['msg'] = `\n #### ERRO ####  FILE WRITE \n INFORMAR O 'rewrite' TRUE ou FALSE \n\n`;
         } else if (inf.text == undefined || inf.text == '') {
-            //ret['msg'] = `INFORMAR O 'text'`;
             ret['msg'] = `\n #### ERRO ####  FILE WRITE \n INFORMAR O 'text' \n\n`;
         } else {
 
@@ -275,16 +274,13 @@ async function configStorage(inf) {
                     return new Promise((resolve) => {
                         const data = {};
                         if (!inf.key) {
-                            //ret['msg'] = 'STORAGE SET: ERRO | INFORMAR A "key"';
                             ret['msg'] = `\n #### ERRO ####  STORAGE SET \n INFORMAR A 'key' \n\n`;
                         } else if (!inf.value) {
-                            //ret['msg'] = 'STORAGE SET: ERRO | INFORMAR O "value"';
                             ret['msg'] = `\n #### ERRO ####  STORAGE SET \n INFORMAR O 'value' \n\n`;
                         } else {
                             data[inf.key] = inf.value;
                             chrome.storage.local.set(data, async () => {
                                 if (chrome.runtime.lastError) {
-                                    //ret['msg'] = `STORAGE SET: ERRO | ${chrome.runtime.lastError}`;
                                     ret['msg'] = `\n #### ERRO ####  STORAGE SET \n ${chrome.runtime.lastError} \n\n`;
                                 } else {
                                     ret['ret'] = true;
@@ -304,12 +300,10 @@ async function configStorage(inf) {
                 async function storageGet(inf) {
                     return new Promise((resolve) => {
                         if (!inf.key) {
-                            //ret['msg'] = 'STORAGE GET: ERRO | INFORMAR A "key"';
                             ret['msg'] = `\n #### ERRO ####  STORAGE GET \n INFORMAR A 'key' \n\n`;
                         } else {
                             chrome.storage.local.get(inf.key, async (result) => {
                                 if (chrome.runtime.lastError) {
-                                    //ret['msg'] = `STORAGE GET: ERRO | ${chrome.runtime.lastError}`;
                                     ret['msg'] = `\n #### ERRO ####  STORAGE GET \n ${chrome.runtime.lastError} \n\n`;
                                 } else if (Object.keys(result).length === 0) {
                                     async function checkConfig() {
@@ -321,7 +315,6 @@ async function configStorage(inf) {
                                             return new Promise((resolve) => {
                                                 chrome.storage.local.set(data, async () => {
                                                     if (chrome.runtime.lastError) {
-                                                        //ret['msg'] = `STORAGE SET*: ERRO | ${chrome.runtime.lastError}`;
                                                         ret['msg'] = `\n #### ERRO ####  STORAGE SET* \n ${chrome.runtime.lastError} \n\n`;
                                                     } else {
                                                         ret['ret'] = true;
@@ -334,7 +327,6 @@ async function configStorage(inf) {
                                             })
                                         }
                                         else {
-                                            //ret['msg'] = `STORAGE GET: ERRO | CHAVE '${inf.key}' NAO ENCONTRADA`;
                                             ret['msg'] = `\n #### ERRO ####  STORAGE GET \n CHAVE '${inf.key}' NAO ENCONTRADA \n\n`;
                                         }
                                         return ret;
@@ -359,15 +351,12 @@ async function configStorage(inf) {
                 async function storageDel(inf) {
                     return new Promise((resolve) => {
                         if (!inf.key) {
-                            //ret['msg'] = 'STORAGE DEL: ERRO | INFORMAR A "key"';
                             ret['msg'] = `\n #### ERRO ####  STORAGE DEL \n INFORMAR A 'key' \n\n`;
                         } else {
                             chrome.storage.local.get(inf.key, async (result) => {
                                 if (chrome.runtime.lastError) {
-                                    //ret['msg'] = `STORAGE DEL: ERRO | ${chrome.runtime.lastError}`;
                                     ret['msg'] = `\n #### ERRO ####  STORAGE DEL \n ${chrome.runtime.lastError} \n\n`;
                                 } else if (Object.keys(result).length === 0) {
-                                    //ret['msg'] = `STORAGE DEL: ERRO | CHAVE '${inf.key}' NAO ENCONTRADA`;
                                     ret['msg'] = `\n #### ERRO ####  STORAGE DEL \n CHAVE '${inf.key}' NAO ENCONTRADA \n\n`;
                                 } else {
                                     chrome.storage.local.remove(inf.key, async () => { });
@@ -397,10 +386,8 @@ async function configStorage(inf) {
             if (inf.action == 'set') { // CONFIG: SET
                 try {
                     if (!inf.key) {
-                        //ret['msg'] = 'CONFIG SET: ERRO | INFORMAR A "key"';
                         ret['msg'] = `\n #### ERRO ####  CONFIG SET \n INFORMAR A 'key' \n\n`;
                     } else if (!inf.value) {
-                        //ret['msg'] = 'CONFIG SET: ERRO | INFORMAR O "value"';
                         ret['msg'] = `\n #### ERRO ####  CONFIG SET \n INFORMAR O 'value' \n\n`;
                     } else {
                         ret['ret'] = true;
@@ -416,7 +403,6 @@ async function configStorage(inf) {
             if (inf.action == 'get') { // CONFIG NODE: GET
                 try {
                     if (!inf.key) {
-                        //ret['msg'] = 'CONFIG GET: ERRO | INFORMAR A "key"';
                         ret['msg'] = `\n #### ERRO ####  CONFIG GET \n INFORMAR A 'key' \n\n`;
                     } else {
                         if (config[inf.key]) {
@@ -424,7 +410,6 @@ async function configStorage(inf) {
                             ret['msg'] = `CONFIG GET: OK`;
                             ret['res'] = config[inf.key];
                         } else {
-                            //ret['msg'] = `CONFIG GET: ERRO | CHAVE '${inf.key}' NAO ENCONTRADA`;
                             ret['msg'] = `\n #### ERRO ####  CONFIG GET \n CHAVE '${inf.key}' NAO ENCONTRADA \n\n`;
                         }
                     }
@@ -436,7 +421,6 @@ async function configStorage(inf) {
             if (inf.action == 'del') { // CONFIG NODE: DEL
                 try {
                     if (!inf.key) {
-                        //ret['msg'] = 'CONFIG DEL: ERRO | INFORMAR A "key"';
                         ret['msg'] = `\n #### ERRO ####  CONFIG DEL \n INFORMAR A 'key' \n\n`;
                     } else {
                         if (config[inf.key]) {
@@ -445,7 +429,6 @@ async function configStorage(inf) {
                             delete config[inf.key];
                             fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
                         } else {
-                            //ret['msg'] = `CONFIG DEL: ERRO | CHAVE '${inf.key}' NAO ENCONTRADA`;
                             ret['msg'] = `\n #### ERRO ####  CONFIG DEL \n CHAVE '${inf.key}' NAO ENCONTRADA \n\n`;
                         }
                     }
@@ -494,8 +477,11 @@ function regex(inf) {
     let ret = { 'ret': false };
     try {
         if (inf.pattern.includes('(.*?)')) {
-            const result = inf.text.match(inf.pattern);
-            if (result && result[1].length > 0) {
+            const patternSplit = inf.pattern.split('(.*?)');
+            const split1 = patternSplit[0].replace(/[.+?^${}()|[\]\\]/g, '\\$&')
+            const split2 = patternSplit[1].replace(/[.+?^${}()|[\]\\]/g, '\\$&')
+            const result = inf.text.match(`${split1}([\\s\\S]*?)${split2}`);
+            if (result && result.length > 0) {
                 ret['ret'] = true;
                 ret['msg'] = `REGEX: OK`;
                 ret['res'] = {
@@ -504,7 +490,6 @@ function regex(inf) {
                 }
             } else {
                 ret['ret'] = true;
-                //ret['msg'] = `REGEX: ERRO | PADRAO '${inf.pattern}' NAO ENCONTRADO`;
                 ret['msg'] = `\n #### ERRO ####  REGEX \n PADRAO '${inf.pattern}' NAO ENCONTRADO \n\n`;
                 ret['res'] = { 'bolean': false }
             }
@@ -527,7 +512,6 @@ function regex(inf) {
                     }
                 } else {
                     ret['ret'] = true;
-                    //ret['msg'] = `REGEX: ERRO | PADRAO '${inf.pattern}' NAO ENCONTRADO`;
                     ret['msg'] = `\n #### ERRO ####  REGEX \n PADRAO '${inf.pattern}' NAO ENCONTRADO \n\n`;
                     ret['res'] = { 'bolean': false }
                 }
@@ -624,143 +608,3 @@ if (typeof window !== 'undefined') { // CHROME
     global['regexE'] = regexE;
 }
 
-
-
-
-// const { google } = await import('googleapis');
-// const sheets = google.sheets('v4');
-// const spreadsheetId = '1lSl6VUYmp0c32Gu8qwlbtJ-BGdl1gKXB9YC4thffSOk'
-// const sheetTab = 'DADOS'
-// let sheetLin = 0
-// const authClient = new google.auth.GoogleAuth({
-//     keyFile: './src/resources/api.json',
-//     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-// });
-
-// async function lastLin(inf) {
-//     let ret = { 'ret': false };
-//     try {
-
-//         const auth = await authClient.getClient();
-//         const range = `${sheetTab}!A2`;
-//         const response = await sheets.spreadsheets.values.get({ auth, spreadsheetId, range, });
-//         ret['ret'] = true;
-//         ret['msg'] = `LAST LIN: OK`;
-//         ret['res'] = Number(response.data.values[0][0]);
-
-//     } catch (e) {
-//         ret['msg'] = regexE({ 'e': e }).res
-//     }
-
-//     if (!ret.ret) { console.log(ret.msg) }
-//     return ret
-// }
-
-// async function dataGet(inf) {
-//     let ret = { 'ret': false };
-//     try {
-
-//         const auth = await authClient.getClient();
-//         const range = `${sheetTab}!B${inf.lin}`;
-//         const response = await sheets.spreadsheets.values.get({ auth, spreadsheetId, range, });
-//         ret['ret'] = true;
-//         ret['msg'] = `DATA GET: OK`;
-//         ret['res'] = response.data.values;
-
-//     } catch (e) {
-//         ret['msg'] = regexE({ 'e': e }).res
-//     }
-
-//     if (!ret.ret) { console.log(ret.msg) }
-//     return ret
-// }
-
-// async function dataSend(inf) {
-//     let ret = { 'ret': false };
-//     try {
-
-//         const auth = await authClient.getClient();
-//         console.log(auth)
-//         await sheets.spreadsheets.values.update({
-//             auth,
-//             spreadsheetId,
-//             range: `${sheetTab}!B${inf.lin}`,
-//             valueInputOption: 'USER_ENTERED',
-//             resource: { values: [[inf.values]] },
-//         });
-//         ret['ret'] = true;
-//         ret['msg'] = `DATA SEND: OK`;
-
-//     } catch (e) {
-//         ret['msg'] = regexE({ 'e': e }).res
-//     }
-
-//     if (!ret.ret) { console.log(ret.msg) }
-//     return ret
-// }
-
-// async function fun() {
-
-//     const retLastlin = await lastLin()
-//     console.log(retLastlin);
-
-//     const infDataSend = { 'lin': retLastlin.res, 'values': 'Ola' }
-//     const retDataSend = await dataSend(infDataSend)
-//     console.log(retDataSend);
-
-// }
-// //fun()
-
-
-
-
-
-
-
-
-// const { api } = await import('./api.js');
-// const { fileWrite } = await import('./fileWrite.js');
-
-// async function teste() {
-//     let ret = { 'ret': false };
-
-//     try {
-//         perfils = [perfils[0]]
-//         for (let i = 0; i < perfils.length; i++) {
-//             const perfilId = perfils[i];
-
-//             const infApi = {
-//                 url: `https://www.instagram.com/api/v1/users/web_profile_info/?username=${perfilId}`,
-//                 method: 'GET',
-//                 headers: {
-//                     'Content-Type': 'application/json',
-//                     'x-ig-app-id': '936619743392459',
-//                     'sec-fetch-site': 'same-origin'
-//                 }
-//             };
-
-//             const retApi = await api(infApi);
-//             console.log(retApi)
-//             if (!retApi.ret) { ret['ret'] = false; }
-//             const res = JSON.parse(retApi.res.body);
-
-//             const infFileWrite = {
-//                 'file': `PERFILS/${res.data.user.id}=${perfilId}.txt`,
-//                 'rewrite': false,
-//                 'text': JSON.stringify(res)
-//             };
-//             await fileWrite(infFileWrite);
-
-//             ret['ret'] = true;
-//             ret['msg'] = 'FUNCTIONS: OK';
-//             console.log(`${perfils.length} - ${i + 1} | ${res.data.user.id} = ${perfilId}`);
-
-//         }
-//     } catch (e) {
-//         ret['msg'] = regexE({ 'e': e }).res
-//     }
-
-//     if (!ret.ret) { console.log(ret.msg) }
-// }
-
-// teste()
