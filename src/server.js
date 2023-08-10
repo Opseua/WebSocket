@@ -20,7 +20,9 @@ async function server(inf) {
                     if (client !== sender) {
                         client.send(message);
                     } else {
-                        client.send(`WEBSOCKET: OK '${room}'`);
+                        if (message.includes('wsStatus')) {
+                            client.send(`WEBSOCKET: OK '${room}'`);
+                        }
                     }
                 });
             }
@@ -48,7 +50,9 @@ async function server(inf) {
                         } else {
                             sendRoom(room, message, null);
                             res.writeHead(200, { 'Content-Type': 'text/plain' });
-                            res.end(`POST: OK '${room}'`);
+                            if (message.includes('wsStatus')) {
+                                res.end(`POST: OK '${room}'`);
+                            }
                         }
                         return;
                     } else {
@@ -73,7 +77,9 @@ async function server(inf) {
                     } else {
                         sendRoom(room, decodeURIComponent(message), null);
                         res.writeHead(200, { 'Content-Type': 'text/plain' });
-                        res.end(`GET: OK '${room}'`);
+                        if (decodeURIComponent(message).includes('wsStatus')) {
+                            res.end(`GET: OK '${room}'`);
+                        }
                     }
                     return;
                 } else {
