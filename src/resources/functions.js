@@ -85,7 +85,7 @@ async function api(inf) {
                 'headers': resHeaders,
                 'body': resBody
             }
-        } else { // ######################################### NODEJS ou CHROME
+        } else { // NODEJS ou CHROME
             const reqOpt = { 'method': inf.method, 'redirect': 'follow', 'keepalive': true };
             if (inf.headers) {
                 reqOpt['headers'] = inf.headers
@@ -232,7 +232,7 @@ async function fileRead(inf) {
 async function configStorage(inf) {
     let ret = { 'ret': false };
     try {
-        if (typeof window !== 'undefined') { // ################## CHROME
+        if (typeof window !== 'undefined') { // CHROME
 
             if (inf.action == 'set') { // STORAGE: SET
                 await storageSet(inf)
@@ -338,7 +338,7 @@ async function configStorage(inf) {
                 }
             }
 
-        } else { // ################## NODE
+        } else { // NODEJS
 
             const fs = await import('fs');
             const infFileInf = { 'path': new URL(import.meta.url).pathname }
@@ -364,7 +364,7 @@ async function configStorage(inf) {
                 }
             }
 
-            if (inf.action == 'get') { // CONFIG NODE: GET
+            if (inf.action == 'get') { // CONFIG NODEJS: GET
                 try {
                     if (!inf.key) {
                         ret['msg'] = `\n #### ERRO #### CONFIG GET \n INFORMAR A 'key' \n\n`;
@@ -382,7 +382,7 @@ async function configStorage(inf) {
                 }
             }
 
-            if (inf.action == 'del') { // CONFIG NODE: DEL
+            if (inf.action == 'del') { // CONFIG NODEJS: DEL
                 try {
                     if (!inf.key) {
                         ret['msg'] = `\n #### ERRO #### CONFIG DEL \n INFORMAR A 'key' \n\n`;
@@ -555,7 +555,7 @@ if (typeof window !== 'undefined') { // CHROME
     window['gO'] = gO;
     window['gOAdd'] = gOAdd;
     window['gORem'] = gORem;
-} else if (typeof global !== 'undefined') { // NODE
+} else { // NODEJS
     global['fileInf'] = fileInf;
     global['api'] = api;
     global['fileWrite'] = fileWrite;
