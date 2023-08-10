@@ -4,18 +4,15 @@
 // const retFileInf = await fileInf(infFileInf);
 // console.log(retFileInf)
 // - # -         - # -     - # -     - # -     - # -     - # -     - # -     - # - 
-// const infFileWrite = {
+// const infFile = {
+//     'action':'write',
 //     'file': `PASTAS 1/PASTA 2/arquivo.txt`,
 //     'rewrite': true, // 'true' adiciona no MESMO arquivo, 'false' cria outro em branco
 //     'text': `LINHA 1\nLINHA 2\nLINHA 3\n`
 //   };
-//   const retFileWrite = await fileWrite(infFileWrite);
-//   console.log(retFileWrite);
+//   const retFile = await file(infFile);
+//   console.log(retFile);
 // - # -         - # -     - # -     - # -     - # -     - # -     - # -     - # - 
-// const infFileRead = { 'file': `D:/Downloads/Google Chrome/PASTAS 1/PASTA 2/arquivo.txt` }
-// const retFileRead = await fileRead(infFileRead)
-// console.log(retFileRead)
-// - # -         - # -     - # -     - # -     - # -     - # -     - # -     - # -  
 // let infConfigStorage, retConfigStorage
 // infConfigStorage = { 'path': '/src/config.json', 'action': 'set', 'key': 'NomeDaChave', 'value': 'Valor da chave' }
 // retConfigStorage = await configStorage(infConfigStorage)
@@ -85,7 +82,7 @@ async function api(inf) {
                 'headers': resHeaders,
                 'body': resBody
             }
-        } else { // NODEJS ou CHROME
+        } else { // ######################################### NODEJS ou CHROME
             const reqOpt = { 'method': inf.method, 'redirect': 'follow', 'keepalive': true };
             if (inf.headers) {
                 reqOpt['headers'] = inf.headers
@@ -155,72 +152,68 @@ async function fileInf(inf) { // ## CHROME NAO!
     return ret;
 }
 
-async function fileWrite(inf) {
+async function file(inf) {
     let ret = { 'ret': false };
     try {
-        if (inf.file == undefined || inf.file == '') {
-            ret['msg'] = `\n #### ERRO #### FILE WRITE \n INFORMAR O 'file' \n\n`;
-        } else if (typeof inf.rewrite !== 'boolean') {
-            ret['msg'] = `\n #### ERRO #### FILE WRITE \n INFORMAR O 'rewrite' TRUE ou FALSE \n\n`;
-        } else if (inf.text == undefined || inf.text == '') {
-            ret['msg'] = `\n #### ERRO #### FILE WRITE \n INFORMAR O 'text' \n\n`;
+        if (!inf.action || !(inf.action == 'write' || inf.action == 'read')) {
+            ret['msg'] = `\n #### ERRO #### FILE \n INFORMAR O 'action' \n\n`;
         } else {
-            if (typeof window !== 'undefined') { // CHROME
-                let textOk = inf.text;
-                if (inf.rewrite) {
-                    const infFileRead = { 'file': `D:/Downloads/Google Chrome/${inf.file}` }
-                    const retFileRead = await fileRead(infFileRead)
-                    if (retFileRead.ret) { textOk = `${retFileRead.res}${textOk}` }
+            if (inf.action == 'write') {
+                if (!inf.file || inf.file == '') {
+                    ret['msg'] = `\n #### ERRO #### FILE WRITE \n INFORMAR O 'file' \n\n`;
+                } else if (typeof inf.rewrite !== 'boolean') {
+                    ret['msg'] = `\n #### ERRO #### FILE WRITE \n INFORMAR O 'rewrite' TRUE ou FALSE \n\n`;
+                } else if (!inf.text || inf.text == '') {
+                    ret['msg'] = `\n #### ERRO #### FILE WRITE \n INFORMAR O 'text' \n\n`;
+                } else {
+                    if (typeof window !== 'undefined') { // CHROME
+                        let textOk = inf.text;
+                        if (inf.rewrite) {
+                            const infFile = { 'action': 'read', 'file': `D:/Downloads/Google Chrome/${inf.file}` }
+                            const retFile = await file(infFile)
+                            if (retFile.ret) { textOk = `${retFile.res}${textOk}` }
+                        }
+                        const blob = new Blob([textOk], { type: 'text/plain' });
+                        const downloadOptions = {
+                            url: URL.createObjectURL(blob),
+                            filename: inf.file,
+                            saveAs: false, // PERGUNTAR AO USUARIO ONDE SALVAR
+                            conflictAction: 'overwrite' // overwrite (SUBSTITUIR) OU uniquify (REESCREVER→ ADICIONANDO (1), (2), (3)... NO FINAL)
+                        };
+                        chrome.downloads.download(downloadOptions);
+                    } else { // NODEJS
+                        const fs = await import('fs');
+                        const path = await import('path');
+                        async function createDirectoriesRecursive(directoryPath) {
+                            const normalizedPath = path.normalize(directoryPath);
+                            const directories = normalizedPath.split(path.sep);
+                            let currentDirectory = '';
+                            for (let directory of directories) {
+                                currentDirectory += directory + path.sep;
+                                if (!fs.existsSync(currentDirectory)) { await fs.promises.mkdir(currentDirectory); }
+                            }; return true;
+                        }
+                        const folderPath = path.dirname(inf.file);
+                        await createDirectoriesRecursive(folderPath);
+                        await fs.promises.writeFile(inf.file, inf.text, { flag: inf.rewrite ? 'a' : 'w' });
+                    }
+                    ret['ret'] = true;
+                    ret['msg'] = `FILE WRITE: OK`;
                 }
-                const blob = new Blob([textOk], { type: 'text/plain' });
-                const downloadOptions = {
-                    url: URL.createObjectURL(blob),
-                    filename: inf.file,
-                    saveAs: false, // PERGUNTAR AO USUARIO ONDE SALVAR
-                    conflictAction: 'overwrite' // overwrite (SUBSTITUIR) OU uniquify (REESCREVER→ ADICIONANDO (1), (2), (3)... NO FINAL)
-                };
-                chrome.downloads.download(downloadOptions);
-            } else { // NODEJS
-                const fs = await import('fs');
-                const path = await import('path');
-                async function createDirectoriesRecursive(directoryPath) {
-                    const normalizedPath = path.normalize(directoryPath);
-                    const directories = normalizedPath.split(path.sep);
-                    let currentDirectory = '';
-                    for (let directory of directories) {
-                        currentDirectory += directory + path.sep;
-                        if (!fs.existsSync(currentDirectory)) { await fs.promises.mkdir(currentDirectory); }
-                    }; return true;
+            } else {
+                let retFetch
+                if (typeof window !== 'undefined') { // CHROME
+                    retFetch = await fetch(`file:///${inf.file}`);
+                    retFetch = await retFetch.text();
+                } else { // NODEJS
+                    const fs = await import('fs');
+                    retFetch = fs.readFileSync(inf.file.replace(/\//g, '\\'), 'utf8');
                 }
-                const folderPath = path.dirname(inf.file);
-                await createDirectoriesRecursive(folderPath);
-                await fs.promises.writeFile(inf.file, inf.text, { flag: inf.rewrite ? 'a' : 'w' });
+                ret['ret'] = true;
+                ret['msg'] = `FILE READ: OK`;
+                ret['res'] = retFetch;
             }
-            ret['ret'] = true;
-            ret['msg'] = `FILE WRITE: OK`;
         }
-    } catch (e) {
-        ret['msg'] = regexE({ 'e': e }).res;
-    }
-
-    if (!ret.ret) { console.log(ret.msg) }
-    return ret;
-}
-
-async function fileRead(inf) {
-    let ret = { 'ret': false };
-    try {
-        let retFetch
-        if (typeof window !== 'undefined') { // CHROME
-            retFetch = await fetch(`file:///${inf.file}`);
-            retFetch = await retFetch.text();
-        } else { // NODEJS
-            const fs = await import('fs');
-            retFetch = fs.readFileSync(inf.file.replace(/\//g, '\\'), 'utf8');
-        }
-        ret['ret'] = true;
-        ret['msg'] = `FILE READ: OK`;
-        ret['res'] = retFetch;
     } catch (e) {
         ret['msg'] = regexE({ 'e': e }).res;
     }
@@ -338,7 +331,7 @@ async function configStorage(inf) {
                 }
             }
 
-        } else { // NODEJS
+        } else { // ################## NODE
 
             const fs = await import('fs');
             const infFileInf = { 'path': new URL(import.meta.url).pathname }
@@ -364,7 +357,7 @@ async function configStorage(inf) {
                 }
             }
 
-            if (inf.action == 'get') { // CONFIG NODEJS: GET
+            if (inf.action == 'get') { // CONFIG NODE: GET
                 try {
                     if (!inf.key) {
                         ret['msg'] = `\n #### ERRO #### CONFIG GET \n INFORMAR A 'key' \n\n`;
@@ -382,7 +375,7 @@ async function configStorage(inf) {
                 }
             }
 
-            if (inf.action == 'del') { // CONFIG NODEJS: DEL
+            if (inf.action == 'del') { // CONFIG NODE: DEL
                 try {
                     if (!inf.key) {
                         ret['msg'] = `\n #### ERRO #### CONFIG DEL \n INFORMAR A 'key' \n\n`;
@@ -545,8 +538,7 @@ function regexE(inf) {
 
 if (typeof window !== 'undefined') { // CHROME
     window['api'] = api;
-    window['fileWrite'] = fileWrite;
-    window['fileRead'] = fileRead;
+    window['file'] = file;
     window['configStorage'] = configStorage;
     window['dateHour'] = dateHour;
     window['regex'] = regex;
@@ -558,8 +550,7 @@ if (typeof window !== 'undefined') { // CHROME
 } else { // NODEJS
     global['fileInf'] = fileInf;
     global['api'] = api;
-    global['fileWrite'] = fileWrite;
-    global['fileRead'] = fileRead;
+    global['file'] = file;
     global['configStorage'] = configStorage;
     global['dateHour'] = dateHour;
     global['regex'] = regex;
