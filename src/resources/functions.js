@@ -1,8 +1,5 @@
 // await import('./functions.js');
 
-// const retNodeOrBrowser = await nodeOrBrowser();
-// console.log(retNodeOrBrowser);
-// - # -         - # -     - # -     - # -     - # -     - # -     - # -     - # -  
 // const infFileInf = { 'path': new URL(import.meta.url).pathname } // ## CHROME NAO!
 // const retFileInf = await fileInf(infFileInf);
 // console.log(retFileInf)
@@ -66,6 +63,7 @@
 // await new Promise(resolve => setTimeout(resolve, (2500)));
 // globalObject.inf = { 'alert': true, 'function': 'Nome', 'res': 'AAAAA' };
 
+
 async function api(inf) {
     let ret = { 'ret': false };
     try {
@@ -112,28 +110,6 @@ async function api(inf) {
         }
     } catch (e) {
         ret['msg'] = regexE({ 'e': e }).res
-    }
-
-    if (!ret.ret) { console.log(ret.msg) }
-    return ret
-}
-
-async function nodeOrBrowser() {
-    let ret = { 'ret': false }
-    try {
-        if (typeof process !== 'undefined') { // NODE
-            ret['res'] = 'node'
-        } else if (typeof window !== 'undefined') { // CHROME
-            ret['res'] = 'chrome'
-        } else if (typeof UrlFetchApp !== 'undefined') { // GOOGLE APP SCRIPT
-            ret['res'] = 'googleAppScript'
-        } else { // NAO IDENTIFICADO
-            ret['res'] = 'NAO IDENTIFICADO'
-        }
-        ret['ret'] = true;
-        ret['msg'] = 'NODE OR BROWSER: OK';
-    } catch (e) {
-        ret['msg'] = regexE({ 'e': e.message }).res
     }
 
     if (!ret.ret) { console.log(ret.msg) }
@@ -189,26 +165,7 @@ async function fileWrite(inf) {
         } else if (inf.text == undefined || inf.text == '') {
             ret['msg'] = `\n #### ERRO #### FILE WRITE \n INFORMAR O 'text' \n\n`;
         } else {
-
-            const resNodeOrBrowser = await nodeOrBrowser()
-            if (resNodeOrBrowser.res == 'node') {
-                // NODEJS
-                const fs = await import('fs');
-                const path = await import('path');
-                async function createDirectoriesRecursive(directoryPath) {
-                    const normalizedPath = path.normalize(directoryPath);
-                    const directories = normalizedPath.split(path.sep);
-                    let currentDirectory = '';
-                    for (let directory of directories) {
-                        currentDirectory += directory + path.sep;
-                        if (!fs.existsSync(currentDirectory)) { await fs.promises.mkdir(currentDirectory); }
-                    }; return true;
-                }
-                const folderPath = path.dirname(inf.file);
-                await createDirectoriesRecursive(folderPath);
-                await fs.promises.writeFile(inf.file, inf.text, { flag: inf.rewrite ? 'a' : 'w' });
-            } else {
-                // CHROME
+            if (typeof window !== 'undefined') { // CHROME
                 let textOk = inf.text;
                 if (inf.rewrite) {
                     const infFileRead = { 'file': `D:/Downloads/Google Chrome/${inf.file}` }
@@ -223,6 +180,21 @@ async function fileWrite(inf) {
                     conflictAction: 'overwrite' // overwrite (SUBSTITUIR) OU uniquify (REESCREVER→ ADICIONANDO (1), (2), (3)... NO FINAL)
                 };
                 chrome.downloads.download(downloadOptions);
+            } else { // NODEJS
+                const fs = await import('fs');
+                const path = await import('path');
+                async function createDirectoriesRecursive(directoryPath) {
+                    const normalizedPath = path.normalize(directoryPath);
+                    const directories = normalizedPath.split(path.sep);
+                    let currentDirectory = '';
+                    for (let directory of directories) {
+                        currentDirectory += directory + path.sep;
+                        if (!fs.existsSync(currentDirectory)) { await fs.promises.mkdir(currentDirectory); }
+                    }; return true;
+                }
+                const folderPath = path.dirname(inf.file);
+                await createDirectoriesRecursive(folderPath);
+                await fs.promises.writeFile(inf.file, inf.text, { flag: inf.rewrite ? 'a' : 'w' });
             }
             ret['ret'] = true;
             ret['msg'] = `FILE WRITE: OK`;
@@ -239,16 +211,12 @@ async function fileRead(inf) {
     let ret = { 'ret': false };
     try {
         let retFetch
-        const retNodeOrBrowser = await nodeOrBrowser();
-
-        if (retNodeOrBrowser.res == 'node') { // ################## NODE
-            const fs = await import('fs');
-            retFetch = fs.readFileSync(inf.file.replace(/\//g, '\\'), 'utf8');
-        }
-
-        if (retNodeOrBrowser.res == 'chrome') { // ################## CHROME
+        if (typeof window !== 'undefined') { // CHROME
             retFetch = await fetch(`file:///${inf.file}`);
             retFetch = await retFetch.text();
+        } else { // NODEJS
+            const fs = await import('fs');
+            retFetch = fs.readFileSync(inf.file.replace(/\//g, '\\'), 'utf8');
         }
         ret['ret'] = true;
         ret['msg'] = `FILE READ: OK`;
@@ -264,9 +232,7 @@ async function fileRead(inf) {
 async function configStorage(inf) {
     let ret = { 'ret': false };
     try {
-        const retNodeOrBrowser = await nodeOrBrowser();
-
-        if (retNodeOrBrowser.res == 'chrome') { // ################## CHROME
+        if (typeof window !== 'undefined') { // ################## CHROME
 
             if (inf.action == 'set') { // STORAGE: SET
                 await storageSet(inf)
@@ -275,7 +241,7 @@ async function configStorage(inf) {
                         const data = {};
                         if (!inf.key) {
                             ret['msg'] = `\n #### ERRO #### STORAGE SET \n INFORMAR A 'key' \n\n`;
-                        } else if (!inf.value) {
+                        } else if (!inf.value && !inf.value == false) {
                             ret['msg'] = `\n #### ERRO #### STORAGE SET \n INFORMAR O 'value' \n\n`;
                         } else {
                             data[inf.key] = inf.value;
@@ -372,9 +338,7 @@ async function configStorage(inf) {
                 }
             }
 
-        }
-
-        if (retNodeOrBrowser.res == 'node') { // ################## NODE
+        } else { // ################## NODE
 
             const fs = await import('fs');
             const infFileInf = { 'path': new URL(import.meta.url).pathname }
@@ -387,7 +351,7 @@ async function configStorage(inf) {
                 try {
                     if (!inf.key) {
                         ret['msg'] = `\n #### ERRO #### CONFIG SET \n INFORMAR A 'key' \n\n`;
-                    } else if (!inf.value) {
+                    } else if (!inf.value && !inf.value == false) {
                         ret['msg'] = `\n #### ERRO #### CONFIG SET \n INFORMAR O 'value' \n\n`;
                     } else {
                         ret['ret'] = true;
@@ -477,46 +441,38 @@ function regex(inf) {
     let ret = { 'ret': false };
     try {
         if (inf.pattern.includes('(.*?)')) {
+            let res = {}
             const patternSplit = inf.pattern.split('(.*?)');
             const split1 = patternSplit[0].replace(/[.+?^${}()|[\]\\]/g, '\\$&')
             const split2 = patternSplit[1].replace(/[.+?^${}()|[\]\\]/g, '\\$&')
-            const result = inf.text.match(`${split1}([\\s\\S]*?)${split2}`);
-            if (result && result.length > 0) {
-                ret['ret'] = true;
-                ret['msg'] = `REGEX: OK`;
-                ret['res'] = {
-                    'bolean': true,
-                    'text': result[1]
-                }
-            } else {
-                ret['ret'] = true;
-                ret['msg'] = `\n #### ERRO #### REGEX \n PADRAO '${inf.pattern}' NAO ENCONTRADO \n\n`;
-                ret['res'] = { 'bolean': false }
-            }
+            const result1 = inf.text.match(`${split1}(.*?)${split2}`);
+            const result2 = inf.text.match(`(?<=${split1})(.+)(?=${split2})`);
+            const result3 = inf.text.match(`${split1}([\\s\\S]*?)${split2}`);
+            const result4 = inf.text.match(`(?<=${split1})([\\s\\S]+)(?=${split2})`);
+            if (result1 && result1.length > 0) { res['1'] = result1[1] }
+            else { res['1'] = `[-|<] PADRAO '${inf.pattern}' NAO ENCONTRADO` } // SEM QUEBRA DE LINHA ATE A PRIMEIRA OCORRENCIA
+            if (result2 && result2.length > 0) { res['2'] = result2[1] }
+            else { res['2'] = `[-|>] PADRAO '${inf.pattern}' NAO ENCONTRADO` } // SEM QUEBRA DE LINHA ATE A ULTIMA OCORRENCIA
+            if (result3 && result3.length > 0) { res['3'] = result3[1] }
+            else { res['3'] = `[^|<] PADRAO '${inf.pattern}' NAO ENCONTRADO` } // COM QUEBRA DE LINHA ATE A PRIMEIRA OCORRENCIA
+            if (result4 && result4.length > 0) { res['4'] = result4[1] }
+            else { res['4'] = `[^|>] PADRAO '${inf.pattern}' NAO ENCONTRADO` } // COM QUEBRA DE LINHA ATE A ULTIMA OCORRENCIA
+            ret['msg'] = `REGEX: OK`;
+            ret['res'] = { 'bolean': true, 'text': res }
         } else {
             const pattern = inf.pattern.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*');
             const result = new RegExp(`^${pattern}$`).test(inf.text);
-            if (inf.simple) {
+            if (inf.simple) { if (result) { return true } else { return false } } else {
                 if (result) {
-                    return true
-                } else {
-                    return false
-                }
-            } else {
-                if (result) {
-                    ret['ret'] = true;
                     ret['msg'] = `REGEX: OK`;
-                    ret['res'] = {
-                        'bolean': true,
-                        'text': 'TEXTO POSSUI O PADRAO'
-                    }
+                    ret['res'] = { 'bolean': true, 'text': 'TEXTO POSSUI O PADRAO' }
                 } else {
-                    ret['ret'] = true;
                     ret['msg'] = `\n #### ERRO #### REGEX \n PADRAO '${inf.pattern}' NAO ENCONTRADO \n\n`;
                     ret['res'] = { 'bolean': false }
                 }
             }
         }
+        ret['ret'] = true;
     } catch (e) {
         ret['msg'] = regexE({ 'e': e }).res
     }
@@ -548,17 +504,23 @@ async function random(inf) {
 }
 
 // ############### GLOBAL OBJECT ###############
-const data = { inf: false };
+const data = { inf: '' };
 const listeners = new Set();
-const globalObject = new Proxy(data, {
+const gO = new Proxy(data, {
     set(target, key, value) {
-        target[key] = value; globalChanged(value);
-        listeners.forEach(listener => listener(target)); return true
+        target[key] = value;
+        globalChanged(value);
+        listeners.forEach(listener => listener(target));
+        return true
     }
 });
-function addListener(listener) { listeners.add(listener) }
-function removeListener(listener) { listeners.delete(listener) }
-async function globalChanged(i) { if (i.alert !== false) { console.log('globalObject ALTERADO →', i) } }
+function gOAdd(listener) { listeners.add(listener) }
+function gORem(listener) { listeners.delete(listener) }
+async function globalChanged(i) {
+    if (i.alert !== false) {
+        //console.log('globalObject ALTERADO →', i)
+    }
+}
 // ############### ###############
 
 function regexE(inf) {
@@ -583,28 +545,28 @@ function regexE(inf) {
 
 if (typeof window !== 'undefined') { // CHROME
     window['api'] = api;
-    window['nodeOrBrowser'] = nodeOrBrowser;
     window['fileWrite'] = fileWrite;
     window['fileRead'] = fileRead;
     window['configStorage'] = configStorage;
     window['dateHour'] = dateHour;
     window['regex'] = regex;
     window['random'] = random;
-    window['globalObject'] = globalObject;
-    window['addListener'] = addListener;
     window['regexE'] = regexE;
+    window['gO'] = gO;
+    window['gOAdd'] = gOAdd;
+    window['gORem'] = gORem;
 } else if (typeof global !== 'undefined') { // NODE
     global['fileInf'] = fileInf;
     global['api'] = api;
-    global['nodeOrBrowser'] = nodeOrBrowser;
     global['fileWrite'] = fileWrite;
     global['fileRead'] = fileRead;
     global['configStorage'] = configStorage;
     global['dateHour'] = dateHour;
     global['regex'] = regex;
     global['random'] = random;
-    global['globalObject'] = globalObject;
-    global['addListener'] = addListener;
     global['regexE'] = regexE;
+    global['gO'] = gO;
+    global['gOAdd'] = gOAdd;
+    global['gORem'] = gORem;
 }
 
