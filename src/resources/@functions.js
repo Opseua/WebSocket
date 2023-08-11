@@ -1,5 +1,3 @@
-// await import('./functions.js');
-
 // const infFileInf = { 'path': new URL(import.meta.url).pathname } // ## CHROME NAO!
 // const retFileInf = await fileInf(infFileInf);
 // console.log(retFileInf)
@@ -7,7 +5,7 @@
 // const infFile = {
 //     'action':'write',
 //     'file': `PASTAS 1/PASTA 2/arquivo.txt`,
-//     'rewrite': true, // 'true' adiciona no MESMO arquivo, 'false' cria outro em branco
+//     'rewrite': true, // 'true' adiciona, 'false' limpa
 //     'text': `LINHA 1\nLINHA 2\nLINHA 3\n`
 //   };
 //   const retFile = await file(infFile);
@@ -15,13 +13,7 @@
 // - # -         - # -     - # -     - # -     - # -     - # -     - # -     - # - 
 // let infConfigStorage, retConfigStorage
 // infConfigStorage = { 'path': '/src/config.json', 'action': 'set', 'key': 'NomeDaChave', 'value': 'Valor da chave' }
-// retConfigStorage = await configStorage(infConfigStorage)
-// console.log(retConfigStorage)
-
 // infConfigStorage = { 'path': '/src/config.json', 'action': 'get', 'key': 'NomeDaChave' }
-// retConfigStorage = await configStorage(infConfigStorage)
-// console.log(retConfigStorage)
-
 // infConfigStorage = { 'path': '/src/config.json', 'action': 'del', 'key': 'NomeDaChave' }
 // retConfigStorage = await configStorage(infConfigStorage)
 // console.log(retConfigStorage)
@@ -59,7 +51,6 @@
 // - # -         - # -     - # -     - # -     - # -     - # -     - # -     - # - 
 // await new Promise(resolve => setTimeout(resolve, (2500)));
 // globalObject.inf = { 'alert': true, 'function': 'Nome', 'res': 'AAAAA' };
-
 
 async function api(inf) {
     let ret = { 'ret': false };
@@ -169,7 +160,8 @@ async function file(inf) {
                     if (typeof window !== 'undefined') { // CHROME
                         let textOk = inf.text;
                         if (inf.rewrite) {
-                            const infFile = { 'action': 'read', 'file': `D:/Downloads/Google Chrome/${inf.file}` }
+                            const file = inf.file.includes(':') ? inf.file.slice(3) : inf.file;
+                            const infFile = { 'action': 'read', 'file': `D:/Downloads/Google Chrome/${file}` }
                             const retFile = await file(infFile)
                             if (retFile.ret) { textOk = `${retFile.res}${textOk}` }
                         }
@@ -537,8 +529,10 @@ function regexE(inf) {
 };
 
 if (typeof window !== 'undefined') { // CHROME
+    // ## functions
     window['api'] = api;
     window['file'] = file;
+    window['fileInf'] = fileInf;
     window['configStorage'] = configStorage;
     window['dateHour'] = dateHour;
     window['regex'] = regex;
@@ -548,9 +542,10 @@ if (typeof window !== 'undefined') { // CHROME
     window['gOAdd'] = gOAdd;
     window['gORem'] = gORem;
 } else { // NODEJS
-    global['fileInf'] = fileInf;
+    // ## functions
     global['api'] = api;
     global['file'] = file;
+    global['fileInf'] = fileInf;
     global['configStorage'] = configStorage;
     global['dateHour'] = dateHour;
     global['regex'] = regex;
@@ -560,4 +555,3 @@ if (typeof window !== 'undefined') { // CHROME
     global['gOAdd'] = gOAdd;
     global['gORem'] = gORem;
 }
-

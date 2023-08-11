@@ -1,5 +1,5 @@
 await import('./resources/clearConsole.js');
-await import('./resources/functions.js');
+await import('./resources/@functions.js');
 const { default: http } = await import('http');
 const { default: WebSocket } = await import('isomorphic-ws');
 let WebS = WebSocket;
