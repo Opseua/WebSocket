@@ -1,3 +1,22 @@
+// ## outros
+await import('./chatGpt.js');
+await import('./clipboard.js');
+await import('./excel.js');
+await import('./getCookies.js');
+await import('./notification.js');
+await import('./promptChrome.js');
+await import('./setTag.js');
+await import('./sniffer.js');
+await import('./splitText.js');
+await import('./tabSearch.js');
+await import('./translate.js');
+await import('./websocketRet.js');
+// actions | scripts
+await import('../scripts/command1.js');
+await import('../scripts/command2.js');
+await import('../scripts/oneFormaMTPE.js');
+await import('../scripts/peroptyx.js');
+
 // const infFileInf = { 'path': new URL(import.meta.url).pathname } // ## CHROME NAO!
 // const retFileInf = await fileInf(infFileInf);
 // console.log(retFileInf)
@@ -99,7 +118,7 @@ async function api(inf) {
     } catch (e) {
         ret['msg'] = regexE({ 'e': e }).res
     }
-    if(!ret.ret) { console.log(ret.msg) }
+    if (!ret.ret) { console.log(ret.msg) }
     return ret
 }
 
@@ -137,7 +156,7 @@ async function fileInf(inf) { // ## CHROME NAO!
     } catch (e) {
         ret['msg'] = regexE({ 'e': e }).res;
     }
-    if(!ret.ret) { console.log(ret.msg) }
+    if (!ret.ret) { console.log(ret.msg) }
     return ret;
 }
 
@@ -158,10 +177,13 @@ async function file(inf) {
                     if (typeof window !== 'undefined') { // CHROME
                         let textOk = inf.text;
                         if (inf.rewrite) {
+                            let retFetch
                             const file = inf.file.includes(':') ? inf.file.slice(3) : inf.file;
-                            const infFile = { 'action': 'read', 'file': `D:/Downloads/Google Chrome/${file}` }
-                            const retFile = await file(infFile)
-                            if (retFile.ret) { textOk = `${retFile.res}${textOk}` }
+                            try {
+                                retFetch = await fetch(`file:///D:/Downloads/Google Chrome/${file}`);
+                                retFetch = await retFetch.text();
+                                textOk = `${retFetch}${textOk}`
+                            } catch (e) { }
                         }
                         const blob = new Blob([textOk], { type: 'text/plain' });
                         const downloadOptions = {
@@ -207,7 +229,7 @@ async function file(inf) {
     } catch (e) {
         ret['msg'] = regexE({ 'e': e }).res;
     }
-    if(!ret.ret) { console.log(ret.msg) }
+    if (!ret.ret) { console.log(ret.msg) }
     return ret;
 }
 
@@ -388,7 +410,7 @@ async function configStorage(inf) {
     catch (e) {
         ret['msg'] = regexE({ 'e': e }).res;
     }
-    if(!ret.ret) { console.log(ret.msg) }
+    if (!ret.ret) { console.log(ret.msg) }
     return ret
 }
 
@@ -396,7 +418,9 @@ function dateHour() { // NAO POR COMO 'async'!!!
     let ret = { 'ret': false };
     try {
         const date = new Date();
-        const retDate = {
+        ret['ret'] = true;
+        ret['msg'] = `DATE HOUR: OK`;
+        ret['res'] = {
             'day': String(date.getDate()).padStart(2, '0'),
             'mon': String(date.getMonth() + 1).padStart(2, '0'),
             'yea': String(date.getFullYear()),
@@ -405,15 +429,12 @@ function dateHour() { // NAO POR COMO 'async'!!!
             'sec': String(date.getSeconds()).padStart(2, '0'),
             'mil': String(date.getMilliseconds()).padStart(3, '0'),
             'tim': Date.now()
-        }
-        ret['ret'] = true;
-        ret['msg'] = `DATE HOUR: OK`;
-        ret['res'] = retDate;
+        };
     }
     catch (e) {
         ret['msg'] = regexE({ 'e': e }).res;
     }
-    if(!ret.ret) { console.log(ret.msg) }
+    if (!ret.ret) { console.log(ret.msg) }
     return ret
 }
 
@@ -421,7 +442,7 @@ function regex(inf) {
     let ret = { 'ret': false };
     try {
         if (inf.pattern.includes('(.*?)')) {
-            let res = {}
+            let res = {}; let ok = false
             const patternSplit = inf.pattern.split('(.*?)');
             const split1 = patternSplit[0].replace(/[.+?^${}()|[\]\\]/g, '\\$&')
             const split2 = patternSplit[1].replace(/[.+?^${}()|[\]\\]/g, '\\$&')
@@ -429,34 +450,55 @@ function regex(inf) {
             const result2 = inf.text.match(`(?<=${split1})(.+)(?=${split2})`);
             const result3 = inf.text.match(`${split1}([\\s\\S]*?)${split2}`);
             const result4 = inf.text.match(`(?<=${split1})([\\s\\S]+)(?=${split2})`);
-            if (result1 && result1.length > 0) { res['1'] = result1[1] }
-            else { res['1'] = `[-|<] PADRAO '${inf.pattern}' NAO ENCONTRADO` } // SEM QUEBRA DE LINHA ATE A PRIMEIRA OCORRENCIA
-            if (result2 && result2.length > 0) { res['2'] = result2[1] }
-            else { res['2'] = `[-|>] PADRAO '${inf.pattern}' NAO ENCONTRADO` } // SEM QUEBRA DE LINHA ATE A ULTIMA OCORRENCIA
-            if (result3 && result3.length > 0) { res['3'] = result3[1] }
-            else { res['3'] = `[^|<] PADRAO '${inf.pattern}' NAO ENCONTRADO` } // COM QUEBRA DE LINHA ATE A PRIMEIRA OCORRENCIA
-            if (result4 && result4.length > 0) { res['4'] = result4[1] }
-            else { res['4'] = `[^|>] PADRAO '${inf.pattern}' NAO ENCONTRADO` } // COM QUEBRA DE LINHA ATE A ULTIMA OCORRENCIA
-            ret['msg'] = `REGEX: OK`;
-            ret['res'] = { 'bolean': true, 'text': res }
+            if (result1 && result1.length > 0) {
+                res['1'] = result1[1];
+                ok = true
+            }
+            else { // SEM QUEBRA DE LINHA ATE A PRIMEIRA OCORRENCIA
+                res['1'] = `[-|<] PADRAO '${inf.pattern}' NAO ENCONTRADO`
+            }
+            if (result2 && result2.length > 0) {
+                res['2'] = result2[1];
+                ok = true
+            }
+            else { // SEM QUEBRA DE LINHA ATE A ULTIMA OCORRENCIA
+                res['2'] = `[-|>] PADRAO '${inf.pattern}' NAO ENCONTRADO`
+            }
+            if (result3 && result3.length > 0) {
+                res['3'] = result3[1];
+                ok = true
+            }
+            else { // COM QUEBRA DE LINHA ATE A PRIMEIRA OCORRENCIA
+                res['3'] = `[^|<] PADRAO '${inf.pattern}' NAO ENCONTRADO`
+            }
+            if (result4 && result4.length > 0) {
+                res['4'] = result4[1];
+                ok = true
+            }
+            else { // COM QUEBRA DE LINHA ATE A ULTIMA OCORRENCIA
+                res['4'] = `[^|>] PADRAO '${inf.pattern}' NAO ENCONTRADO`
+            }
+            if (ok) {
+                ret['msg'] = `REGEX: OK`;
+                ret['res'] = res;
+                ret['ret'] = true;
+            }
         } else {
             const pattern = inf.pattern.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*');
             const result = new RegExp(`^${pattern}$`).test(inf.text);
             if (inf.simple) { if (result) { return true } else { return false } } else {
                 if (result) {
                     ret['msg'] = `REGEX: OK`;
-                    ret['res'] = { 'bolean': true, 'text': 'TEXTO POSSUI O PADRAO' }
-                } else {
-                    ret['msg'] = `\n #### ERRO #### REGEX \n PADRAO '${inf.pattern}' NAO ENCONTRADO \n\n`;
-                    ret['res'] = { 'bolean': false }
+                    ret['res'] = 'TEXTO POSSUI O PADRAO';
+                    ret['ret'] = true;
                 }
+                else { ret['msg'] = `\n #### ERRO #### REGEX \n PADRAO '${inf.pattern}' NAO ENCONTRADO \n\n`; }
             }
         }
-        ret['ret'] = true;
     } catch (e) {
         ret['msg'] = regexE({ 'e': e }).res
+        console.log(ret.msg)
     }
-    if(!ret.ret) { console.log(ret.msg) }
     return ret
 }
 
@@ -477,7 +519,7 @@ async function random(inf) {
     } catch (e) {
         ret['msg'] = regexE({ 'e': e }).res
     }
-    if(!ret.ret) { console.log(ret.msg) }
+    if (!ret.ret) { console.log(ret.msg) }
     return ret
 }
 
@@ -516,7 +558,7 @@ function regexE(inf) {
         const match = e.stack.match(/(\w+\.\w+):(\d+):\d+/);
         ret['msg'] = `\n #### ERRO #### ${match[1]} [${match[2]}] \n ${e.toString()} \n\n`
     }
-    if(!ret.ret) { console.log(ret.msg) }
+    if (!ret.ret) { console.log(ret.msg) }
     return ret
 };
 
@@ -533,6 +575,24 @@ if (typeof window !== 'undefined') { // CHROME
     window['gO'] = gO;
     window['gOAdd'] = gOAdd;
     window['gORem'] = gORem;
+    // ## outros
+    window['chatGpt'] = chatGpt;
+    window['clipboard'] = clipboard;
+    window['excel'] = excel;
+    window['getCookies'] = getCookies;
+    window['notification'] = notification;
+    window['promptChrome'] = promptChrome;
+    window['setTag'] = setTag;
+    window['sniffer'] = sniffer;
+    window['splitText'] = splitText;
+    window['tabSearch'] = tabSearch;
+    window['translate'] = translate;
+    window['websocketRet'] = websocketRet;
+    // ## actions | scripts
+    window['command1'] = command1;
+    window['command2'] = command2;
+    window['oneFormaMTPE'] = oneFormaMTPE;
+    window['peroptyx'] = peroptyx;
 } else { // NODEJS
     // ## functions
     global['api'] = api;
@@ -546,4 +606,22 @@ if (typeof window !== 'undefined') { // CHROME
     global['gO'] = gO;
     global['gOAdd'] = gOAdd;
     global['gORem'] = gORem;
+    // ## outros
+    global['chatGpt'] = chatGpt;
+    global['clipboard'] = clipboard;
+    global['excel'] = excel;
+    global['getCookies'] = getCookies;
+    global['notification'] = notification;
+    global['promptChrome'] = promptChrome;
+    global['setTag'] = setTag;
+    global['sniffer'] = sniffer;
+    global['splitText'] = splitText;
+    global['tabSearch'] = tabSearch;
+    global['translate'] = translate;
+    global['websocketRet'] = websocketRet;
+    // ## actions | scripts
+    global['command1'] = command1;
+    global['command2'] = command2;
+    global['oneFormaMTPE'] = oneFormaMTPE;
+    global['peroptyx'] = peroptyx;
 }
