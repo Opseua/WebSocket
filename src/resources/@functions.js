@@ -1,22 +1,3 @@
-// ## outros
-await import('./chatGpt.js');
-await import('./clipboard.js');
-await import('./excel.js');
-await import('./getCookies.js');
-await import('./notification.js');
-await import('./promptChrome.js');
-await import('./setTag.js');
-await import('./sniffer.js');
-await import('./splitText.js');
-await import('./tabSearch.js');
-await import('./translate.js');
-await import('./websocketRet.js');
-// actions | scripts
-await import('../scripts/command1.js');
-await import('../scripts/command2.js');
-await import('../scripts/oneFormaMTPE.js');
-await import('../scripts/peroptyx.js');
-
 // const infFileInf = { 'path': new URL(import.meta.url).pathname } // ## CHROME NAO!
 // const retFileInf = await fileInf(infFileInf);
 // console.log(retFileInf)
@@ -575,24 +556,6 @@ if (typeof window !== 'undefined') { // CHROME
     window['gO'] = gO;
     window['gOAdd'] = gOAdd;
     window['gORem'] = gORem;
-    // ## outros
-    window['chatGpt'] = chatGpt;
-    window['clipboard'] = clipboard;
-    window['excel'] = excel;
-    window['getCookies'] = getCookies;
-    window['notification'] = notification;
-    window['promptChrome'] = promptChrome;
-    window['setTag'] = setTag;
-    window['sniffer'] = sniffer;
-    window['splitText'] = splitText;
-    window['tabSearch'] = tabSearch;
-    window['translate'] = translate;
-    window['websocketRet'] = websocketRet;
-    // ## actions | scripts
-    window['command1'] = command1;
-    window['command2'] = command2;
-    window['oneFormaMTPE'] = oneFormaMTPE;
-    window['peroptyx'] = peroptyx;
 } else { // NODEJS
     // ## functions
     global['api'] = api;
@@ -606,22 +569,4 @@ if (typeof window !== 'undefined') { // CHROME
     global['gO'] = gO;
     global['gOAdd'] = gOAdd;
     global['gORem'] = gORem;
-    // ## outros
-    global['chatGpt'] = chatGpt;
-    global['clipboard'] = clipboard;
-    global['excel'] = excel;
-    global['getCookies'] = getCookies;
-    global['notification'] = notification;
-    global['promptChrome'] = promptChrome;
-    global['setTag'] = setTag;
-    global['sniffer'] = sniffer;
-    global['splitText'] = splitText;
-    global['tabSearch'] = tabSearch;
-    global['translate'] = translate;
-    global['websocketRet'] = websocketRet;
-    // ## actions | scripts
-    global['command1'] = command1;
-    global['command2'] = command2;
-    global['oneFormaMTPE'] = oneFormaMTPE;
-    global['peroptyx'] = peroptyx;
 }
