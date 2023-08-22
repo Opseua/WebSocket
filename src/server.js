@@ -27,7 +27,6 @@ async function server(inf) {
                 });
             }
         }
-
         const server = http.createServer(async (req, res) => {
             if (req.method === 'POST') {
                 let requestBody = '';
@@ -50,9 +49,7 @@ async function server(inf) {
                         } else {
                             sendRoom(room, message, null);
                             res.writeHead(200, { 'Content-Type': 'text/plain' });
-                            if (message.includes('wsStatus')) {
-                                res.end(`POST: OK '${room}'`);
-                            }
+                            res.end(`POST: OK '${room}'`);
                         }
                         return;
                     } else {
@@ -77,9 +74,7 @@ async function server(inf) {
                     } else {
                         sendRoom(room, decodeURIComponent(message), null);
                         res.writeHead(200, { 'Content-Type': 'text/plain' });
-                        if (decodeURIComponent(message).includes('wsStatus')) {
-                            res.end(`GET: OK '${room}'`);
-                        }
+                        res.end(`GET: OK '${room}'`);
                     }
                     return;
                 } else {
@@ -128,14 +123,12 @@ async function server(inf) {
         server.listen(port, () => {
             console.log(`SERVER PORTA: ${port}`);
         });
-
         ret['ret'] = true;
         ret['msg'] = `SERVER: OK`;
-
     } catch (e) {
         ret['msg'] = regexE({ 'e': e }).res
     }
-    if(!ret.ret) { console.log(ret.msg) }
+    if (!ret.ret) { console.log(ret.msg) }
     return ret
 }
 server()
