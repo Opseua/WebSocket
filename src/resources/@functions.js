@@ -1,3 +1,5 @@
+// ####### await import('./@functions.js');
+
 // const infFileInf = { 'path': new URL(import.meta.url).pathname } // ## CHROME NAO!
 // const retFileInf = await fileInf(infFileInf);
 // console.log(retFileInf)
