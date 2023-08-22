@@ -47,9 +47,13 @@ async function server(inf) {
                             res.writeHead(200, { 'Content-Type': 'text/plain' });
                             res.end(`POST: ERRO | MENSAGEM VAZIA '${room}'`);
                         } else {
-                            sendRoom(room, message, null);
                             res.writeHead(200, { 'Content-Type': 'text/plain' });
-                            res.end(`POST: OK '${room}'`);
+                            if (message.toLowerCase() == 'clients') {
+                                res.end(`POST: OK | CLIENTS: ${clients.size} → '${room}'`);
+                            } else {
+                                sendRoom(room, message, null);
+                                res.end(`POST: OK '${room}'`);
+                            }
                         }
                         return;
                     } else {
@@ -72,9 +76,14 @@ async function server(inf) {
                         res.writeHead(200, { 'Content-Type': 'text/plain' });
                         res.end(`GET: ERRO | MENSAGEM VAZIA '${room}'`);
                     } else {
-                        sendRoom(room, decodeURIComponent(message), null);
                         res.writeHead(200, { 'Content-Type': 'text/plain' });
-                        res.end(`GET: OK '${room}'`);
+                        const mess = decodeURIComponent(message)
+                        if (mess.toLowerCase() == 'clients') {
+                            res.end(`GET: OK | CLIENTS: ${clients.size} → '${room}'`);
+                        } else {
+                            sendRoom(room, mess, null);
+                            res.end(`GET: OK '${room}'`);
+                        }
                     }
                     return;
                 } else {
@@ -104,7 +113,11 @@ async function server(inf) {
                 if (text.length == 0) {
                     client.send(`WEBSOCKET:  ERRO | MENSAGEM VAZIA '${room}'`)
                 } else {
-                    sendRoom(room, text, client);
+                    if (text.toLowerCase() == 'clients') {
+                        client.send(`WEBSOCKET: OK | CLIENTS: ${clients.size} → '${room}'`);
+                    } else {
+                        sendRoom(room, text, client);
+                    }
                 }
                 return
             });
