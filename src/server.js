@@ -7,7 +7,7 @@ let WebS = WebSocket;
 async function server(inf) {
     let ret = { 'ret': false };
     try {
-        const infConfigStorage = { 'path': '/src/config.json', 'action': 'get', 'key': 'websocket' }
+        const infConfigStorage = { 'path': '/src/config.json', 'action': 'get', 'key': 'webSocketRet' }
         const retConfigStorage = await configStorage(infConfigStorage)
         const port = retConfigStorage.res.port
         const par1 = retConfigStorage.res.par1
