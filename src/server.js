@@ -10,8 +10,13 @@ async function server(inf) {
         const infConfigStorage = { 'path': '/src/config.json', 'action': 'get', 'key': 'websocket' }
         const retConfigStorage = await configStorage(infConfigStorage)
         const port = retConfigStorage.res.port
+        const par1 = retConfigStorage.res.par1
+        const par2 = retConfigStorage.res.par2
         const clients = new Set();
         const rooms = {};
+        function getClients() {
+            return Object.keys(rooms).map(r => ({ 'sala': r, 'qtd': rooms[r].size }));
+        }
 
         function sendRoom(room, message, sender) {
             const clientsInRoom = rooms[room];
@@ -20,81 +25,73 @@ async function server(inf) {
                     if (client !== sender) {
                         client.send(message);
                     } else {
-                        if (message.includes('wsStatus')) {
+                        if (message.includes(par2)) {
                             client.send(`WEBSOCKET: OK '${room}'`);
                         }
                     }
                 });
             }
         }
+
         const server = http.createServer(async (req, res) => {
+            res.writeHead(200, { 'Content-Type': 'text/plain' });
+            const urlParts = req.url.split('/');
             if (req.method === 'POST') {
                 let requestBody = '';
                 req.on('data', (chunk) => {
                     requestBody += chunk.toString();
                 });
                 req.on('end', async () => {
-                    const urlParts = req.url.split('/');
-                    if (urlParts.length >= 2) {
+                    if (urlParts.length < 3 && urlParts['1'] == '') {
+                        res.end(`POST: ERRO | INFORMAR A SALA`);
+                    } else {
                         const room = urlParts[1];
                         const message = requestBody;
-                        if (!rooms[room]) {
-                            res.writeHead(200, { 'Content-Type': 'text/plain' });
-                            res.end(`POST: ERRO | NAO EXISTE '${room}'`);
-                            return;
+                        if (room.toLowerCase() == par1 || message.toLowerCase() == par1) {
+                            res.end(`POST: OK | CLIENTS:\n\n${JSON.stringify(getClients())}`);
                         }
-                        if (message.length == 0) {
-                            res.writeHead(200, { 'Content-Type': 'text/plain' });
-                            res.end(`POST: ERRO | MENSAGEM VAZIA '${room}'`);
-                        } else {
-                            res.writeHead(200, { 'Content-Type': 'text/plain' });
-                            if (message.toLowerCase() == 'clients') {
-                                res.end(`POST: OK | CLIENTS: ${clients.size} → '${room}'`);
+                        else {
+                            if (!rooms[room]) {
+                                res.end(`POST: ERRO | NAO EXISTE '${room}'`);
                             } else {
-                                sendRoom(room, message, null);
-                                res.end(`POST: OK '${room}'`);
+                                if (message.length == 0) {
+                                    res.end(`POST: ERRO | MENSAGEM VAZIA '${room}'`);
+                                } else {
+                                    sendRoom(room, message, null);
+                                    res.end(`POST: OK '${room}'`);
+                                }
                             }
                         }
-                        return;
-                    } else {
-                        res.writeHead(400, { 'Content-Type': 'text/plain' });
-                        res.end(`POST: OUTRO ERRO`);
-                        return;
                     }
                 })
             } else if (req.method === 'GET') {
-                const urlParts = req.url.split('/');
-                if (urlParts.length >= 2) {
-                    const room = urlParts[1];
+                if (urlParts.length < 3 && urlParts['1'] == '') {
+                    res.end(`GET: ERRO | INFORMAR A SALA`);
+                } else {
+                    const room = urlParts[1]
                     const message = urlParts.slice(2).join('/');
-                    if (!rooms[room]) {
-                        res.writeHead(200, { 'Content-Type': 'text/plain' });
-                        res.end(`GET: ERRO | NAO EXISTE '${room}'`);
-                        return;
-                    }
-                    if (message.length == 0) {
-                        res.writeHead(200, { 'Content-Type': 'text/plain' });
-                        res.end(`GET: ERRO | MENSAGEM VAZIA '${room}'`);
+                    if (room.toLowerCase() == par1 || message.toLowerCase() == par1) {
+                        res.end(`GET: OK | CLIENTS:\n\n${JSON.stringify(getClients())}`);
                     } else {
-                        res.writeHead(200, { 'Content-Type': 'text/plain' });
-                        const mess = decodeURIComponent(message)
-                        if (mess.toLowerCase() == 'clients') {
-                            res.end(`GET: OK | CLIENTS: ${clients.size} → '${room}'`);
+                        if (!rooms[room]) {
+                            res.end(`GET: ERRO | NAO EXISTE '${room}'`);
                         } else {
-                            sendRoom(room, mess, null);
-                            res.end(`GET: OK '${room}'`);
+                            if (message.length == 0) {
+                                res.end(`GET: ERRO | MENSAGEM VAZIA '${room}'`);
+                            } else {
+                                const mess = decodeURIComponent(message)
+                                if (mess.toLowerCase() == 'clients') {
+                                    res.end(`GET: OK | CLIENTS:\n\n${JSON.stringify(getClients())}`);
+                                } else {
+                                    sendRoom(room, mess, null);
+                                    res.end(`GET: OK '${room}'`);
+                                }
+                            }
                         }
                     }
-                    return;
-                } else {
-                    res.writeHead(400, { 'Content-Type': 'text/plain' });
-                    res.end('GET: OUTRO ERRO');
-                    return;
                 }
             } else {
-                res.writeHead(200, { 'Content-Type': 'text/plain' });
                 res.end(`METODOS ACEITOS 'GET' OU 'POST'`);
-                return
             }
         });
 
@@ -102,35 +99,44 @@ async function server(inf) {
         wss.on('connection', (client, req) => {
             clients.add(client);
             const urlParts = req.url.split('/');
-            const room = urlParts[urlParts.length - 1];
-            if (!rooms[room]) {
-                rooms[room] = new Set();
-            }
-            console.log(`WEBSOCKET: NOVO CLIENTE '${room}'`);
-            rooms[room].add(client);
-            client.on('message', async (message) => {
-                const text = message.toString('utf-8');
-                if (text.length == 0) {
-                    client.send(`WEBSOCKET:  ERRO | MENSAGEM VAZIA '${room}'`)
+            if (urlParts.length < 3 && urlParts['1'] == '') {
+                client.send(`WEBSOCKET: ERRO | INFORMAR A SALA`)
+            } else {
+                const room = urlParts[1]
+                if (room.toLowerCase() == par1) {
+                    client.send(`WEBSOCKET: OK | CLIENTS:\n\n${JSON.stringify(getClients())}`);
                 } else {
-                    if (text.toLowerCase() == 'clients') {
-                        client.send(`WEBSOCKET: OK | CLIENTS: ${clients.size} → '${room}'`);
+                    if (!rooms[room]) {
+                        rooms[room] = new Set();
+                    }
+                    rooms[room].add(client);
+                }
+                console.log(`WEBSOCKET: NOVO CLIENTE '${room}'`);
+                client.on('message', async (text) => {
+                    const message = text.toString('utf-8');
+                    if (message.length == 0) {
+                        client.send(`WEBSOCKET:  ERRO | MENSAGEM VAZIA '${room}'`)
                     } else {
-                        sendRoom(room, text, client);
+                        if (message.toLowerCase() == par1) {
+                            client.send(`WEBSOCKET: OK | CLIENTS:\n\n${JSON.stringify(getClients())}`);
+                        } else {
+                            sendRoom(room, message, client);
+                        }
                     }
-                }
-                return
-            });
-            client.on('close', () => {
-                console.log(`WEBSOCKET: CLIENTE DESCONECTADO '${room}'`);
-                clients.delete(client);
-                if (rooms[room]) {
-                    rooms[room].delete(client);
-                    if (rooms[room].size === 0) {
-                        delete rooms[room];
+                });
+                client.on('close', () => {
+                    console.log(`WEBSOCKET: CLIENTE DESCONECTADO '${room}'`);
+                    if (room.toLowerCase() !== par1) {
+                        clients.delete(client);
+                        if (rooms[room]) {
+                            rooms[room].delete(client);
+                            if (rooms[room].size === 0) {
+                                delete rooms[room];
+                            }
+                        }
                     }
-                }
-            });
+                });
+            }
         });
 
         server.listen(port, () => {
