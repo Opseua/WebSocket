@@ -423,19 +423,21 @@ async function configStorage(inf) {
 function dateHour() { // NAO POR COMO 'async'!!!
     let ret = { 'ret': false };
     try {
-        const date = new Date();
+        const date1 = new Date();
+        const date2 = Date.now()
         ret['ret'] = true;
         ret['msg'] = `DATE HOUR: OK`;
         ret['res'] = {
-            'day': String(date.getDate()).padStart(2, '0'),
-            'mon': String(date.getMonth() + 1).padStart(2, '0'),
-            'yea': String(date.getFullYear()),
-            'hou': String(date.getHours()).padStart(2, '0'),
-            'min': String(date.getMinutes()).padStart(2, '0'),
-            'sec': String(date.getSeconds()).padStart(2, '0'),
-            'mil': String(date.getMilliseconds()).padStart(3, '0'),
-            'tim': Date.now()
+            'day': String(date1.getDate()).padStart(2, '0'),
+            'mon': String(date1.getMonth() + 1).padStart(2, '0'),
+            'yea': String(date1.getFullYear()),
+            'hou': String(date1.getHours()).padStart(2, '0'),
+            'min': String(date1.getMinutes()).padStart(2, '0'),
+            'sec': String(date1.getSeconds()).padStart(2, '0'),
+            'mil': String(date2.toString().slice(-3)),
+            'tim': String(date2.toString().slice(0, -3))
         };
+        // manter o 'String' para forcar o '0' (zero) na frente → '001'
     }
     catch (e) {
         ret['msg'] = regexE({ 'e': e }).res;
