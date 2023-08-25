@@ -1,5 +1,28 @@
-// ####### await import('./@functions.js');
+// await import('./@functions.js');
 
+// // ########## TYPE → text
+// const infApi = {
+//     url: `https://ntfy.sh/`,
+//     method: 'PUT',
+//     headers: { 'content-type': 'text/plain;charset=UTF-8' },
+//     body: '{"topic":"OPSEUA","message":"a"}'
+// };
+// const retApi = await api(infApi);
+// console.log(retApi)
+// // ########## TYPE → json
+// const infApi = {
+//     headers: { 'accept-language': 'application/json' },
+//     body: { 'Chave': 'aaaaaaaaaaa', 'Valor': 'bbbbbbbbb' }
+// };
+// // ########## TYPE → x-www-form-urlencoded
+// const formData = new URLSearchParams();
+// formData.append('grant_type', 'client_credentials');
+// formData.append('resource', 'https://graph.microsoft.com');
+// const infApi = {
+//     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+//     body: formData.toString()
+// };
+// - # -         - # -     - # -     - # -     - # -     - # -     - # -     - # - 
 // const infFileInf = { 'path': new URL(import.meta.url).pathname } // ## CHROME NAO!
 // const retFileInf = await fileInf(infFileInf);
 // console.log(retFileInf)
