@@ -7,9 +7,9 @@ let WebS = WebSocket;
 async function server(inf) {
     let ret = { 'ret': false };
     try {
-        const infConfigStorage = { 'path': '/src/config.json', 'action': 'get', 'key': 'webSocketRet' }
+        const infConfigStorage = { 'path': '/src/config.json', 'action': 'get', 'key': 'webSocket' }
         const retConfigStorage = await configStorage(infConfigStorage)
-        const port = retConfigStorage.res.port
+        const portWebSocket = retConfigStorage.res.portWebSocket
         const par1 = retConfigStorage.res.par1
         const par2 = retConfigStorage.res.par2
         const clients = new Set();
@@ -139,8 +139,8 @@ async function server(inf) {
             }
         });
 
-        server.listen(port, () => {
-            console.log(`SERVER PORTA: ${port}`);
+        server.listen(portWebSocket, () => {
+            console.log(`SERVER PORTA: ${portWebSocket}`);
         });
         ret['ret'] = true;
         ret['msg'] = `SERVER: OK`;
