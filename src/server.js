@@ -6,11 +6,20 @@ let WebS = WebSocket;
 async function server(inf) {
     let ret = { 'ret': false };
     try {
-        const infConfigStorage = { 'path': '/src/config.json', 'action': 'get', 'key': 'webSocket' }
+        async function log(inf) {
+            const dH = dateHour().res
+            const text = `${dH.mon}/${dH.day}/${dH.yea} | ${dH.hou}:${dH.min}:${dH.sec} - ${inf}\n`
+            const infFile = { 'p': new Error(), 'action': 'write', 'path': 'log/startReset.txt', 'rewrite': true, 'text': text }
+            const retFile = await file(infFile);
+            console.log(retFile)
+        }
+        await log('START')
+        const infConfigStorage = { 'p': new Error(), 'path': './src/config.json', 'action': 'get', 'key': 'webSocket' }
         const retConfigStorage = await configStorage(infConfigStorage)
         const portWebSocket = retConfigStorage.res.portWebSocket
         const par1 = retConfigStorage.res.par1
         const par2 = retConfigStorage.res.par2
+        const par3 = retConfigStorage.res.par3
         const clients = new Set();
         const rooms = {};
         function getClients() {
@@ -48,6 +57,8 @@ async function server(inf) {
                         const message = requestBody;
                         if (room.toLowerCase() == par1 || message.toLowerCase() == par1) {
                             res.end(`POST: OK | CLIENTS:\n\n${JSON.stringify(getClients())}`);
+                        } else if (room.toLowerCase() == par3 || message.toLowerCase() == par3) {
+                            await log('RESET → START')
                         }
                         else {
                             if (!rooms[room]) {
@@ -71,7 +82,10 @@ async function server(inf) {
                     const message = urlParts.slice(2).join('/');
                     if (room.toLowerCase() == par1 || message.toLowerCase() == par1) {
                         res.end(`GET: OK | CLIENTS:\n\n${JSON.stringify(getClients())}`);
-                    } else {
+                    } else if (room.toLowerCase() == par3 || message.toLowerCase() == par3) {
+                        await log('RESET → START')
+                    }
+                    else {
                         if (!rooms[room]) {
                             res.end(`GET: ERRO | NAO EXISTE '${room}'`);
                         } else {
@@ -118,6 +132,8 @@ async function server(inf) {
                     } else {
                         if (message.toLowerCase() == par1) {
                             client.send(`WEBSOCKET: OK | CLIENTS:\n\n${JSON.stringify(getClients())}`);
+                        } else if (message.toLowerCase() == par3) {
+                            await log('RESET → START')
                         } else {
                             sendRoom(room, message, client);
                         }
@@ -125,13 +141,11 @@ async function server(inf) {
                 });
                 client.on('close', () => {
                     console.log(`WEBSOCKET: CLIENTE DESCONECTADO '${room}'`);
-                    if (room.toLowerCase() !== par1) {
-                        clients.delete(client);
-                        if (rooms[room]) {
-                            rooms[room].delete(client);
-                            if (rooms[room].size === 0) {
-                                delete rooms[room];
-                            }
+                    clients.delete(client);
+                    if (rooms[room]) {
+                        rooms[room].delete(client);
+                        if (rooms[room].size === 0) {
+                            delete rooms[room];
                         }
                     }
                 });
