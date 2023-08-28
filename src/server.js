@@ -7,25 +7,24 @@ let WebS = WebSocket;
 async function server(inf) {
     let ret = { 'ret': false };
     try {
-        async function log(inf) {
-            const dH = dateHour().res
-            const text = `${dH.mon}/${dH.day}/${dH.yea} | ${dH.hou}:${dH.min}:${dH.sec}:${dH.mil} - ${inf}\n`
-            const infFile = { 'p': p, 'action': 'write', 'path': 'log/startReset.txt', 'rewrite': true, 'text': text }
-            const retFile = await file(infFile);
-            console.log(retFile)
-        }
-        await log('START')
         const infConfigStorage = { 'p': p, 'path': './src/config.json', 'action': 'get', 'key': 'webSocket' }
         const retConfigStorage = await configStorage(infConfigStorage)
         const portWebSocket = retConfigStorage.res.portWebSocket
         const par1 = retConfigStorage.res.par1
         const par2 = retConfigStorage.res.par2
         const par3 = retConfigStorage.res.par3
-        const clients = new Set();
-        const rooms = {};
-        function getClients() {
-            return Object.keys(rooms).map(r => ({ 'sala': r, 'qtd': rooms[r].size }));
-        }
+        const clients = new Set(); let rooms = {};
+        function getClients() { return Object.keys(rooms).map(r => ({ 'sala': r, 'qtd': rooms[r].size })); }
+        async function log(inf) {
+            let infFile, retFile; const dH = dateHour().res
+            const text = `${dH.mon}/${dH.day}/${dH.yea} | ${dH.hou}:${dH.min}:${dH.sec}:${dH.mil} - ${inf}\n`
+            infFile = { 'p': p, 'action': 'write', 'path': 'log/log.txt', 'rewrite': true, 'text': text }
+            retFile = await file(infFile);
+            if (inf.includes('RESET')) {
+                infFile = { 'p': p, 'action': 'write', 'path': 'log/log.js', 'rewrite': false, 'text': ' ' }
+                retFile = await file(infFile);
+            }
+        }; log('START')
 
         function sendRoom(room, message, sender) {
             const clientsInRoom = rooms[room];
@@ -47,9 +46,7 @@ async function server(inf) {
             const urlParts = req.url.split('/');
             if (req.method === 'POST') {
                 let requestBody = '';
-                req.on('data', (chunk) => {
-                    requestBody += chunk.toString();
-                });
+                req.on('data', (chunk) => { requestBody += chunk.toString() });
                 req.on('end', async () => {
                     if (urlParts.length < 3 && urlParts['1'] == '') {
                         res.end(`POST: ERRO | INFORMAR A SALA`);
@@ -59,7 +56,8 @@ async function server(inf) {
                         if (room.toLowerCase() == par1 || message.toLowerCase() == par1) {
                             res.end(`POST: OK | CLIENTS:\n\n${JSON.stringify(getClients())}`);
                         } else if (room.toLowerCase() == par3 || message.toLowerCase() == par3) {
-                            await log('RESET → START')
+                            res.end(`POST: OK ### RESET ###`);
+                            log('RESET')
                         }
                         else {
                             if (!rooms[room]) {
@@ -84,7 +82,8 @@ async function server(inf) {
                     if (room.toLowerCase() == par1 || message.toLowerCase() == par1) {
                         res.end(`GET: OK | CLIENTS:\n\n${JSON.stringify(getClients())}`);
                     } else if (room.toLowerCase() == par3 || message.toLowerCase() == par3) {
-                        await log('RESET → START')
+                        res.end(`GET: OK ### RESET ###`);
+                        log('RESET')
                     }
                     else {
                         if (!rooms[room]) {
@@ -110,7 +109,7 @@ async function server(inf) {
         });
 
         const wss = new WebS.Server({ server });
-        wss.on('connection', (client, req) => {
+        wss.on('connection', async (client, req) => {
             clients.add(client);
             const urlParts = req.url.split('/');
             if (urlParts.length < 3 && urlParts['1'] == '') {
@@ -126,6 +125,7 @@ async function server(inf) {
                     rooms[room].add(client);
                 }
                 console.log(`WEBSOCKET: NOVO CLIENTE '${room}'`);
+                log(`WEBSOCKET: NOVO CLIENTE '${room}'`)
                 client.on('message', async (text) => {
                     const message = text.toString('utf-8');
                     if (message.length == 0) {
@@ -134,7 +134,7 @@ async function server(inf) {
                         if (message.toLowerCase() == par1) {
                             client.send(`WEBSOCKET: OK | CLIENTS:\n\n${JSON.stringify(getClients())}`);
                         } else if (message.toLowerCase() == par3) {
-                            await log('RESET → START')
+                            log('RESET')
                         } else {
                             sendRoom(room, message, client);
                         }
@@ -142,6 +142,7 @@ async function server(inf) {
                 });
                 client.on('close', () => {
                     console.log(`WEBSOCKET: CLIENTE DESCONECTADO '${room}'`);
+                    log(`WEBSOCKET: CLIENTE DESCONECTADO '${room}'`)
                     clients.delete(client);
                     if (rooms[room]) {
                         rooms[room].delete(client);
@@ -152,7 +153,6 @@ async function server(inf) {
                 });
             }
         });
-
         server.listen(portWebSocket, () => {
             console.log(`SERVER PORTA: ${portWebSocket}`);
         });
