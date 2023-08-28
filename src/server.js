@@ -1,4 +1,5 @@
 await import('./resources/@functions.js');
+const p = new Error()
 const { default: http } = await import('http');
 const { default: WebSocket } = await import('isomorphic-ws');
 let WebS = WebSocket;
@@ -8,13 +9,13 @@ async function server(inf) {
     try {
         async function log(inf) {
             const dH = dateHour().res
-            const text = `${dH.mon}/${dH.day}/${dH.yea} | ${dH.hou}:${dH.min}:${dH.sec} - ${inf}\n`
-            const infFile = { 'p': new Error(), 'action': 'write', 'path': 'log/startReset.txt', 'rewrite': true, 'text': text }
+            const text = `${dH.mon}/${dH.day}/${dH.yea} | ${dH.hou}:${dH.min}:${dH.sec}:${dH.mil} - ${inf}\n`
+            const infFile = { 'p': p, 'action': 'write', 'path': 'log/startReset.txt', 'rewrite': true, 'text': text }
             const retFile = await file(infFile);
             console.log(retFile)
         }
         await log('START')
-        const infConfigStorage = { 'p': new Error(), 'path': './src/config.json', 'action': 'get', 'key': 'webSocket' }
+        const infConfigStorage = { 'p': p, 'path': './src/config.json', 'action': 'get', 'key': 'webSocket' }
         const retConfigStorage = await configStorage(infConfigStorage)
         const portWebSocket = retConfigStorage.res.portWebSocket
         const par1 = retConfigStorage.res.par1

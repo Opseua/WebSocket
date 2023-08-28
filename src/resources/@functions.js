@@ -21,20 +21,20 @@
 // retApi = await api(infApi);
 // console.log(retApi)
 // - # -         - # -     - # -     - # -     - # -     - # -     - # -     - # - 
-// let infFile, retFile
-// infFile = { 'p': new Error(), 'action': 'inf' }
-// infFile = { 'p': new Error(), 'action': 'relative', 'relative': './1_PASTA/aaa.txt' }
-// infFile = { 'p': new Error(), 'action': 'write', 'path': './1_PASTA/aaa.txt', 'rewrite': true, 'text': '1234\n' }
-// infFile = { 'p': new Error(), 'action': 'read', 'path': './1_PASTA/aaa.txt' }
-// infFile = { 'p': new Error(), 'action': 'del', 'path': './1_PASTA/aaa.txt' }
-// infFile = { 'p': new Error(), 'action': 'list', 'path': '../', 'max': 10 }
+// let infFile, retFile; const p = new Error()
+// infFile = { 'p': p, 'action': 'inf' }
+// infFile = { 'p': p, 'action': 'relative', 'relative': './1_PASTA/aaa.txt' }
+// infFile = { 'p': p, 'action': 'write', 'path': './1_PASTA/aaa.txt', 'rewrite': true, 'text': '1234\n' }
+// infFile = { 'p': p, 'action': 'read', 'path': './1_PASTA/aaa.txt' }
+// infFile = { 'p': p, 'action': 'del', 'path': './1_PASTA/aaa.txt' }
+// infFile = { 'p': p, 'action': 'list', 'path': '../', 'max': 10 }
 // retFile = await file(infFile);
 // console.log(retFile)
 // - # -         - # -     - # -     - # -     - # -     - # -     - # -     - # - 
-// let infConfigStorage, retConfigStorage
-// infConfigStorage = { 'p': new Error(), 'path': '/src/config.json', 'action': 'set', 'key': 'NomeDaChave', 'value': 'Valor da chave' }
-// infConfigStorage = { 'p': new Error(), 'path': '/src/config.json', 'action': 'get', 'key': 'NomeDaChave' }
-// infConfigStorage = { 'p': new Error(), 'path': '/src/config.json', 'action': 'del', 'key': 'NomeDaChave' }
+// let infConfigStorage, retConfigStorage; const p = new Error()
+// infConfigStorage = { 'p': p, 'path': '/src/config.json', 'action': 'set', 'key': 'NomeDaChave', 'value': 'Valor da chave' }
+// infConfigStorage = { 'p': p, 'path': '/src/config.json', 'action': 'get', 'key': 'NomeDaChave' }
+// infConfigStorage = { 'p': p, 'path': '/src/config.json', 'action': 'del', 'key': 'NomeDaChave' }
 // retConfigStorage = await configStorage(infConfigStorage)
 // console.log(retConfigStorage)
 // - # -         - # -     - # -     - # -     - # -     - # -     - # -     - # -  
