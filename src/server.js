@@ -7,21 +7,22 @@ let WebS = WebSocket;
 async function server(inf) {
     let ret = { 'ret': false };
     try {
-        const infConfigStorage = { 'p': p, 'path': './src/config.json', 'action': 'get', 'key': 'webSocket' }
+        const infConfigStorage = { 'path': './src/config.json', 'action': 'get', 'key': 'webSocket' }
         const retConfigStorage = await configStorage(infConfigStorage)
-        const portWebSocket = retConfigStorage.res.portWebSocket
-        const par1 = retConfigStorage.res.par1
-        const par2 = retConfigStorage.res.par2
-        const par3 = retConfigStorage.res.par3
+        if (!retConfigStorage.ret) { return ret } else { retConfigStorage = retConfigStorage.res }
+        const portWebSocket = retConfigStorage.portWebSocket
+        const par1 = retConfigStorage.par1
+        const par2 = retConfigStorage.par2
+        const par3 = retConfigStorage.par3
         const clients = new Set(); let rooms = {};
         function getClients() { return Object.keys(rooms).map(r => ({ 'sala': r, 'qtd': rooms[r].size })); }
         async function log(inf) {
             let infFile, retFile; const dH = dateHour().res
             const text = `${dH.mon}/${dH.day}/${dH.yea} | ${dH.hou}:${dH.min}:${dH.sec}:${dH.mil} - ${inf}\n`
-            infFile = { 'p': p, 'action': 'write', 'path': 'log/log.txt', 'rewrite': true, 'text': text }
+            infFile = { 'action': 'write', 'path': 'log/log.txt', 'rewrite': true, 'text': text }
             retFile = await file(infFile);
             if (inf.includes('RESET')) {
-                infFile = { 'p': p, 'action': 'write', 'path': 'log/log.js', 'rewrite': false, 'text': ' ' }
+                infFile = { 'action': 'write', 'path': 'log/log.js', 'rewrite': false, 'text': ' ' }
                 retFile = await file(infFile);
             }
         }; log('START')
