@@ -99,9 +99,7 @@ async function api(inf) {
             const resBody = await req.text(); ret['ret'] = true; ret['msg'] = 'API: OK';
             ret['res'] = { 'code': req.status, 'headers': resHeaders, 'body': resBody }
         }
-    } catch (e) {
-        ret['msg'] = regexE({ 'e': e }).res
-    }
+    } catch (e) { ret['msg'] = regexE({ 'e': e }).res }
     if (!ret.ret) { console.log(ret.msg) }
     return ret
 }
@@ -237,9 +235,7 @@ async function file(inf) {
                 }
             }
         }
-    } catch (e) {
-        ret['msg'] = regexE({ 'e': e }).res;
-    }
+    } catch (e) { ret['msg'] = regexE({ 'e': e }).res }
     if (!ret.ret) { console.log(ret.msg) }
     return ret;
 }
@@ -328,7 +324,7 @@ async function configStorage(inf) {
                             ret['ret'] = true; ret['msg'] = `CONFIG SET: OK`; config[inf.key] = inf.value;
                             _fs.writeFileSync(path[0], JSON.stringify(config, null, 2));
                         }
-                    } catch (e) { ret['msg'] = regexE({ 'e': e }).res; }
+                    } catch (e) { ret['msg'] = regexE({ 'e': e }).res }
                 } else if (inf.action == 'get') { // #### CONFIG NODE: GET
                     try {
                         if (!inf.key || inf.key == '') { ret['msg'] = `\n #### ERRO #### CONFIG GET \n INFORMAR A 'key' \n\n`; }
@@ -336,7 +332,7 @@ async function configStorage(inf) {
                             if (config[inf.key]) { ret['ret'] = true; ret['msg'] = `CONFIG GET: OK`; ret['res'] = config[inf.key]; }
                             else { ret['msg'] = `\n #### ERRO #### CONFIG GET \n CHAVE '${inf.key}' NAO ENCONTRADA \n\n`; }
                         }
-                    } catch (e) { ret['msg'] = regexE({ 'e': e }).res; }
+                    } catch (e) { ret['msg'] = regexE({ 'e': e }).res }
                 } else if (inf.action == 'del') { // #### CONFIG NODE: DEL
                     try {
                         if (!inf.key || inf.key == '') { ret['msg'] = `\n #### ERRO #### CONFIG DEL \n INFORMAR A 'key' \n\n`; }
@@ -346,14 +342,11 @@ async function configStorage(inf) {
                                 _fs.writeFileSync(path[0], JSON.stringify(config, null, 2));
                             } else { ret['msg'] = `\n #### ERRO #### CONFIG DEL \n CHAVE '${inf.key}' NAO ENCONTRADA \n\n`; }
                         }
-                    } catch (e) { ret['msg'] = regexE({ 'e': e }).res; }
+                    } catch (e) { ret['msg'] = regexE({ 'e': e }).res }
                 }
             }
         }
-    }
-    catch (e) {
-        ret['msg'] = regexE({ 'e': e }).res;
-    }
+    } catch (e) { ret['msg'] = regexE({ 'e': e }).res }
     if (!ret.ret) { console.log(ret.msg) }
     return ret
 }
@@ -374,9 +367,7 @@ function dateHour(sec = 0) { // NAO POR COMO 'async'!!!
             'mil': String(date.getMilliseconds()).padStart(3, '0'),
             'tim': String(Math.floor(date.getTime() / 1000))
         };
-    } catch (e) {
-        ret['msg'] = regexE({ 'e': e }).res;
-    }
+    } catch (e) { ret['msg'] = regexE({ 'e': e }).res }
     if (!ret.ret) {
         console.log(ret.msg);
     }
@@ -415,10 +406,7 @@ function regex(inf) {
                 else { ret['msg'] = `\n #### ERRO #### REGEX \n PADRAO '${inf.pattern}' NAO ENCONTRADO \n\n`; }
             }
         }
-    } catch (e) {
-        ret['msg'] = regexE({ 'e': e }).res
-        console.log(ret.msg)
-    }
+    } catch (e) { ret['msg'] = regexE({ 'e': e }).res }
     return ret
 }
 
@@ -429,9 +417,7 @@ async function random(inf) {
         const number = Math.floor(Math.random() * (max - min + 1) + min) * 1000;
         if (message) { console.log(`AGUARDANDO: ${number / 1000} SEGUNDOS`); await new Promise(resolve => setTimeout(resolve, number)); }
         ret['ret'] = true; ret['msg'] = `RANDON: OK`; ret['res'] = number / 1000;
-    } catch (e) {
-        ret['msg'] = regexE({ 'e': e }).res
-    }
+    } catch (e) { ret['msg'] = regexE({ 'e': e }).res }
     if (!ret.ret) { console.log(ret.msg) }
     return ret
 }
@@ -470,9 +456,7 @@ async function jsonInterpret(inf) {
     try {
         const json = JSON.stringify(inf.json); const res = json.replace(/\$\[(.*?)\]/g, (match, p1) => g[p1])
         ret['ret'] = true; ret['msg'] = `JSON INTERPRET: OK`; ret['res'] = res;
-    } catch (e) {
-        ret['msg'] = regexE({ 'e': e }).res
-    }
+    } catch (e) { ret['msg'] = regexE({ 'e': e }).res }
     if (!ret.ret) { console.log(ret.msg) }
     return ret
 }
