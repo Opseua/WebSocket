@@ -7,8 +7,8 @@ async function server(inf) {
         const infConfigStorage = { 'action': 'get', 'key': 'webSocket' }
         let retConfigStorage = await configStorage(infConfigStorage)
         if (!retConfigStorage.ret) { return ret } else { retConfigStorage = retConfigStorage.res }
-        const portWebSocket = retConfigStorage.portWebSocket;const max = retConfigStorage.max
-        const msg = retConfigStorage.msg;const par1 = retConfigStorage.par1;const par2 = retConfigStorage.par2
+        const portWebSocket = retConfigStorage.portWebSocket; const max = retConfigStorage.max
+        const msg = retConfigStorage.msg; const par1 = retConfigStorage.par1; const par2 = retConfigStorage.par2
         const par3 = retConfigStorage.par3
         const clients = new Set(); let rooms = {}; let clientInfo = {};
 
@@ -143,8 +143,6 @@ async function server(inf) {
         server.listen(portWebSocket, () => { console.log(`SERVER PORTA: ${portWebSocket}`); });
         ret['ret'] = true;
         ret['msg'] = `SERVER: OK`;
-    } catch (e) { ret['msg'] = regexE({ 'e': e }).res }
-    if (!ret.ret) { console.log(ret.msg) }
-    return ret
+    } catch (e) { ret['msg'] = regexE({ 'e': e }).res }; if (!ret.ret) { console.log(ret.msg) }; return ret
 }
 server()

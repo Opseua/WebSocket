@@ -99,9 +99,7 @@ async function api(inf) {
             const resBody = await req.text(); ret['ret'] = true; ret['msg'] = 'API: OK';
             ret['res'] = { 'code': req.status, 'headers': resHeaders, 'body': resBody }
         }
-    } catch (e) { ret['msg'] = regexE({ 'e': e }).res }
-    if (!ret.ret) { console.log(ret.msg) }
-    return ret
+    } catch (e) { ret['msg'] = regexE({ 'e': e }).res }; if (!ret.ret) { console.log(ret.msg) }; return ret
 }
 //######################################## ############# #########
 
@@ -235,9 +233,7 @@ async function file(inf) {
                 }
             }
         }
-    } catch (e) { ret['msg'] = regexE({ 'e': e }).res }
-    if (!ret.ret) { console.log(ret.msg) }
-    return ret;
+    } catch (e) { ret['msg'] = regexE({ 'e': e }).res }; if (!ret.ret) { console.log(ret.msg) }; return ret
 }
 
 async function configStorage(inf) {
@@ -346,9 +342,7 @@ async function configStorage(inf) {
                 }
             }
         }
-    } catch (e) { ret['msg'] = regexE({ 'e': e }).res }
-    if (!ret.ret) { console.log(ret.msg) }
-    return ret
+    } catch (e) { ret['msg'] = regexE({ 'e': e }).res }; if (!ret.ret) { console.log(ret.msg) }; return ret
 }
 
 function dateHour(sec = 0) { // NAO POR COMO 'async'!!!
@@ -368,9 +362,7 @@ function dateHour(sec = 0) { // NAO POR COMO 'async'!!!
             'tim': String(Math.floor(date.getTime() / 1000))
         };
     } catch (e) { ret['msg'] = regexE({ 'e': e }).res }
-    if (!ret.ret) {
-        console.log(ret.msg);
-    }
+    if (!ret.ret) { console.log(ret.msg); };
     return ret;
 }
 
@@ -417,9 +409,7 @@ async function random(inf) {
         const number = Math.floor(Math.random() * (max - min + 1) + min) * 1000;
         if (message) { console.log(`AGUARDANDO: ${number / 1000} SEGUNDOS`); await new Promise(resolve => setTimeout(resolve, number)); }
         ret['ret'] = true; ret['msg'] = `RANDON: OK`; ret['res'] = number / 1000;
-    } catch (e) { ret['msg'] = regexE({ 'e': e }).res }
-    if (!ret.ret) { console.log(ret.msg) }
-    return ret
+    } catch (e) { ret['msg'] = regexE({ 'e': e }).res }; if (!ret.ret) { console.log(ret.msg) }; return ret
 }
 
 // ############### GLOBAL OBJECT ###############
@@ -443,8 +433,7 @@ function regexE(inf) {
         const match = e.stack.match(/(\w+\.\w+):(\d+):\d+/);
         ret['msg'] = `\n #### ERRO #### ${match[1]} [${match[2]}] \n ${e.toString()} \n\n`
     }
-    if (!ret.ret) { console.log(ret.msg) }
-    return ret
+    if (!ret.ret) { console.log(ret.msg) }; return ret
 };
 
 function orderObj(o) {
@@ -456,9 +445,7 @@ async function jsonInterpret(inf) {
     try {
         const json = JSON.stringify(inf.json); const res = json.replace(/\$\[(.*?)\]/g, (match, p1) => g[p1])
         ret['ret'] = true; ret['msg'] = `JSON INTERPRET: OK`; ret['res'] = res;
-    } catch (e) { ret['msg'] = regexE({ 'e': e }).res }
-    if (!ret.ret) { console.log(ret.msg) }
-    return ret
+    } catch (e) { ret['msg'] = regexE({ 'e': e }).res }; if (!ret.ret) { console.log(ret.msg) }; return ret
 }
 
 // ############### CLEAR CONSOLE ###############
