@@ -1,6 +1,6 @@
 {
   "type": "module",
   "dependencies": {
-    "isomorphic-ws": "^5.0.0"
+    "ws": "^8.14.0"
   }
 }
