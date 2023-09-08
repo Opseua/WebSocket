@@ -353,10 +353,11 @@ async function configStorage(inf) {
     } catch (e) { ret['msg'] = regexE({ 'e': e }).res }; if (!ret.ret) { console.log(ret.msg) }; return ret
 }
 
-function dateHour() { // NAO POR COMO 'async'!!!
+function dateHour(inf = 0) { // NAO POR COMO 'async'!!!
     let ret = { 'ret': false };
     try {
-        const date1 = new Date(); const date2 = Date.now();
+        const date1 = new Date(); date1.setSeconds(new Date().getSeconds() + inf).setSeconds
+        const date2 = Date.now() + (inf * 1000);
         ret['res'] = {
             'day': String(date1.getDate()).padStart(2, '0'), 'mon': String(date1.getMonth() + 1).padStart(2, '0'),
             'yea': String(date1.getFullYear()), 'hou': String(date1.getHours()).padStart(2, '0'),

@@ -11,7 +11,8 @@ async function server(inf) {
         const clients = new Set(); let rooms = {}; function heartbeat() { this.isAlive = true }
 
         function getClients() {
-            let res = Object.keys(rooms).map(r => ({ 'sala': r, 'qtd': rooms[r].size })); res.unshift({ 'um': 'dois' }); return JSON.stringify(res)
+            let res = Object.keys(rooms).map(r => ({ 'sala': r, 'qtd': rooms[r].size }));
+            const dH = dateHour().res; res.unshift({ 'hour': `${dH.hou}:${dH.min}:${dH.sec}` }); return JSON.stringify(res)
         }
         async function log(inf) {
             let infFile, retFile; const dH = dateHour().res
