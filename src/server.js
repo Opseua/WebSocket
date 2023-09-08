@@ -10,10 +10,12 @@ async function server(inf) {
         const par1 = retConfigStorage.par1; const par2 = retConfigStorage.par2; const par3 = retConfigStorage.par3
         const clients = new Set(); let rooms = {}; function heartbeat() { this.isAlive = true }
 
-        function getClients() { return JSON.stringify(Object.keys(rooms).map(r => ({ 'sala': r, 'qtd': rooms[r].size }))) }
+        function getClients() {
+            let res = Object.keys(rooms).map(r => ({ 'sala': r, 'qtd': rooms[r].size })); res.unshift({ 'um': 'dois' }); return JSON.stringify(res)
+        }
         async function log(inf) {
             let infFile, retFile; const dH = dateHour().res
-            const folder = `MES_${dH.mon}`; const text = `DIA_${dH.day} ${dH.hou}:${dH.min}:${dH.sec}:${dH.mil} - ${inf}\n`
+            const folder = `MES_${dH.mon}_${dH.monNam}`; const text = `DIA_${dH.day} ${dH.hou}:${dH.min}:${dH.sec}:${dH.mil} - ${inf}\n`
             infFile = { 'action': 'write', 'functionLocal': true, 'path': `./log/WebSocket/${folder}/log.txt`, 'rewrite': true, 'text': text }
             retFile = await file(infFile);
             if (inf.includes('RESET')) {
@@ -72,7 +74,7 @@ async function server(inf) {
         });
         setInterval(function ping() {
             wss.clients.forEach(function each(ws) { if (ws.isAlive == false) return ws.terminate(); ws.isAlive = false; ws.ping() })
-        }, 1500)
+        }, max * 1000)
         server.listen(portWebSocket, () => { console.log(`SERVER PORTA: ${portWebSocket}`) })
         ret['ret'] = true;
     } catch (e) { ret['msg'] = regexE({ 'e': e }).res }; if (!ret.ret) { console.log(ret.msg) }; return ret
