@@ -356,14 +356,13 @@ async function configStorage(inf) {
 function dateHour(inf = 0) { // NAO POR COMO 'async'!!!
     let ret = { 'ret': false };
     try {
-        const date1 = new Date(); date1.setSeconds(new Date().getSeconds() + inf).setSeconds
-        const date2 = Date.now() + (inf * 1000);
+        const dt1 = new Date(); dt1.setSeconds(new Date().getSeconds() + inf).setSeconds; const dt2 = Date.now() + (inf * 1000);
         ret['res'] = {
-            'day': String(date1.getDate()).padStart(2, '0'), 'mon': String(date1.getMonth() + 1).padStart(2, '0'),
-            'yea': String(date1.getFullYear()), 'hou': String(date1.getHours()).padStart(2, '0'),
-            'min': String(date1.getMinutes()).padStart(2, '0'), 'sec': String(date1.getSeconds()).padStart(2, '0'),
-            'mil': String(date2.toString().slice(-3)), 'tim': String(date2.toString().slice(0, -3)), 'timMil': String(date2.toString()),
-            'monNam': ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'][date1.getMonth()]
+            'day': String(dt1.getDate()).padStart(2, '0'), 'mon': String(dt1.getMonth() + 1).padStart(2, '0'),
+            'yea': String(dt1.getFullYear()), 'hou': String(dt1.getHours()).padStart(2, '0'),
+            'min': String(dt1.getMinutes()).padStart(2, '0'), 'sec': String(dt1.getSeconds()).padStart(2, '0'),
+            'mil': String(dt2.toString().slice(-3)), 'tim': String(dt2.toString().slice(0, -3)), 'timMil': String(dt2.toString()),
+            'monNam': ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'][dt1.getMonth()]
         }; // manter o 'String' para forcar o '0' (zero) na frente → '001'
         ret['ret'] = true; ret['msg'] = `DATE HOUR: OK`
     } catch (e) { ret['msg'] = regexE({ 'e': e }).res }; if (!ret.ret) { console.log(ret.msg) }; return ret
@@ -412,8 +411,7 @@ function regex(inf) {
                 else { ret['msg'] = `\n #### ERRO #### REGEX \n PADRAO '${inf.pattern}' NAO ENCONTRADO \n\n`; }
             }
         }
-    } catch (e) { ret['msg'] = regexE({ 'e': e }).res }
-    return ret
+    } catch (e) { ret['msg'] = regexE({ 'e': e }).res }; return ret
 }
 
 async function random(inf) {
@@ -471,7 +469,7 @@ if (typeof window !== 'undefined') { // CHROME
 console.clear(); let messageCount = 0; const clearConsole = console.log;
 console.log = async function () {
     clearConsole.apply(console, arguments); messageCount++;
-    if (messageCount >= 100) { console.clear(); messageCount = 0; console.log('CONSOLE LIMPO!') }
+    if (messageCount >= 50) { console.clear(); messageCount = 0; console.log('CONSOLE LIMPO!') }
 };
 // ############### ###############
 
