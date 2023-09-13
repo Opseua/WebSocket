@@ -75,15 +75,19 @@ if (typeof window == 'undefined') { _fs = await import('fs'); _path = await impo
 // let retJsonInterpret = await jsonInterpret(infJsonInterpret)
 // if (retJsonInterpret.ret) { retJsonInterpret = JSON.parse(retJsonInterpret.res) }
 // console.log(retJsonInterpret)
+// - # -         - # -     - # -     - # -     - # -     - # -     - # -     - # -
+// await log({ 'folder': '###_TESTE_###', 'file': `TESTE.txt`, 'text': 'INF AQUI' })
+
+// for (const nameKey in json.taskName) { console.log(nameKey) }
 
 async function api(inf) {
-    let ret = { 'ret': false };
+    let ret = { 'ret': false }
     try {
         if (typeof UrlFetchApp !== 'undefined') { // ################ GOOGLE APP SCRIPT
             const reqOpt = { 'method': inf.method, 'redirect': 'follow', 'keepalive': true, 'muteHttpExceptions': true, 'validateHttpsCertificates': true, };
             if (inf.headers) { reqOpt['headers'] = inf.headers }
             if ((inf.body) && (inf.method == 'POST' || inf.method == 'PUT')) {
-                reqOpt['body'] = typeof inf.body === 'object' ? JSON.stringify(inf.body) : inf.body
+                reqOpt['body'] = typeof inf.body == 'object' ? JSON.stringify(inf.body) : inf.body
             }
             const req = UrlFetchApp.fetch(inf.url, reqOpt); const resHeaders = req.getAllHeaders();
             const resBody = req.getContentText(); ret['ret'] = true; ret['msg'] = 'API: OK';
@@ -92,19 +96,19 @@ async function api(inf) {
             const reqOpt = { 'method': inf.method, 'redirect': 'follow', 'keepalive': true };
             if (inf.headers) { reqOpt['headers'] = inf.headers }
             if ((inf.body) && (inf.method == 'POST' || inf.method == 'PUT')) {
-                reqOpt['body'] = typeof inf.body === 'object' ? JSON.stringify(inf.body) : inf.body
+                reqOpt['body'] = typeof inf.body == 'object' ? JSON.stringify(inf.body) : inf.body
             }
             const req = await fetch(inf.url, reqOpt); const resHeaders = {};
             req.headers.forEach((value, name) => { resHeaders[name] = value })
             const resBody = await req.text(); ret['ret'] = true; ret['msg'] = 'API: OK';
             ret['res'] = { 'code': req.status, 'headers': resHeaders, 'body': resBody }
         }
-    } catch (e) { ret['msg'] = regexE({ 'e': e }).res }; if (!ret.ret) { console.log(ret.msg) }; return ret
+    } catch (e) { const m = await regexE({ 'e': e }); ret['msg'] = m.res }; if (!ret.ret) { console.log(ret.msg) }; return ret
 }
 //######################################## ############# #########
 
 async function file(inf) {
-    let ret = { 'ret': false };
+    let ret = { 'ret': false }
     try {
         if (/\$\[[^\]]+\]/.test(JSON.stringify(inf))) { // PASSAR NO jsonInterpret
             let rji = await jsonInterpret({ 'json': inf }); if (rji.ret) { rji = JSON.parse(rji.res); inf = rji };
@@ -119,7 +123,7 @@ async function file(inf) {
                     if (typeof inf.rewrite !== 'boolean') { ret['msg'] = `\n #### ERRO #### FILE \n INFORMAR O 'rewrite' TRUE ou FALSE \n\n`; }
                     else if (!inf.text || inf.text == '') { ret['msg'] = `\n #### ERRO #### FILE \n INFORMAR O 'text' \n\n`; }
                     else {
-                        let infFile, retFile, path, retFetch = ''; let text = inf.text
+                        let infFile, retFile, path, retFetch = ''; let text = typeof inf.text == 'object' ? JSON.stringify(inf.text) : inf.text
                         if (inf.path.includes(':')) { path = inf.path; if (typeof window !== 'undefined') { path = path.split(':/')[1] } }
                         else {
                             infFile = { 'action': 'relative', 'path': inf.path, 'functionLocal': inf.functionLocal && typeof window == 'undefined' ? true : false };
@@ -139,13 +143,8 @@ async function file(inf) {
                                 conflictAction: 'overwrite' // 'overwrite' LIMPA | 'uniquify' (ADICIONA (1), (2), (3)... NO FINAL)
                             }; chrome.downloads.download(downloadOptions);
                         } else { // NODEJS
-                            async function createFolder(f) {
-                                const p = _path.normalize(f); const d = p.split(_path.sep); let cF = '';
-                                for (let directory of d) {
-                                    cF += directory + _path.sep; if (!_fs.existsSync(cF)) { await _fs.promises.mkdir(cF); }
-                                }; return true;
-                            }; const folderPath = _path.dirname(path); await createFolder(folderPath);
-                            await _fs.promises.writeFile(path, text, { flag: !inf.rewrite ? 'w' : 'a' }); // 'w' limpa | 'a' adiciona
+                            await _fs.promises.mkdir(_path.dirname(path), { recursive: true })
+                            await _fs.promises.writeFile(path, text, { flag: !inf.rewrite ? 'w' : 'a' });
                         }; ret['ret'] = true; ret['msg'] = `FILE WRITE: OK`;
                     }
                 } else if (inf.action == 'read') { // ########################## READ
@@ -157,14 +156,14 @@ async function file(inf) {
                     if (typeof window !== 'undefined') { // CHROME
                         if (!inf.functionLocal) { path = `file:///${path}` }
                         retFetch = await fetch(path.replace('%', '')); retFetch = await retFetch.text()
-                    } else { retFetch = _fs.readFileSync(path, 'utf8'); }; // NODEJS
+                    } else { retFetch = await _fs.promises.readFile(path, 'utf8') } // NODEJS
                     ret['ret'] = true; ret['msg'] = `FILE READ: OK`; ret['res'] = retFetch;
                 } else if (inf.action == 'del' && typeof window == 'undefined') { // ########################## DEL
                     let infFile, retFile, path; if (inf.path.includes(':')) { path = inf.path }
                     else {
                         infFile = { 'action': 'relative', 'path': inf.path, 'functionLocal': inf.functionLocal }; retFile = await file(infFile);
                         path = retFile.res[0]
-                    }; _fs.unlinkSync(path); ret['ret'] = true; ret['msg'] = `FILE DEL: OK`;
+                    }; await _fs.promises.unlink(path); ret['ret'] = true; ret['msg'] = `FILE DEL: OK`;
                 } else if (inf.action == 'inf') { // ########################## INF
                     let jsonFile, functionLocal, file, e = JSON.stringify(new Error().stack).replace('at ', '')
                     // [0] config.json | [1] letra | [2] caminho do projeto atual | [3] path download/terminal | [4] arquivo atual
@@ -175,12 +174,13 @@ async function file(inf) {
                             const text = e; const pattern = new RegExp(`at ${functionLocal}/(.*?)\\.js`)
                             const res = text.match(pattern); file = res[1]; conf = [conf[0], jsonFile[0], functionLocal, jsonFile[1], file]
                         } else { // NODEJS
-                            function w(c) {
-                                while (true) { if (['package.json'].some(file => _fs.existsSync(_path.join(c, file)))) { return c }; const p = _path.dirname(c); if (p === c) { return null } c = p }
-                            };
-                            functionLocal = e.match(/ file:\/\/\/(.*?)\.js:/)[1]; file = functionLocal.charAt(0).toUpperCase() + functionLocal.slice(1); functionLocal = w(file);
-                            file = file.replace(`${functionLocal}/`, ''); jsonFile = JSON.parse(_fs.readFileSync(`${functionLocal}/${conf}`, 'utf8')).conf
-                            conf = [conf[0], jsonFile[0], functionLocal.replace(`${jsonFile[0]}:/`, ''), process.cwd().replace(/\\/g, '/').replace(`${jsonFile[0]}:/`, ''), file]
+                            functionLocal = e.match(/ file:\/\/\/(.*?)\.js:/)[1]; file = functionLocal.charAt(0).toUpperCase() + functionLocal.slice(1);
+                            async function getRoot(inf) {
+                                try { await _fs.promises.access(`${inf}/package.json`); return inf }
+                                catch { const p = inf.split('/').slice(0, -1).join('/'); return p == inf ? null : getRoot(p) }
+                            }; functionLocal = await getRoot(file);
+                            file = file.replace(`${functionLocal}/`, ''); jsonFile = await _fs.promises.readFile(`${functionLocal}/${conf}`, 'utf8'); jsonFile = JSON.parse(jsonFile).conf
+                            conf = [conf[0], jsonFile[0], functionLocal.replace(`${jsonFile[0]}:/`, ''), process.cwd().replace(/\\/g, '/').replace(`${jsonFile[0]}:/`, ''), `${file}.js`]
                         }
                     } else { // NOME DO ARQUIVO
                         const text = e; const pattern = new RegExp(`at.*?${typeof window !== 'undefined' ? conf[2] : conf[3]}(.*?)\\.js`)
@@ -193,7 +193,7 @@ async function file(inf) {
                         function runPath(pp, par) {
                             if (pp.startsWith('./')) { pp = pp.slice(2) } else if (relative.startsWith('/')) { pp = pp.slice(1) }
                             pathFull = conf[par].split('/'); relativeParts = pp.split('/');
-                            while (pathFull.length > 0 && relativeParts[0] === '..') { pathFull.pop(); relativeParts.shift(); }
+                            while (pathFull.length > 0 && relativeParts[0] == '..') { pathFull.pop(); relativeParts.shift(); }
                             retRelative = pathFull.concat(relativeParts).join('/')
                             if (retRelative.endsWith('/.')) { retRelative = retRelative.slice(0, -2); }
                             else if (retRelative.endsWith('.') || retRelative.endsWith('/')) { retRelative = retRelative.slice(0, -1); }; return retRelative
@@ -209,7 +209,7 @@ async function file(inf) {
                             retFile = await file(infFile); path = retFile.res[0]
                         }; let retFilesList = { 'path': path, 'max': inf.max }
                         function formatBytes(b, d = 2) {
-                            if (b === 0) return '0 Bytes'; const i = Math.floor(Math.log(b) / Math.log(1024));
+                            if (b == 0) return '0 Bytes'; const i = Math.floor(Math.log(b) / Math.log(1024));
                             return parseFloat((b / Math.pow(1024, i)).toFixed(d < 0 ? 0 : d)) + ' ' + ['bytes', 'KB', 'MB', 'GB'][i];
                         }; let iFilesList = 0
                         async function filesList(inf, files = []) {
@@ -233,11 +233,11 @@ async function file(inf) {
                 }
             }
         }
-    } catch (e) { ret['msg'] = regexE({ 'e': e }).res }; if (!ret.ret) { console.log(ret.msg) }; return ret
+    } catch (e) { const m = await regexE({ 'e': e }); ret['msg'] = m.res }; if (!ret.ret) { console.log(ret.msg) }; return ret
 }
 
 async function configStorage(inf) {
-    let ret = { 'ret': false };
+    let ret = { 'ret': false }
     try {
         let run = false
         if (!inf.action || !['set', 'get', 'del'].includes(inf.action)) {
@@ -270,7 +270,7 @@ async function configStorage(inf) {
                             chrome.storage.local.get(inf.key, async (result) => {
                                 if (chrome.runtime.lastError) {
                                     ret['msg'] = `\n #### ERRO #### STORAGE GET \n ${chrome.runtime.lastError} \n\n`;
-                                } else if (Object.keys(result).length === 0) {
+                                } else if (Object.keys(result).length == 0) {
                                     async function checkConfig() {
                                         const infFile = { 'action': 'read', 'path': conf[0], 'functionLocal': true }
                                         const retFile = await file(infFile); const config = JSON.parse(retFile.res);
@@ -297,7 +297,7 @@ async function configStorage(inf) {
                             chrome.storage.local.get(inf.key, async (result) => {
                                 if (chrome.runtime.lastError) {
                                     ret['msg'] = `\n #### ERRO #### STORAGE DEL \n ${chrome.runtime.lastError} \n\n`;
-                                } else if (Object.keys(result).length === 0) {
+                                } else if (Object.keys(result).length == 0) {
                                     ret['msg'] = `\n #### ERRO #### STORAGE DEL \n CHAVE '${inf.key}' NAO ENCONTRADA \n\n`;
                                 } else {
                                     chrome.storage.local.remove(inf.key, async () => { });
@@ -311,50 +311,43 @@ async function configStorage(inf) {
                 let infFile, retFile, config, path, ret_Fs = false
                 if (inf.path && inf.path.includes(':')) { path = inf.path }
                 else {
-                    if (inf.path && typeof inf.functionLocal === 'boolean') {
+                    if (inf.path && typeof inf.functionLocal == 'boolean') {
                         infFile = { 'action': 'relative', 'path': inf.path, 'functionLocal': inf.functionLocal }
                     } else { infFile = { 'action': 'relative', 'path': conf[0], 'functionLocal': true } }
                     retFile = await file(infFile); path = retFile.res[0]
                 }; try { await _fs.promises.access(path); ret_Fs = true } catch (e) { }
-                if (ret_Fs) { const configFile = _fs.readFileSync(path); config = JSON.parse(configFile) } else { config = {} }
-                if (inf.action == 'set') { // CONFIG: SET
-                    try {
-                        if (!inf.key || inf.key == '') { ret['msg'] = `\n #### ERRO #### CONFIG SET \n INFORMAR A 'key' \n\n`; }
-                        else if (!inf.value && !inf.value == false) {
-                            ret['msg'] = `\n #### ERRO #### CONFIG SET \n INFORMAR O 'value' \n\n`;
-                        } else {
-                            ret['ret'] = true; ret['msg'] = `CONFIG SET: OK`; config[inf.key] = inf.value;
-                            _fs.writeFileSync(path, JSON.stringify(config, null, 2));
-                        }
-                    } catch (e) { ret['msg'] = regexE({ 'e': e }).res }
+                if (ret_Fs) { const configFile = await _fs.promises.readFile(path, 'utf8'); config = JSON.parse(configFile) } else { config = {} }
+                if (!inf.key || inf.key == '') { ret['msg'] = `\n #### ERRO #### CONFIG \n INFORMAR A 'key' \n\n`; }
+                else if (inf.action == 'set') { // CONFIG: SET
+                    if (!inf.value && !inf.value == false) {
+                        ret['msg'] = `\n #### ERRO #### CONFIG \n INFORMAR O 'value' \n\n`;
+                    } else {
+                        config[inf.key] = inf.value;
+                        infFile = { 'action': 'write', 'path': path, 'rewrite': false, 'text': JSON.stringify(config, null, 2) }
+                        retFile = await file(infFile); ret['ret'] = true; ret['msg'] = `CONFIG SET: OK`
+                    }
                 } else if (inf.action == 'get') { // #### CONFIG NODE: GET
-                    try {
-                        if (!inf.key || inf.key == '') { ret['msg'] = `\n #### ERRO #### CONFIG GET \n INFORMAR A 'key' \n\n`; }
-                        else {
-                            if (!ret_Fs) { ret['msg'] = `\n #### ERRO #### CONFIG GET \n ARQUIVO '${path}' NAO ENCONTRADO \n\n`; }
-                            else if (config[inf.key]) { ret['ret'] = true; ret['msg'] = `CONFIG GET: OK`; ret['res'] = config[inf.key]; }
-                            else { ret['msg'] = `\n #### ERRO #### CONFIG GET \n CHAVE '${inf.key}' NAO ENCONTRADA \n\n`; }
-                        }
-                    } catch (e) { ret['msg'] = regexE({ 'e': e }).res }
+                    if (!ret_Fs) { ret['msg'] = `\n #### ERRO #### CONFIG GET \n ARQUIVO '${path}' NAO ENCONTRADO \n\n`; }
+                    else if (inf.key == '*' || (inf.key !== '*' && config[inf.key])) {
+                        ret['ret'] = true; ret['msg'] = `CONFIG GET: OK`;
+                        ret['res'] = inf.key == '*' ? config : config[inf.key]
+                    }
+                    else { ret['msg'] = `\n #### ERRO #### CONFIG GET \n CHAVE '${inf.key}' NAO ENCONTRADA \n\n`; }
                 } else if (inf.action == 'del') { // #### CONFIG NODE: DEL
-                    try {
-                        if (!inf.key || inf.key == '') { ret['msg'] = `\n #### ERRO #### CONFIG DEL \n INFORMAR A 'key' \n\n`; }
-                        else {
-                            if (!ret_Fs) { ret['msg'] = `\n #### ERRO #### CONFIG GET \n ARQUIVO '${path}' NAO ENCONTRADO \n\n`; }
-                            else if (config[inf.key]) {
-                                ret['ret'] = true; ret['msg'] = `CONFIG DEL: OK`; delete config[inf.key];
-                                _fs.writeFileSync(path, JSON.stringify(config, null, 2));
-                            } else { ret['msg'] = `\n #### ERRO #### CONFIG DEL \n CHAVE '${inf.key}' NAO ENCONTRADA \n\n`; }
-                        }
-                    } catch (e) { ret['msg'] = regexE({ 'e': e }).res }
+                    if (!ret_Fs) { ret['msg'] = `\n #### ERRO #### CONFIG DEL\n ARQUIVO '${path}' NAO ENCONTRADO \n\n`; }
+                    else if (config[inf.key]) {
+                        delete config[inf.key]
+                        infFile = { 'action': 'write', 'path': path, 'rewrite': false, 'text': JSON.stringify(config, null, 2) }
+                        retFile = await file(infFile); ret['ret'] = true; ret['msg'] = `CONFIG DEL: OK`
+                    } else { ret['msg'] = `\n #### ERRO #### CONFIG DEL \n CHAVE '${inf.key}' NAO ENCONTRADA \n\n`; }
                 }
             }
         }
-    } catch (e) { ret['msg'] = regexE({ 'e': e }).res }; if (!ret.ret) { console.log(ret.msg) }; return ret
+    } catch (e) { const m = await regexE({ 'e': e }); ret['msg'] = m.res }; if (!ret.ret) { console.log(ret.msg) }; return ret
 }
 
 function dateHour(inf = 0) { // NAO POR COMO 'async'!!!
-    let ret = { 'ret': false };
+    let ret = { 'ret': false }
     try {
         const dt1 = new Date(); dt1.setSeconds(new Date().getSeconds() + inf).setSeconds; const dt2 = Date.now() + (inf * 1000);
         ret['res'] = {
@@ -365,22 +358,22 @@ function dateHour(inf = 0) { // NAO POR COMO 'async'!!!
             'monNam': ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'][dt1.getMonth()]
         }; // manter o 'String' para forcar o '0' (zero) na frente → '001'
         ret['ret'] = true; ret['msg'] = `DATE HOUR: OK`
-    } catch (e) { ret['msg'] = regexE({ 'e': e }).res }; if (!ret.ret) { console.log(ret.msg) }; return ret
+    } catch (e) { (async () => { const m = await regexE({ 'e': e }); ret['msg'] = m.res; console.log(ret.msg); return ret })() }; if (!ret.ret) { console.log(ret.msg) }; return ret
 }
 
 function secToHour(inf) { // NAO POR COMO 'async'!!!
-    let ret = { 'ret': false };
+    let ret = { 'ret': false }
     try {
         const hou = Math.floor(inf / 3600).toString().padStart(2, "0");
         const min = Math.floor((inf % 3600) / 60).toString().padStart(2, "0");
         const sec = (inf % 60).toString().padStart(2, "0");
         ret['res'] = String(`${hou}:${min}:${sec}`) // manter o 'String' para forcar o '0' (zero) na frente → '001'
         ret['ret'] = true; ret['msg'] = `SEC TO HOUR: OK`
-    } catch (e) { ret['msg'] = regexE({ 'e': e }).res }; if (!ret.ret) { console.log(ret.msg) }; return ret
+    } catch (e) { (async () => { const m = await regexE({ 'e': e }); ret['msg'] = m.res; console.log(ret.msg); return ret })() }; if (!ret.ret) { console.log(ret.msg) }; return ret
 }
 
-function regex(inf) {
-    let ret = { 'ret': false };
+function regex(inf) { // NAO POR COMO 'async'!!!
+    let ret = { 'ret': false }
     try {
         if (inf.pattern.includes('(.*?)')) {
             let res = {}; let ok = false; const patternSplit = inf.pattern.split('(.*?)');
@@ -411,17 +404,17 @@ function regex(inf) {
                 else { ret['msg'] = `\n #### ERRO #### REGEX \n PADRAO '${inf.pattern}' NAO ENCONTRADO \n\n`; }
             }
         }
-    } catch (e) { ret['msg'] = regexE({ 'e': e }).res }; return ret
+    } catch (e) { (async () => { const m = await regexE({ 'e': e }); ret['msg'] = m.res; return ret })() }; return ret
 }
 
 async function random(inf) {
-    let ret = { 'ret': false };
+    let ret = { 'ret': false }
     try {
         const min = inf.min; const max = inf.max; const message = inf.await ? true : false
         const number = Math.floor(Math.random() * (max - min + 1) + min) * 1000;
         if (message) { console.log(`AGUARDANDO: ${number / 1000} SEGUNDOS`); await new Promise(resolve => setTimeout(resolve, number)); }
         ret['ret'] = true; ret['msg'] = `RANDON: OK`; ret['res'] = number / 1000;
-    } catch (e) { ret['msg'] = regexE({ 'e': e }).res }; if (!ret.ret) { console.log(ret.msg) }; return ret
+    } catch (e) { const m = await regexE({ 'e': e }); ret['msg'] = m.res }; if (!ret.ret) { console.log(ret.msg) }; return ret
 }
 
 // ############### GLOBAL OBJECT ###############
@@ -435,16 +428,14 @@ async function globalChanged(i) {
 }
 // ############### ###############
 
-function regexE(inf) {
-    let ret = { 'ret': false };
+async function regexE(inf) {
+    let ret = { 'ret': false }
     try {
-        ret['ret'] = true; ret['msg'] = `REGEX E: OK`; const match = inf.e.stack.match(/(\w+\.\w+):(\d+):\d+/);
-        if (match && match.length === 3) { ret['res'] = `\n #### ERRO #### ${match[1]} [${match[2]}] \n ${inf.e.toString()} \n\n` }
-        else { ret['res'] = `\n #### ERRO #### NAO IDENTIFICADO [NAO IDENTIFICADA] \n ${inf.e.toString()} \n\n` }
-    } catch (e) {
-        const match = e.stack.match(/(\w+\.\w+):(\d+):\d+/);
-        ret['msg'] = `\n #### ERRO #### ${match[1]} [${match[2]}] \n ${e.toString()} \n\n`
-    } if (!ret.ret) { console.log(ret.msg) }; return ret
+        ret['msg'] = `REGEX E: OK`; const match = inf.e.stack.match(/(\w+\.\w+):(\d+):\d+/)
+        if (match && match.length == 3) { ret['res'] = `\n #### ERRO #### ${match[1]} [${match[2]}] \n ${inf.e.toString()} \n\n` }
+        else { ret['res'] = `\n\n #### ERRO #### NAO IDENTIFICADO [NAO IDENTIFICADA] \n ${inf.e.toString()} \n\n` }
+        if (typeof window == 'undefined') { const retLog = await log({ 'folder': 'JavaScript', 'rewrite': true, 'file': `log.txt`, 'text': ret }) }; ret['ret'] = true;
+    } catch (e) { console.log(`\n\n #### ERRO REGEXe #### ${e} \n\n`) } return ret
 }
 
 function orderObj(o) {
@@ -452,17 +443,22 @@ function orderObj(o) {
 }
 
 async function jsonInterpret(inf) {
-    let ret = { 'ret': false };
+    let ret = { 'ret': false }
     try {
         const json = JSON.stringify(inf.json); const res = json.replace(/\$\[(.*?)\]/g, (match, p1) => g[p1])
         ret['ret'] = true; ret['msg'] = `JSON INTERPRET: OK`; ret['res'] = res;
-    } catch (e) { ret['msg'] = regexE({ 'e': e }).res }; if (!ret.ret) { console.log(ret.msg) }; return ret
+    } catch (e) { const m = await regexE({ 'e': e }); ret['msg'] = m.res }; if (!ret.ret) { console.log(ret.msg) }; return ret
 }
 
-if (typeof window !== 'undefined') { // CHROME
-    window['jsonInterpret'] = jsonInterpret;
-} else { // NODEJS
-    global['jsonInterpret'] = jsonInterpret;
+async function log(inf) {
+    let ret = { 'ret': false }
+    try {
+        let time = dateHour().res, mon = `MES_${time.mon}_${time.monNam}`, day = `DIA_${time.day}`, hou = `${time.hou}.${time.min}.${time.sec}.${time.mil}`, pathOk
+        let text = inf.text; pathOk = `log/${inf.folder}`; if (['timeLastGet.txt', 'reset.js'].includes(inf.file)) { pathOk = `${pathOk}/${inf.file}` }
+        else if (inf.rewrite) { text = `${hou}\n${inf.text}\n\n`; pathOk = `${pathOk}/${mon}/${day}/${inf.file}` } else { pathOk = `${pathOk}/${mon}/${day}/${hou}_${inf.file}` }
+        const infFile = { 'action': 'write', 'functionLocal': false, 'text': text, 'rewrite': inf.rewrite ? true : false, 'path': pathOk };
+        const retFile = await file(infFile); ret['msg'] = `LOG: OK`; ret['res'] = `${conf[1]}:/${conf[3]}/${pathOk}`; ret['ret'] = true
+    } catch (e) { }; return ret
 }
 
 // ############### CLEAR CONSOLE ###############
@@ -478,15 +474,18 @@ if (typeof window !== 'undefined') { // CHROME
     window['g'] = {}; window['p'] = p; window['conf'] = retFile.res;
     // ## functions
     window['api'] = api; window['file'] = file; window['configStorage'] = configStorage;
-    window['dateHour'] = dateHour; window['secToHour'] = secToHour; window['regex'] = regex; window['random'] = random;
-    window['regexE'] = regexE; window['gO'] = gO; window['gOAdd'] = gOAdd;
-    window['gORem'] = gORem; window['orderObj'] = orderObj; window['jsonInterpret'] = jsonInterpret;
+    window['dateHour'] = dateHour; window['secToHour'] = secToHour;
+    window['regex'] = regex; window['random'] = random; window['regexE'] = regexE;
+    window['gO'] = gO; window['gOAdd'] = gOAdd; window['gORem'] = gORem;
+    window['orderObj'] = orderObj; window['jsonInterpret'] = jsonInterpret; window['log'] = log;
 } else { // NODEJS
     global['g'] = {}; global['p'] = p; global['conf'] = retFile.res;
     // ## functions
-    global['api'] = api; global['file'] = file; global['configStorage'] = configStorage; global['dateHour'] = dateHour;
-    global['secToHour'] = secToHour; global['regex'] = regex; global['random'] = random; global['regexE'] = regexE; global['gO'] = gO;
-    global['gOAdd'] = gOAdd; global['gORem'] = gORem; global['orderObj'] = orderObj; global['jsonInterpret'] = jsonInterpret;
+    global['api'] = api; global['file'] = file; global['configStorage'] = configStorage;
+    global['dateHour'] = dateHour; global['secToHour'] = secToHour; global['regex'] = regex;
+    global['random'] = random; global['regexE'] = regexE; global['gO'] = gO;
+    global['gOAdd'] = gOAdd; global['gORem'] = gORem; global['orderObj'] = orderObj;
+    global['jsonInterpret'] = jsonInterpret; global['log'] = log;
 }
 
 
