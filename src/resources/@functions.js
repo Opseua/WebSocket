@@ -76,7 +76,7 @@ if (typeof window == 'undefined') { _fs = await import('fs'); _path = await impo
 // if (retJsonInterpret.ret) { retJsonInterpret = JSON.parse(retJsonInterpret.res) }
 // console.log(retJsonInterpret)
 // - # -         - # -     - # -     - # -     - # -     - # -     - # -     - # -
-// await log({ 'folder': '###_TESTE_###', 'file': `TESTE.txt`, 'text': 'INF AQUI' })
+// await log({ 'folder': '###_TESTE_###', 'path': `TESTE.txt`, 'text': 'INF AQUI' })
 
 // for (const nameKey in json.taskName) { console.log(nameKey) }
 
@@ -434,7 +434,7 @@ async function regexE(inf) {
         ret['msg'] = `REGEX E: OK`; const match = inf.e.stack.match(/(\w+\.\w+):(\d+):\d+/)
         if (match && match.length == 3) { ret['res'] = `\n #### ERRO #### ${match[1]} [${match[2]}] \n ${inf.e.toString()} \n\n` }
         else { ret['res'] = `\n\n #### ERRO #### NAO IDENTIFICADO [NAO IDENTIFICADA] \n ${inf.e.toString()} \n\n` }
-        if (typeof window == 'undefined') { const retLog = await log({ 'folder': 'JavaScript', 'rewrite': true, 'file': `log.txt`, 'text': ret }) }; ret['ret'] = true;
+        if (typeof window == 'undefined') { const retLog = await log({ 'folder': 'JavaScript', 'rewrite': true, 'path': `log.txt`, 'text': ret }) }; ret['ret'] = true;
     } catch (e) { console.log(`\n\n #### ERRO REGEXe #### ${e} \n\n`) } return ret
 }
 
@@ -454,8 +454,8 @@ async function log(inf) {
     let ret = { 'ret': false }
     try {
         let time = dateHour().res, mon = `MES_${time.mon}_${time.monNam}`, day = `DIA_${time.day}`, hou = `${time.hou}.${time.min}.${time.sec}.${time.mil}`, pathOk
-        let text = inf.text; pathOk = `log/${inf.folder}`; if (['timeLastGet.txt', 'reset.js'].includes(inf.file)) { pathOk = `${pathOk}/${inf.file}` }
-        else if (inf.rewrite) { text = `${hou}\n${inf.text}\n\n`; pathOk = `${pathOk}/${mon}/${day}/${inf.file}` } else { pathOk = `${pathOk}/${mon}/${day}/${hou}_${inf.file}` }
+        let text = inf.text; pathOk = `log/${inf.folder}`; if (['timeLastGet.txt', 'reset.js'].includes(inf.path)) { pathOk = `${pathOk}/${inf.path}` }
+        else if (inf.rewrite) { text = `${hou}\n${inf.text}\n\n`; pathOk = `${pathOk}/${mon}/${day}/${inf.path}` } else { pathOk = `${pathOk}/${mon}/${day}/${hou}_${inf.path}` }
         const infFile = { 'action': 'write', 'functionLocal': false, 'text': text, 'rewrite': inf.rewrite ? true : false, 'path': pathOk };
         const retFile = await file(infFile); ret['msg'] = `LOG: OK`; ret['res'] = `${conf[1]}:/${conf[3]}/${pathOk}`; ret['ret'] = true
     } catch (e) { }; return ret

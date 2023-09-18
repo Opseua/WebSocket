@@ -13,7 +13,7 @@ async function server(inf) {
         function getClients() {
             let res = Object.keys(rooms).map(r => ({ 'sala': r, 'qtd': rooms[r].size }));
             const dH = dateHour().res; res.unshift({ 'hour': `${dH.hou}:${dH.min}:${dH.sec}` }); return JSON.stringify(res)
-        }; await log({ 'folder': 'JavaScript', 'rewrite': true, 'file': `log.txt`, 'text': 'START' })
+        }; await log({ 'folder': 'JavaScript', 'rewrite': true, 'path': `log.txt`, 'text': 'START' })
 
         function sendRoom(room, message, sender) {
             const clientsInRoom = rooms[room]; if (clientsInRoom) {
@@ -33,8 +33,8 @@ async function server(inf) {
                         res.end(`${req.method}: OK | CLIENTS:\n\n${getClients()}`)
                     } else if (room.toLowerCase() == par3 || message.toLowerCase() == par3) {
                         res.end(`${req.method}: OK ### RESET ###`);
-                        await log({ 'folder': 'JavaScript', 'rewrite': true, 'file': `log.txt`, 'text': 'RESET' })
-                        await log({ 'folder': 'JavaScript', 'file': `reset.js`, 'text': ' ' })
+                        await log({ 'folder': 'JavaScript', 'rewrite': true, 'path': `log.txt`, 'text': 'RESET' })
+                        await log({ 'folder': 'JavaScript', 'path': `reset.js`, 'text': ' ' })
                     } else if (!rooms[room]) { res.end(`${req.method}: ERRO | NAO EXISTE '${room}'`) }
                     else if (message.length == 0) { res.end(`${req.method}: ERRO | MENSAGEM VAZIA '${room}'`) }
                     else { sendRoom(room, message, null); res.end(`${req.method}: OK '${room}'`) }
@@ -45,7 +45,7 @@ async function server(inf) {
         const wss = new WebS({ server });
         wss.on('connection', async (ws, req) => {
             ws.isAlive = true; ws.on('error', async (text) => {
-                (console.error); await log({ 'folder': 'JavaScript', 'rewrite': true, 'file': `log.txt`, 'text': error })
+                (console.error); await log({ 'folder': 'JavaScript', 'rewrite': true, 'path': `log.txt`, 'text': error })
             })
             ws.on('pong', heartbeat); clients.add(ws); const urlParts = req.url.split('/')
             if (urlParts.length < 3 && urlParts['1'] == '') { ws.send(`WEBSOCKET: ERRO | INFORMAR A SALA`); ws.terminate() }
@@ -54,11 +54,11 @@ async function server(inf) {
                 if (room.toLowerCase() == par1) { ws.send(`WEBSOCKET: OK | CLIENTS:\n\n${getClients()}`); ws.terminate() }
                 else if (room.toLowerCase() == par3) {
                     ws.send(`WEBSOCKET: OK ### RESET ###`)
-                    await log({ 'folder': 'JavaScript', 'rewrite': true, 'file': `log.txt`, 'text': 'RESET' })
-                    await log({ 'folder': 'JavaScript', 'file': `reset.js`, 'text': ' ' })
+                    await log({ 'folder': 'JavaScript', 'rewrite': true, 'path': `log.txt`, 'text': 'RESET' })
+                    await log({ 'folder': 'JavaScript', 'path': `reset.js`, 'text': ' ' })
                 }
                 else { if (!rooms[room]) { rooms[room] = new Set() }; rooms[room].add(ws) };
-                await log({ 'folder': 'JavaScript', 'rewrite': true, 'file': `log.txt`, 'text': `WEBSOCKET: NOVO CLIENTE '${room}'` })
+                await log({ 'folder': 'JavaScript', 'rewrite': true, 'path': `log.txt`, 'text': `WEBSOCKET: NOVO CLIENTE '${room}'` })
                 ws.on('message', async (text) => {
                     const message = text.toString('utf-8');
                     if (message.length == 0) { ws.send(`WEBSOCKET:  ERRO | MENSAGEM VAZIA '${room}'`) }
@@ -66,13 +66,13 @@ async function server(inf) {
                         if (message.toLowerCase() == par1) { ws.send(`WEBSOCKET: OK | CLIENTS:\n\n${getClients()}`) }
                         else if (message.toLowerCase() == par3) {
                             ws.send(`WEBSOCKET: OK ### RESET ###`)
-                            await log({ 'folder': 'JavaScript', 'rewrite': true, 'file': `log.txt`, 'text': 'RESET' })
-                            await log({ 'folder': 'JavaScript', 'file': `reset.js`, 'text': ' ' })
+                            await log({ 'folder': 'JavaScript', 'rewrite': true, 'path': `log.txt`, 'text': 'RESET' })
+                            await log({ 'folder': 'JavaScript', 'path': `reset.js`, 'text': ' ' })
                         } else { sendRoom(room, message, ws) }
                     }
                 });
                 ws.on('close', async () => {
-                    await log({ 'folder': 'JavaScript', 'rewrite': true, 'file': `log.txt`, 'text': `WEBSOCKET: CLIENTE DESCONECTADO '${room}'` })
+                    await log({ 'folder': 'JavaScript', 'rewrite': true, 'path': `log.txt`, 'text': `WEBSOCKET: CLIENTE DESCONECTADO '${room}'` })
                     clients.delete(ws); if (rooms[room]) { rooms[room].delete(ws); if (rooms[room].size == 0) { delete rooms[room] } }
                 });
             }
