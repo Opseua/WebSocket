@@ -1,5 +1,8 @@
-let _fs, _path, p, conf = ['src/config.json']
-if (typeof window == 'undefined') { _fs = await import('fs'); _path = await import('path'); }
+let _fs, _path, _cheerio, _clipboard, _WebS, _http, p, conf = ['src/config.json']
+if (typeof window !== 'undefined') { _WebS = window.WebSocket } else { // ← CHROME     ↓ NODEJS
+    _fs = await import('fs'); _path = await import('path'); _cheerio = await import('cheerio'); const { default: clipboard } = await import('clipboardy');
+    _clipboard = clipboard; const { default: WebSocket } = await import('ws'); _WebS = WebSocket; const { default: http } = await import('http'); _http = http
+}
 
 // await import('./@functions.js');
 
@@ -80,6 +83,11 @@ if (typeof window == 'undefined') { _fs = await import('fs'); _path = await impo
 // - # -         - # -     - # -     - # -     - # -     - # -     - # -     - # -
 // const objeto = { 'chave1': { 'chave2': { 'chave3': 'VALOR' } } };
 // const infHasKey = { 'key': 'chave3', 'obj': objeto }; const retHaskey = hasKey(infHasKey); console.log(retHaskey)
+// - # -         - # -     - # -     - # -     - # -     - # -     - # -     - # -
+// const retClipboard = await clipboard({ 'value': `Esse é o texto` }); console.log(retClipboard)
+// - # -         - # -     - # -     - # -     - # -     - # -     - # -     - # -
+// const infTranslate = { 'source': 'auto', 'target': 'pt', 'text': `Hi, what your name?` };
+// const retTranslate = await translate(infTranslate);console.log(retTranslate)
 
 // for (const nameKey in json.taskName) { console.log(nameKey) }
 
@@ -457,6 +465,91 @@ function hasKey(inf) { // NAO POR COMO 'async'!!!
     } catch (e) { (async () => { const m = await regexE({ 'e': e }); ret['msg'] = m.res; console.log(ret.msg); return ret })() }; if (!ret.ret) { console.log(ret.msg) }; return ret
 }
 
+async function clipboard(inf) {
+    let ret = { 'ret': false }
+    try {
+        if (inf.value == null || inf.value == '') { ret['msg'] = `\n\n #### ERRO #### CLIPBOARD \n INFORMAR O 'value' \n\n` }
+        else {
+            let text = inf.value; if (typeof text === 'object') { text = JSON.stringify(text, null, 2) }  // OBJETO INDENTADO EM TEXTO BRUTO
+            if (typeof window !== 'undefined') { // CHROME
+                const element = document.createElement('textarea'); element.value = text; document.body.appendChild(element);
+                element.select(); document.execCommand('copy'); document.body.removeChild(element);
+            } else { _clipboard.writeSync(text); /*console.log(clipboard.readSync())*/ } // NODEJS
+            ret['ret'] = true; ret['msg'] = 'CLIPBOARD: OK';
+        }
+    } catch (e) { const m = await regexE({ 'e': e }); ret['msg'] = m.res }; if (!ret.ret) { console.log(ret.msg) }; return ret
+}
+
+async function translate(inf) {
+    let ret = { 'ret': false }
+    try {
+        const infApi = {
+            method: 'GET', url: `https://translate.google.com/m?sl=${inf.source}&tl=${inf.target}&q=${encodeURIComponent(inf.text)}&hl=pt-BR`,
+            headers: {}
+        }; const retApi = await api(infApi); if (!retApi.ret) { return ret }; const res = retApi.res.body;
+        const retRegex = regex({ 'pattern': 'class="result-container">(.*?)</div>', 'text': res }); if (!retRegex.ret) { return ret }; let d, $
+        if (typeof window !== 'undefined') { d = new DOMParser().parseFromString(retRegex.res['3'], "text/html").documentElement.textContent } // CHROME
+        else { $ = _cheerio.load(retRegex.res['3']); d = _cheerio.load($('body').html())('body').text() } // NODEJS
+        ret['res'] = d; ret['ret'] = true; ret['msg'] = `TRANSLATE: OK`;
+    } catch (e) { const m = await regexE({ 'e': e }); ret['msg'] = m.res }; if (!ret.ret) { console.log(ret.msg) }; return ret
+}
+
+async function webSocketRet(inf) {
+
+    // {
+    //     "fun": [{
+    //         "securityPass": "####################",
+    //         "funRet": { "retUrl": false, "funA": "ARRAY AQUI" },
+    //         "funRun": {
+    //             "name": "notification", "par": { "title": "TITULO 1", "text": "TEXTO" }
+    //         }
+    //     },
+    //     {
+    //         "securityPass": "####################",
+    //         "funRet": { "retUrl": false, "funA": "ARRAY AQUI" },
+    //         "funRun": {
+    //             "name": "notification", "par": { "title": "TITULO 1", "text": "TEXTO" }
+    //         }
+    //     }]
+    // }
+
+    let ret = { 'ret': false }
+    try {
+        const infConfigStorage = { 'action': 'get', 'key': 'webSocket' }; let retConfigStorage = await configStorage(infConfigStorage)
+        if (!retConfigStorage.ret) { return ret } else { retConfigStorage = retConfigStorage.res }
+        const data = JSON.parse(inf.data); const wsHost = retConfigStorage.ws1; const portWebSocket = retConfigStorage.portWebSocket;
+        const device0Ret = retConfigStorage.device0.ret; const securityPass = retConfigStorage.securityPass
+        function label(f) { return typeof (typeof window !== 'undefined' ? window : global)[f] === 'function' }
+        await Promise.all(data.fun.map(async (value, index) => {
+            // --------------------------------------------------
+            if (value.securityPass !== securityPass) { ret['msg'] = `\n #### SECURITYPASS INCORRETO #### \n\n ${JSON.stringify(data)} \n\n` }
+            else if (!label(value.funRun.name)) { ret['msg'] = `\n #### FUNCAO '${value.funRun.name}' NAO EXITE #### \n\n ${JSON.stringify(data)} \n\n` }
+            else {
+                let name; if (typeof window !== 'undefined') { name = window[value.funRun.name] } // CHROME
+                else { name = global[value.funRun.name] } // NODEJS
+                const infName = value.funRun.par; const retName = await name(infName)
+                if (value.funRet && value.funRet.retUrl) {
+                    let wsRet; if (typeof value.funRet.retUrl === 'boolean') { wsRet = `ws://${wsHost}:${portWebSocket}/${device0Ret}` }
+                    else { wsRet = `${value.funRet.retUrl}` }
+                    wsRet = new _WebS(wsRet); wsRet.onerror = (e) => { console.error(`WEBSOCKET RET: ERRO WS`) }
+                    wsRet.onopen = () => {
+                        wsRet.send(JSON.stringify({ 'inf': value.funRet.retInf, 'retWs': retName, 'fun': value.funRet.fun }))
+                        wsRet.close()
+                    }
+                }; ret['ret'] = true;
+            }
+            // --------------------------------------------------
+        }))
+    } catch (e) { const m = await regexE({ 'e': e }); ret['msg'] = m.res; }
+    if (!ret.ret) {
+        console.log(ret.msg);
+        const retLog = await log({ 'folder': 'JavaScript', 'rewrite': true, 'path': `log.txt`, 'text': ret.msg })
+        if (typeof window !== 'undefined') { // CHROME
+            const infConfigStorage = { 'action': 'del', 'key': 'webSocket' }; const retConfigStorage = await configStorage(infConfigStorage)
+        }
+    }; return ret
+}
+
 // ############### CLEAR CONSOLE ###############
 console.clear(); let messageCount = 0; const clearConsole = console.log;
 console.log = async function () {
@@ -468,20 +561,25 @@ console.log = async function () {
 const infFile = { 'action': 'inf', 'functionLocal': false }; const retFile = await file(infFile);
 if (typeof window !== 'undefined') { // CHROME
     window['g'] = {}; window['p'] = p; window['conf'] = retFile.res;
+    window['_WebS'] = _WebS
     // ## functions
     window['api'] = api; window['file'] = file; window['configStorage'] = configStorage;
     window['dateHour'] = dateHour; window['secToHour'] = secToHour;
     window['regex'] = regex; window['random'] = random; window['regexE'] = regexE;
-    window['gO'] = gO; window['gOAdd'] = gOAdd; window['gORem'] = gORem;
-    window['orderObj'] = orderObj; window['jsonInterpret'] = jsonInterpret; window['log'] = log; window['hasKey'] = hasKey;
+    window['gO'] = gO; window['gOAdd'] = gOAdd; window['gORem'] = gORem; window['orderObj'] = orderObj;
+    window['jsonInterpret'] = jsonInterpret; window['log'] = log; window['hasKey'] = hasKey; window['clipboard'] = clipboard;
+    window['translate'] = translate; window['webSocketRet'] = webSocketRet;
 } else { // NODEJS
-    global['g'] = {}; global['p'] = p; global['conf'] = retFile.res;
+    global['g'] = {}; global['p'] = p; global['conf'] = retFile.res
+    global['_WebS'] = _WebS; global['_fs'] = _fs; global['_path'] = _path; global['_cheerio'] = _cheerio; global['_clipboard'] = _clipboard;
+    global['_http'] = _http; const { WebSocketServer } = await import('ws'); global['_WebSServer'] = WebSocketServer;
     // ## functions
     global['api'] = api; global['file'] = file; global['configStorage'] = configStorage;
     global['dateHour'] = dateHour; global['secToHour'] = secToHour; global['regex'] = regex;
-    global['random'] = random; global['regexE'] = regexE; global['gO'] = gO;
-    global['gOAdd'] = gOAdd; global['gORem'] = gORem; global['orderObj'] = orderObj;
-    global['jsonInterpret'] = jsonInterpret; global['log'] = log; global['hasKey'] = hasKey;
+    global['random'] = random; global['regexE'] = regexE; global['gO'] = gO; global['gOAdd'] = gOAdd;
+    global['gORem'] = gORem; global['orderObj'] = orderObj; global['jsonInterpret'] = jsonInterpret;
+    global['log'] = log; global['hasKey'] = hasKey; global['clipboard'] = clipboard; global['translate'] = translate;
+    global['webSocketRet'] = webSocketRet;
 }
 
 

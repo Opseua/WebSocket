@@ -3,13 +3,12 @@ await import('./resources/@functions.js');
 async function server(inf) {
     let ret = { 'ret': false }
     try {
-        const { default: http } = await import('http'); const { WebSocketServer } = await import('ws'); let WebS = WebSocketServer;
         const infConfigStorage = { 'action': 'get', 'key': 'webSocket' }; let retConfigStorage = await configStorage(infConfigStorage)
         if (!retConfigStorage.ret) { return ret } else { retConfigStorage = retConfigStorage.res }
         const portWebSocket = retConfigStorage.portWebSocket; const max = retConfigStorage.max
         const par1 = retConfigStorage.par1; const par2 = retConfigStorage.par2; const par3 = retConfigStorage.par3
         const clients = new Set(); let rooms = {}; function heartbeat() { this.isAlive = true }
-
+        
         function getClients() {
             let res = Object.keys(rooms).map(r => ({ 'sala': r, 'qtd': rooms[r].size }));
             const dH = dateHour().res; res.unshift({ 'hour': `${dH.hou}:${dH.min}:${dH.sec}` }); return JSON.stringify(res)
@@ -23,7 +22,7 @@ async function server(inf) {
             }
         }
 
-        const server = http.createServer(async (req, res) => {
+        const server = _http.createServer(async (req, res) => {
             res.writeHead(200, { 'Content-Type': 'text/plain' }); const urlParts = req.url.split('/');
             if (urlParts.length < 3 && urlParts['1'] == '') { res.end(`${req.method}: ERRO | INFORMAR A SALA`) } else {
                 const room = urlParts[1]; if (req.method == 'GET' || req.method == 'POST') {
@@ -42,7 +41,7 @@ async function server(inf) {
             }
         });
 
-        const wss = new WebS({ server });
+        const wss = new _WebSServer({ server });
         wss.on('connection', async (ws, req) => {
             ws.isAlive = true; ws.on('error', async (text) => {
                 (console.error); await log({ 'folder': 'JavaScript', 'rewrite': true, 'path': `log.txt`, 'text': error })
