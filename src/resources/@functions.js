@@ -1,4 +1,4 @@
-let _fs, _path, _cheerio, _clipboard, _WebS, _http, p, conf = ['src/config.json']
+let _fs, _path, _cheerio, _clipboard, _WebS, _http, p, ws1, conf = ['src/config.json']
 if (typeof window !== 'undefined') { _WebS = window.WebSocket } else { // ← CHROME     ↓ NODEJS
     _fs = await import('fs'); _path = await import('path'); _cheerio = await import('cheerio'); const { default: clipboard } = await import('clipboardy');
     _clipboard = clipboard; const { default: WebSocket } = await import('ws'); _WebS = WebSocket; const { default: http } = await import('http'); _http = http
@@ -79,7 +79,7 @@ if (typeof window !== 'undefined') { _WebS = window.WebSocket } else { // ← CH
 // if (retJsonInterpret.ret) { retJsonInterpret = JSON.parse(retJsonInterpret.res) }
 // console.log(retJsonInterpret)
 // - # -         - # -     - # -     - # -     - # -     - # -     - # -     - # -
-// await log({ 'folder': '###_TESTE_###', 'path': `TESTE.txt`, 'text': 'INF AQUI' })
+// await log({ 'folder': '#_TESTE_#', 'path': `TESTE.txt`, 'text': 'INF AQUI' })
 // - # -         - # -     - # -     - # -     - # -     - # -     - # -     - # -
 // const objeto = { 'chave1': { 'chave2': { 'chave3': 'VALOR' } } };
 // const infHasKey = { 'key': 'chave3', 'obj': objeto }; const retHaskey = hasKey(infHasKey); console.log(retHaskey)
@@ -614,8 +614,7 @@ async function chatGpt(inf) { // https://chat.openai.com/api/auth/session
                 'method': 'POST', 'url': `https://api.openai.com/v1/chat/completions`,
                 'headers': { 'Content-Type': 'application/json', 'Authorization': `Bearer ${retConfigStorage.Authorization}` },
                 'body': { "model": "gpt-3.5-turbo", "messages": [{ "role": "user", "content": inf.input }] }
-            }; const retApi = await api(infApi); if (!retApi.ret) { return ret }
-            const res = JSON.parse(retApi.res.body);
+            }; const retApi = await api(infApi); if (!retApi.ret) { return ret }; const res = JSON.parse(retApi.res.body);
             if ('choices' in res) { ret['res'] = res.choices[0].message.content; ret['ret'] = true; ret['msg'] = `CHAT GPT OPEN AI: OK` }
             else {
                 infConfigStorage = { 'action': 'del', 'key': 'chatGptOpenAi' }; retConfigStorage = await configStorage(infConfigStorage)
@@ -641,14 +640,14 @@ async function chatGpt(inf) { // https://chat.openai.com/api/auth/session
                 },
                 'body': { "prompt": inf.input, "userId": `#/chat/${dateHour().res.timMil}`, "network": false, "system": "", "withoutContext": false, "stream": false }
             }; const retApi = await api(infApi); if (!retApi.ret || retApi.res.code !== 200) { return ret }
-            if (retApi.res.code == 200) { ret['res'] = retApi.res.body; ret['ret'] = true; ret['msg'] = `CHAT GPT OPEN AI: OK` }
+            if (retApi.res.code == 200) { ret['res'] = retApi.res.body; ret['ret'] = true; ret['msg'] = `CHAT GPT AI CHATOS: OK` }
             else {
                 let infNotification =
                 {
                     'duration': 5, 'icon': './src/media/notification_3.png',
                     'title': `ERRO AO PESQUISAR NO CHATGPT`,
                     'text': '',
-                }; await notification(infNotification); ret['msg'] = `\n #### ERRO #### CHAT GPT OPEN AI \n \n\n`;
+                }; await notification(infNotification); ret['msg'] = `\n #### ERRO #### CHAT GPT AI CHATOS \n \n\n`;
             }
         }
         else if (inf.provider == 'railway') {
@@ -666,7 +665,7 @@ async function chatGpt(inf) { // https://chat.openai.com/api/auth/session
             }; const retApi = await api(infApi); if (!retApi.ret) { return ret }
             if (retApi.res.code == 200) {
                 const res = retApi.res.body.split('\n').filter(str => str.trim() !== '').map(jsonStr => JSON.parse(jsonStr));
-                ret['res'] = res[res.length - 1].text; ret['ret'] = true; ret['msg'] = `CHAT GPT OPEN AI: OK`
+                ret['res'] = res[res.length - 1].text; ret['ret'] = true; ret['msg'] = `CHAT GPT RAILWAY: OK`
             }
             else {
                 let infNotification =
@@ -674,8 +673,23 @@ async function chatGpt(inf) { // https://chat.openai.com/api/auth/session
                     'duration': 5, 'icon': './src/media/notification_3.png',
                     'title': `ERRO AO PESQUISAR NO CHATGPT`,
                     'text': '',
-                }; await notification(infNotification)
-                ret['msg'] = `\n #### ERRO #### CHAT GPT OPEN AI \n \n\n`; ret['res'] = 'res.error.message';
+                }; await notification(infNotification); ret['msg'] = `\n #### ERRO #### CHAT GPT RAILWAY \n \n\n`; ret['res'] = 'res.error.message';
+            }
+        } else if (inf.provider == 'ec2') {
+            infConfigStorage = { 'action': 'get', 'key': 'webSocket' }; retConfigStorage = await configStorage(infConfigStorage)
+            if (!retConfigStorage.ret) { return ret } else { retConfigStorage = retConfigStorage.res }
+            const infApi = {
+                'method': 'POST', 'url': `http://${retConfigStorage.ws1}:${retConfigStorage.portWebSocket}/chatgpt`,
+                'headers': {}, 'body': { "prompt": inf.input, "network": inf.network ? true : false }
+            }; const retApi = await api(infApi); if (!retApi.ret) { return ret }
+            if (JSON.parse(retApi.res.body).ret) { ret['res'] = JSON.parse(retApi.res.body).res; ret['ret'] = true; ret['msg'] = `CHAT GPT EC2: OK` }
+            else {
+                let infNotification =
+                {
+                    'duration': 5, 'icon': './src/media/notification_3.png',
+                    'title': `ERRO AO PESQUISAR NO CHATGPT`,
+                    'text': '',
+                }; await notification(infNotification); ret['msg'] = `\n #### ERRO #### CHAT GPT EC2 \n \n\n`; ret['res'] = 'res.error.message';
             }
         }
     } catch (e) { const m = await regexE({ 'e': e }); ret['msg'] = m.res }; if (!ret.ret) { console.log(ret.msg) }; return ret
@@ -692,7 +706,7 @@ console.log = async function () {
 const infFile = { 'action': 'inf', 'functionLocal': false }; const retFile = await file(infFile);
 if (typeof window !== 'undefined') { // CHROME
     window['g'] = {}; window['p'] = p; window['conf'] = retFile.res;
-    window['_WebS'] = _WebS
+    window['_WebS'] = _WebS; window['ws1'] = ws1
     // ## functions
     window['api'] = api; window['file'] = file; window['configStorage'] = configStorage;
     window['dateHour'] = dateHour; window['secToHour'] = secToHour;
@@ -702,7 +716,8 @@ if (typeof window !== 'undefined') { // CHROME
     window['translate'] = translate; window['webSocketRet'] = webSocketRet; window['chatGpt'] = chatGpt
 } else { // NODEJS
     global['g'] = {}; global['p'] = p; global['conf'] = retFile.res
-    global['_WebS'] = _WebS; global['_fs'] = _fs; global['_path'] = _path; global['_cheerio'] = _cheerio; global['_clipboard'] = _clipboard;
+    global['_WebS'] = _WebS; global['ws1'] = ws1; global['_fs'] = _fs; global['_path'] = _path; global['_cheerio'] = _cheerio;
+    global['_clipboard'] = _clipboard;
     global['_http'] = _http; const { WebSocketServer } = await import('ws'); global['_WebSServer'] = WebSocketServer;
     // ## functions
     global['api'] = api; global['file'] = file; global['configStorage'] = configStorage;
