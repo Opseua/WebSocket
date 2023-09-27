@@ -5,10 +5,10 @@ async function server(inf) {
     try {
         const infConfigStorage = { 'action': 'get', 'key': 'webSocket' }; let retConfigStorage = await configStorage(infConfigStorage)
         if (!retConfigStorage.ret) { return ret } else { retConfigStorage = retConfigStorage.res }
-        const portWebSocket = retConfigStorage.portWebSocket; const max = retConfigStorage.max
-        const par1 = retConfigStorage.par1; const par2 = retConfigStorage.par2; const par3 = retConfigStorage.par3
+        const portWebSocket = retConfigStorage.portWebSocket; const max = retConfigStorage.max; const chatGptAiChatos = retConfigStorage.chatGptAiChatos
+        const par1 = retConfigStorage.par1; const par2 = retConfigStorage.par2; const par3 = retConfigStorage.par3; const par4 = retConfigStorage.par4
         const clients = new Set(); let rooms = {}; function heartbeat() { this.isAlive = true }
-        
+
         function getClients() {
             let res = Object.keys(rooms).map(r => ({ 'sala': r, 'qtd': rooms[r].size }));
             const dH = dateHour().res; res.unshift({ 'hour': `${dH.hou}:${dH.min}:${dH.sec}` }); return JSON.stringify(res)
@@ -34,6 +34,23 @@ async function server(inf) {
                         res.end(`${req.method}: OK ### RESET ###`);
                         await log({ 'folder': 'JavaScript', 'rewrite': true, 'path': `log.txt`, 'text': 'RESET' })
                         await log({ 'folder': 'JavaScript', 'path': `reset.js`, 'text': ' ' })
+                    } else if (req.method == 'POST' && room.toLowerCase() == par4) {
+                        try {
+                            if (!message.length > 0) { throw new Error() } else {
+                                message = JSON.parse(message); if (!message.prompt) { res.end(`INFORMAR O 'prompt'`) } else {
+                                    const infApi = {
+                                        'method': 'POST', 'url': chatGptAiChatos,
+                                        'headers': {
+                                            'sec-ch-ua': '"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"', 'accept': 'application/json, text/plain, */*',
+                                            'content-type': 'application/json', 'dnt': '1', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"',
+                                            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
+                                            'origin': 'https://chat9.yqcloud.top', 'sec-fetch-site': 'cross-site', 'sec-fetch-mode': 'cors',
+                                            'sec-fetch-dest': 'empty', 'referer': 'https://chat9.yqcloud.top/', 'accept-language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7,it;q=0.6'
+                                        }, 'body': { "prompt": message.prompt, "userId": "#/chat/1695782874949", "network": message.network ? true : false, "system": "", "withoutContext": false, "stream": false }
+                                    }; const r = await api(infApi); res.end(JSON.stringify({ 'ret': r.res.code == 200 ? true : false, 'res': r.res.body }))
+                                }
+                            }
+                        } catch (e) { res.end(`BODY INVALIDO`) }
                     } else if (!rooms[room]) { res.end(`${req.method}: ERRO | NAO EXISTE '${room}'`) }
                     else if (message.length == 0) { res.end(`${req.method}: ERRO | MENSAGEM VAZIA '${room}'`) }
                     else { sendRoom(room, message, null); res.end(`${req.method}: OK '${room}'`) }
