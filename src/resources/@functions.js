@@ -429,7 +429,7 @@ async function regexE(inf) {
         ret['msg'] = `REGEX E: OK`; const match = inf.e.stack.match(/(\w+\.\w+):(\d+):\d+/)
         if (match && match.length == 3) { ret['res'] = `\n\n #### ERRO #### ${match[1]} [${match[2]}] \n ${inf.e.toString()} \n\n` }
         else { ret['res'] = `\n\n #### ERRO #### NAO IDENTIFICADO [NAO IDENTIFICADA] \n ${inf.e.toString()} \n\n` }
-        if (typeof window == 'undefined') { const retLog = await log({ 'folder': 'JavaScript', 'rewrite': true, 'path': `log.txt`, 'text': ret }) }; ret['ret'] = true;
+        if (typeof window == 'undefined') { const retLog = await log({ 'folder': 'JavaScript', 'rewrite': true, 'path': `err.txt`, 'text': ret }) }; ret['ret'] = true;
     } catch (e) { console.log(`\n\n #### ERRO REGEXe #### ${e} \n\n`) } return ret
 }
 
