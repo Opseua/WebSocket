@@ -95,6 +95,12 @@ if (typeof window !== 'undefined') { _WebS = window.WebSocket } else { // ← CH
 
 // for (const nameKey in json.taskName) { console.log(nameKey) }
 
+// async function exemploAsync() {
+//     const array = ['A', 'B', 'C', 'D', 'E']; for (let [index, value] of array.entries()) {
+//         await new Promise(resolve => { setTimeout(resolve, 1000) }); console.log(`INDEX: ${index} | VALUE: ${value}`)
+//     }; console.log('FIM')
+// }; exemploAsync()
+
 async function api(inf) {
     let ret = { 'ret': false }
     try {
