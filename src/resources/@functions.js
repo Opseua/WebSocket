@@ -578,7 +578,9 @@ async function chatGpt(inf) { // https://chat.openai.com/api/auth/session
                     }; await notification(infNotification); return ret
                 }; const infGetCookies = { 'url': retTabSearch.res.url, 'cookieSearch': '__Secure-next-auth.session-token' }; const retGetCookies = await getCookies(infGetCookies)
                 if (!(retGetCookies.ret)) {
-                    infConfigStorage = { 'action': 'del', 'key': 'chatGptOra.ai' }; retConfigStorage = await configStorage(infConfigStorage)
+                    if (typeof window !== 'undefined') { // CHROME
+                        infConfigStorage = { 'action': 'del', 'key': 'chatGptOra.ai' }; retConfigStorage = await configStorage(infConfigStorage)
+                    }
                     if (!retConfigStorage.ret) { return ret } else { retConfigStorage = retConfigStorage.res }
                     let infNotification =
                     {
@@ -602,7 +604,9 @@ async function chatGpt(inf) { // https://chat.openai.com/api/auth/session
             }; const retApi = await api(infApi); if (!retApi.ret) { return ret }; const res = JSON.parse(retApi.res.body);
             if ('response' in res) { ret['res'] = res.response; ret['ret'] = true; ret['msg'] = `CHAT GPT ORA AI: OK` }
             else {
-                infConfigStorage = { 'action': 'del', 'key': 'chatGptOra.ai' }; retConfigStorage = await configStorage(infConfigStorage)
+                if (typeof window !== 'undefined') { // CHROME
+                    infConfigStorage = { 'action': 'del', 'key': 'chatGptOra.ai' }; retConfigStorage = await configStorage(infConfigStorage)
+                }
                 let infNotification =
                 {
                     'duration': 5, 'icon': './src/media/notification_3.png',
@@ -622,7 +626,9 @@ async function chatGpt(inf) { // https://chat.openai.com/api/auth/session
             }; const retApi = await api(infApi); if (!retApi.ret) { return ret }; const res = JSON.parse(retApi.res.body);
             if ('choices' in res) { ret['res'] = res.choices[0].message.content; ret['ret'] = true; ret['msg'] = `CHAT GPT OPEN AI: OK` }
             else {
-                infConfigStorage = { 'action': 'del', 'key': 'chatGptOpenAi' }; retConfigStorage = await configStorage(infConfigStorage)
+                if (typeof window !== 'undefined') { // CHROME
+                    infConfigStorage = { 'action': 'del', 'key': 'chatGptOpenAi' }; retConfigStorage = await configStorage(infConfigStorage)
+                }
                 let infNotification =
                 {
                     'duration': 5, 'icon': './src/media/notification_3.png',
