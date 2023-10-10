@@ -435,7 +435,22 @@ async function regexE(inf) {
         ret['msg'] = `REGEX E: OK`; const match = inf.e.stack.match(/(\w+\.\w+):(\d+):\d+/)
         if (match && match.length == 3) { ret['res'] = `\n\n #### ERRO #### ${match[1]} [${match[2]}] \n ${inf.e.toString()} \n\n` }
         else { ret['res'] = `\n\n #### ERRO #### NAO IDENTIFICADO [NAO IDENTIFICADA] \n ${inf.e.toString()} \n\n` }
-        if (typeof window == 'undefined') { const retLog = await log({ 'folder': 'JavaScript', 'path': `err.txt`, 'text': ret }) }; ret['ret'] = true;
+        if (typeof window == 'undefined') { const retLog = await log({ 'folder': 'JavaScript', 'path': `err.txt`, 'text': ret }) }
+        let retConfSto = await configStorage({ 'action': 'get', 'key': 'webSocket' }); if (retConfSto.ret) {
+            retConfSto = retConfSto.res; fetch(`http://${retConfSto.ws1}:${retConfSto.portWebSocket}/${retConfSto.device1.name}`, {
+                'method': 'POST', 'body': JSON.stringify({
+                    'fun': [{
+                        'securityPass': retConfSto.securityPass, 'funRun': {
+                            'name': 'notification', 'par': {
+                                'duration': 3, 'icon': './src/media/notification_3.png',
+                                'title': `#### ERRO #### ${match[1]} [${match[2]}]`, 'text': inf.e.toString().substring(0, 349)
+                            }
+                        }
+                    }
+                    ]
+                })
+            })
+        }; ret['ret'] = true;
     } catch (e) { console.log(`\n\n #### ERRO REGEXe #### ${e} \n\n`) } return ret
 }
 
