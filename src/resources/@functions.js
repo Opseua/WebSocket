@@ -8,12 +8,12 @@ if (typeof window !== 'undefined') { _WebS = window.WebSocket } else { // ← CH
 
 // let infApi, retApi
 // infApi = {                                    // ########## TYPE → text
-//     'method': 'PUT', 'url': `https://ntfy.sh/`,
+//     'method': 'POST', 'url': `https://ntfy.sh/`,
 //     'headers': { 'content-type': 'text/plain;charset=UTF-8' },
 //     'body': '{"topic":"OPSEUA","message":"a"}'
 // };
 // infApi = {                                    // ########## TYPE → json
-//     'method': 'PUT', 'url': `https://ntfy.sh/`,
+//     'method': 'POST', 'url': `https://ntfy.sh/`,
 //     'headers': { 'accept-language': 'application/json' },
 //     'body': { 'Chave': 'aaaaaaaaaaa', 'Valor': 'bbbbbbbbb' }
 // };
@@ -21,7 +21,7 @@ if (typeof window !== 'undefined') { _WebS = window.WebSocket } else { // ← CH
 // formData.append('grant_type', 'client_credentials');
 // formData.append('resource', 'https://graph.microsoft.com');
 // infApi = {
-//     'method': 'PUT', 'url': `https://ntfy.sh/`,
+//     'method': 'POST', 'url': `https://ntfy.sh/`,
 //     'headers': { 'Content-Type': 'application/x-www-form-urlencoded' },
 //     'body': formData.toString()
 // };
@@ -89,7 +89,7 @@ if (typeof window !== 'undefined') { _WebS = window.WebSocket } else { // ← CH
 // const infTranslate = { 'source': 'auto', 'target': 'pt', 'text': `Hi, what your name?` };
 // const retTranslate = await translate(infTranslate);console.log(retTranslate)
 // - # -         - # -     - # -     - # -     - # -     - # -     - # -     - # -
-// let infChatGpt = { 'provider': 'railway', 'input': `Qual a idade de Marte?` }
+// let infChatGpt = { 'provider': 'open.ai', 'input': `Qual a idade de Marte?` }
 // let retChatGpt = await chatGpt(infChatGpt)
 // console.log(retChatGpt.res)
 
@@ -429,7 +429,7 @@ async function regexE(inf) {
         ret['msg'] = `REGEX E: OK`; const match = inf.e.stack.match(/(\w+\.\w+):(\d+):\d+/)
         if (match && match.length == 3) { ret['res'] = `\n\n #### ERRO #### ${match[1]} [${match[2]}] \n ${inf.e.toString()} \n\n` }
         else { ret['res'] = `\n\n #### ERRO #### NAO IDENTIFICADO [NAO IDENTIFICADA] \n ${inf.e.toString()} \n\n` }
-        if (typeof window == 'undefined') { const retLog = await log({ 'folder': 'JavaScript', 'rewrite': true, 'path': `err.txt`, 'text': ret }) }; ret['ret'] = true;
+        if (typeof window == 'undefined') { const retLog = await log({ 'folder': 'JavaScript', 'path': `err.txt`, 'text': ret }) }; ret['ret'] = true;
     } catch (e) { console.log(`\n\n #### ERRO REGEXe #### ${e} \n\n`) } return ret
 }
 
@@ -448,12 +448,11 @@ async function jsonInterpret(inf) {
 async function log(inf) {
     let ret = { 'ret': false }
     try {
-        let time = dateHour().res, mon = `MES_${time.mon}_${time.monNam}`, day = `DIA_${time.day}`, hou = `${time.hou}.${time.min}.${time.sec}.${time.mil}`, pathOk
+        let time = dateHour().res, mon = `MES_${time.mon}_${time.monNam}`, day = `DIA_${time.day}`, hou = `${time.hou}.${time.min}.${time.sec}.${time.mil}`, pathOk, rewrite = false
         let text = inf.text; pathOk = `log/${inf.folder}`; if (['reg.txt', 'reset.js'].includes(inf.path)) { pathOk = `${pathOk}/${inf.path}` }
-        else if (inf.rewrite) {
-            text = typeof inf.text === 'object' ? `${hou}\n${JSON.stringify(inf.text)}\n\n` : `${hou}\n${inf.text}\n\n`; pathOk = `${pathOk}/${mon}/${day}/${inf.path}`
-        } else { pathOk = `${pathOk}/${mon}/${day}/${hou}_${inf.path}` }
-        const infFile = { 'action': 'write', 'functionLocal': false, 'text': text, 'rewrite': inf.rewrite ? true : false, 'path': pathOk };
+        else if (['log.txt', 'err.txt'].includes(inf.path)) { pathOk = `${pathOk}/${mon}/${day}_${inf.path}`; rewrite = true } else { pathOk = `${pathOk}/${mon}/${day}/${hou}_${inf.path}` }
+        if (rewrite) { text = typeof text === 'object' ? `${hou}\n${JSON.stringify(inf.text)}\n\n` : `${hou}\n${inf.text}\n\n` }
+        const infFile = { 'action': 'write', 'functionLocal': false, 'text': text, 'rewrite': rewrite, 'path': pathOk };
         const retFile = await file(infFile); ret['msg'] = `LOG: OK`; ret['res'] = `${conf[1]}:/${conf[3]}/${pathOk}`; ret['ret'] = true
     } catch (e) { }; return ret
 }
@@ -547,7 +546,7 @@ async function webSocketRet(inf) {
     } catch (e) { const m = await regexE({ 'e': e }); ret['msg'] = m.res; }
     if (!ret.ret) {
         console.log(ret.msg);
-        const retLog = await log({ 'folder': 'JavaScript', 'rewrite': true, 'path': `log.txt`, 'text': ret.msg })
+        const retLog = await log({ 'folder': 'JavaScript', 'path': `log.txt`, 'text': ret.msg })
         if (typeof window !== 'undefined') { // CHROME
             const infConfigStorage = { 'action': 'del', 'key': 'webSocket' }; const retConfigStorage = await configStorage(infConfigStorage)
         }
@@ -613,7 +612,7 @@ async function chatGpt(inf) { // https://chat.openai.com/api/auth/session
             const infApi = {
                 'method': 'POST', 'url': `https://api.openai.com/v1/chat/completions`,
                 'headers': { 'Content-Type': 'application/json', 'Authorization': `Bearer ${retConfigStorage.Authorization}` },
-                'body': { "model": "gpt-3.5-turbo", "messages": [{ "role": "user", "content": inf.input }] }
+                'body': { 'model': 'gpt-3.5-turbo', 'messages': [{ 'role': 'user', 'content': inf.input }], 'temperature': 0.7 }
             }; const retApi = await api(infApi); if (!retApi.ret) { return ret }; const res = JSON.parse(retApi.res.body);
             if ('choices' in res) { ret['res'] = res.choices[0].message.content; ret['ret'] = true; ret['msg'] = `CHAT GPT OPEN AI: OK` }
             else {
@@ -650,32 +649,7 @@ async function chatGpt(inf) { // https://chat.openai.com/api/auth/session
                 }; await notification(infNotification); ret['msg'] = `\n #### ERRO #### CHAT GPT AI CHATOS \n \n\n`;
             }
         }
-        else if (inf.provider == 'railway') {
-            infConfigStorage = { 'action': 'get', 'key': 'chatGptRailway' }; retConfigStorage = await configStorage(infConfigStorage)
-            if (!retConfigStorage.ret) { return ret } else { retConfigStorage = retConfigStorage.res }
-            const infApi = {
-                'method': 'POST', 'url': retConfigStorage.url,
-                'headers': {
-                    'accept': 'application/json, text/plain, */*', 'accept-language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7,it;q=0.6',
-                    'content-type': 'application/json', 'dnt': '1', 'sec-ch-ua': '"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"',
-                    'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'sec-fetch-dest': 'empty', 'sec-fetch-mode': 'cors',
-                    'sec-fetch-site': 'same-origin', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
-                },
-                'body': { "prompt": inf.input, "options": {} }
-            }; const retApi = await api(infApi); if (!retApi.ret) { return ret }
-            if (retApi.res.code == 200) {
-                const res = retApi.res.body.split('\n').filter(str => str.trim() !== '').map(jsonStr => JSON.parse(jsonStr));
-                ret['res'] = res[res.length - 1].text; ret['ret'] = true; ret['msg'] = `CHAT GPT RAILWAY: OK`
-            }
-            else {
-                let infNotification =
-                {
-                    'duration': 5, 'icon': './src/media/notification_3.png',
-                    'title': `ERRO AO PESQUISAR NO CHATGPT`,
-                    'text': '',
-                }; await notification(infNotification); ret['msg'] = `\n #### ERRO #### CHAT GPT RAILWAY \n \n\n`; ret['res'] = 'res.error.message';
-            }
-        } else if (inf.provider == 'ec2') {
+        else if (inf.provider == 'ec2') {
             infConfigStorage = { 'action': 'get', 'key': 'webSocket' }; retConfigStorage = await configStorage(infConfigStorage)
             if (!retConfigStorage.ret) { return ret } else { retConfigStorage = retConfigStorage.res }
             const infApi = {
