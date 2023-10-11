@@ -433,29 +433,22 @@ async function regexE(inf) {
     let ret = { 'ret': false }
     try {
         ret['msg'] = `REGEX E: OK`; const match = inf.e.stack.match(/(\w+\.\w+):(\d+):\d+/)
-        if (match && match.length == 3) { ret['res'] = `\n\n #### ERRO #### ${match[1]} [${match[2]}] \n ${inf.e.toString()} \n\n` }
-        else { ret['res'] = `\n\n #### ERRO #### NAO IDENTIFICADO [NAO IDENTIFICADA] \n ${inf.e.toString()} \n\n` }
+        if (match && match.length == 3) { ret['a'] = `#### ERRO #### ${match[1]} [${match[2]}]` }
+        else { ret['a'] = `NAO IDENTIFICADO [NAO IDENTIFICADA]` }; ret['b'] = inf.e.toString(); ret['res'] = `\n\n ${ret.a} \n ${ret.b} \n\n`
+        ret['c'] = typeof window == 'undefined' ? 'ALERTA: NODEJS' : 'ALERTA: CHROME'; ret['d'] = `${ret.a}\n${ret.b.substring(0, 349).replace('\n\n ', '')}`
         if (typeof window == 'undefined') { const retLog = await log({ 'folder': 'JavaScript', 'path': `err.txt`, 'text': ret }) }
-        let retConfSto = await configStorage({ 'action': 'get', 'key': 'webSocket' }); if (retConfSto.ret) {
-            retConfSto = retConfSto.res; fetch(`http://${retConfSto.ws1}:${retConfSto.portWebSocket}/${retConfSto.device1.name}`, {
+        let r = await configStorage({ 'action': 'get', 'key': 'webSocket' }); if (r.ret) {
+            r = r.res; let a = { a: 'securityPass', b: 'notification', c: './src/media/notification_3.png', d: 'duration' }; let par = {
                 'method': 'POST', 'body': JSON.stringify({
-                    'fun': [{
-                        'securityPass': retConfSto.securityPass, 'funRun': {
-                            'name': 'notification', 'par': {
-                                'duration': 3, 'icon': './src/media/notification_3.png',
-                                'title': `#### ERRO #### ${match[1]} [${match[2]}]`, 'text': inf.e.toString().substring(0, 349)
-                            }
-                        }
-                    }
-                    ]
+                    'fun': [{ [a.a]: r[a.a], 'funRun': { 'name': a.b, 'par': { [a.d]: 3, 'icon': a.c, 'title': ret.c, 'text': ret.d } } }]
                 })
-            })
+            }; if (!ret.b.includes('aa')) { fetch(`http://${r.ws1}:${r.portWebSocket}/${r.device1.name}`, par) }
         }; ret['ret'] = true;
     } catch (e) { console.log(`\n\n #### ERRO REGEXe #### ${e} \n\n`) } return ret
 }
 
 function orderObj(o) {
-    return Object.fromEntries(Object.entries(o).sort((a, b) => a[0].localeCompare(b[0])));
+    return Object.fromEntries(Object.entries(o).sort((a, b) => a[0].localeCompare(b[0])))
 }
 
 async function jsonInterpret(inf) {
