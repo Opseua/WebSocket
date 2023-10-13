@@ -1,33 +1,21 @@
-let _fs, _path, _cheerio, _clipboard, _WebS, _http, _run, g = {}, conf = ['src/config.json']
-if (typeof window !== 'undefined') { _WebS = window.WebSocket } else { // ← CHROME     ↓ NODEJS
-    _fs = await import('fs'); _path = await import('path'); _cheerio = await import('cheerio'); const { default: clipboard } = await import('clipboardy');
-    _clipboard = clipboard; const { default: WebSocket } = await import('ws'); _WebS = WebSocket; const { default: http } = await import('http'); _http = http
+let _fs, _path, _cheerio, _clipboard, _WebS, _http, _run, gLet = {}, conf = ['src/config.json']; if (typeof window !== 'undefined') { _WebS = window.WebSocket } else { // ← CHROME ↓ NODEJS
+    _fs = await import('fs'); _path = await import('path'); _cheerio = await import('cheerio'); const { default: clipboard } = await import('clipboardy'); _clipboard = clipboard;
+    const { default: WebSocket } = await import('ws'); _WebS = WebSocket; const { default: http } = await import('http'); _http = http
     const { exec } = await import('child_process'); _run = exec
 }
 
 // await import('./@functions.js');
 
 // let infApi, retApi
-// infApi = {                                    // ########## TYPE → text
-//     'method': 'POST', 'url': `https://ntfy.sh/`,
-//     'headers': { 'content-type': 'text/plain;charset=UTF-8' },
-//     'body': '{"topic":"OPSEUA","message":"a"}'
-// };
-// infApi = {                                    // ########## TYPE → json
-//     'method': 'POST', 'url': `https://ntfy.sh/`,
-//     'headers': { 'accept-language': 'application/json' },
-//     'body': { 'Chave': 'aaaaaaaaaaa', 'Valor': 'bbbbbbbbb' }
-// };
-// const formData = new URLSearchParams();       // ########## TYPE → x-www-form-urlencoded
+// infApi = { // ########## TYPE → text
+//     'method': 'POST', 'url': `https://ntfy.sh/`, 'headers': { 'content-type': 'text/plain;charset=UTF-8' }, 'body': '{"topic":"OPSEUA","message":"a"}'
+// }; infApi = { // ########## TYPE → json
+//     'method': 'POST', 'url': `https://ntfy.sh/`, 'headers': { 'accept-language': 'application/json' }, 'body': { 'Chave': 'aaa', 'Valor': 'bbb' }
+// }; const formData = new URLSearchParams(); // ########## TYPE → x-www-form-urlencoded
 // formData.append('grant_type', 'client_credentials');
-// formData.append('resource', 'https://graph.microsoft.com');
-// infApi = {
-//     'method': 'POST', 'url': `https://ntfy.sh/`,
-//     'headers': { 'Content-Type': 'application/x-www-form-urlencoded' },
-//     'body': formData.toString()
-// };
-// retApi = await api(infApi);
-// console.log(retApi)
+// formData.append('resource', 'https://graph.microsoft.com'); infApi = {
+//     'method': 'POST', 'url': `https://ntfy.sh/`, 'headers': { 'Content-Type': 'application/x-www-form-urlencoded' }, 'body': formData.toString()
+// }; retApi = await api(infApi); console.log(retApi)
 // - # -         - # -     - # -     - # -     - # -     - # -     - # -     - # -
 // let infFile, retFile
 // infFile = { 'action': 'inf' }
@@ -42,43 +30,32 @@ if (typeof window !== 'undefined') { _WebS = window.WebSocket } else { // ← CH
 // infConfigStorage = { 'action': 'set', 'key': 'NomeDaChave', 'value': 'Valor da chave' }
 // infConfigStorage = { 'action': 'get', 'key': 'NomeDaChave' }
 // infConfigStorage = { 'action': 'del', 'key': 'NomeDaChave' }
-// retConfigStorage = await configStorage(infConfigStorage)
-// console.log(retConfigStorage)
+// retConfigStorage = await configStorage(infConfigStorage); console.log(retConfigStorage)
+// @@
+// let csf = configStorage, cs; gLet = 'AAAAAAA'; cs = await csf([gLet]); gLet = cs.res; console.log('######', gLet)
 // - # -         - # -     - # -     - # -     - # -     - # -     - # -     - # -
-// const RetDateHour = dateHour()
-// console.log(RetDateHour)
+// const retDateHour = dateHour(); console.log(retDateHour)
 // - # -         - # -     - # -     - # -     - # -     - # -     - # -     - # -
-// const infRandom = { 'min': 3, 'max': 10, 'await': true }
-// const retRandom = await random(infRandom)
-// console.log(retRandom)
+// const infRandom = { 'min': 3, 'max': 10, 'await': true }; const retRandom = await random(infRandom); console.log(retRandom)
 // - # -         - # -     - # -     - # -     - # -     - # -     - # -     - # -
-// for (let i = 0; i < 10; i++) {
-//     console.log(`Iteração ${i + 1}`);
-// }
+// for (let i = 0; i < 10; i++) { console.log(`Iteração ${i + 1}`) }
 // - # -         - # -     - # -     - # -     - # -     - # -     - # -     - # -
-// let i = 0; const loop = ['A', 'B', 'C', 'D', 'E'];
-// async function runLoop() {
+// let i = 0; const loop = ['A', 'B', 'C', 'D', 'E']; async function runLoop() {
 //   while (i < loop.length) { i++; console.log(loop[i - 1]);
-//     if (loop[i - 1] == 'C') {  break }
-//     const infRandom = { 'min': 1, 'max': 5, 'await': true }
-//     const retRandom = await random(infRandom)
+//     if (loop[i - 1] == 'C') {  break };  const infRandom = { 'min': 1, 'max': 5, 'await': true }; const retRandom = await random(infRandom)
 //   }; console.log('Loop concluído!');
 // } ; runLoop();
 // - # -         - # -     - # -     - # -     - # -     - # -     - # -     - # -
 // const infRegex = { 'pattern': 'UM(.*?)TRES', 'text': 'UMDOISTRES' }
 // const infRegex = { 'simple': true, 'pattern': '*DOIS*', 'text': 'UMDOISTRES' }
-// const retRegex = regex(infRegex)
-// console.log(retRegex)
+// const retRegex = regex(infRegex); console.log(retRegex)
 // - # -         - # -     - # -     - # -     - # -     - # -     - # -     - # -
 // await new Promise(resolve => setTimeout(resolve, (2500)));
 // globalObject.inf = { 'alert': true, 'function': 'Nome', 'res': 'AAAAA' };
 // - # -         - # -     - # -     - # -     - # -     - # -     - # -     - # -
-// infGlobal['var1'] = 'LUA'; infGlobal['var2'] = 'SOL'
-// const json = `{ "nasa": "Tanto a $[var1] quanto o $[var2] são redondos" }`;
-// const infJsonInterpret = { 'json': json, 'vars': infGlobal }
-// let retJsonInterpret = await jsonInterpret(infJsonInterpret)
-// if (retJsonInterpret.ret) { retJsonInterpret = JSON.parse(retJsonInterpret.res) }
-// console.log(retJsonInterpret)
+// infGlobal['var1'] = 'LUA'; infGlobal['var2'] = 'SOL';  const json = `{ "nasa": "Tanto a $[var1] quanto o $[var2] são redondos" }`;
+// const infJsonInterpret = { 'json': json, 'vars': infGlobal };  let retJsonInterpret = await jsonInterpret(infJsonInterpret)
+// if (retJsonInterpret.ret) { retJsonInterpret = JSON.parse(retJsonInterpret.res) }; console.log(retJsonInterpret)
 // - # -         - # -     - # -     - # -     - # -     - # -     - # -     - # -
 // await log({ 'folder': '#_TESTE_#', 'path': `TESTE.txt`, 'text': 'INF AQUI' })
 // - # -         - # -     - # -     - # -     - # -     - # -     - # -     - # -
@@ -87,12 +64,9 @@ if (typeof window !== 'undefined') { _WebS = window.WebSocket } else { // ← CH
 // - # -         - # -     - # -     - # -     - # -     - # -     - # -     - # -
 // const retClipboard = await clipboard({ 'value': `Esse é o texto` }); console.log(retClipboard)
 // - # -         - # -     - # -     - # -     - # -     - # -     - # -     - # -
-// const infTranslate = { 'source': 'auto', 'target': 'pt', 'text': `Hi, what your name?` };
-// const retTranslate = await translate(infTranslate);console.log(retTranslate)
+// const infTranslate = { 'source': 'auto', 'target': 'pt', 'text': `Hi, what your name?` }; const retTranslate = await translate(infTranslate);console.log(retTranslate)
 // - # -         - # -     - # -     - # -     - # -     - # -     - # -     - # -
-// let infChatGpt = { 'provider': 'open.ai', 'input': `Qual a idade de Marte?` }
-// let retChatGpt = await chatGpt(infChatGpt)
-// console.log(retChatGpt.res)
+// let infChatGpt = { 'provider': 'open.ai', 'input': `Qual a idade de Marte?` }; let retChatGpt = await chatGpt(infChatGpt); console.log(retChatGpt.res)
 // - # -         - # -     - # -     - # -     - # -     - # -     - # -     - # -
 // const infChromeActions = { 'action': 'badge', 'text': 'OLA' }
 // const retChromeActions = await chromeActions(infChromeActions); console.log(retChromeActions)
@@ -130,8 +104,7 @@ if (typeof window !== 'undefined') { _WebS = window.WebSocket } else { // ← CH
 // }; exemploAsync()
 
 async function api(inf) {
-    let ret = { 'ret': false }
-    try {
+    let ret = { 'ret': false }; try {
         if (typeof UrlFetchApp !== 'undefined') { // ################ GOOGLE APP SCRIPT
             const reqOpt = { 'method': inf.method, 'redirect': 'follow', 'keepalive': true, 'muteHttpExceptions': true, 'validateHttpsCertificates': true, };
             if (inf.headers) { reqOpt['headers'] = inf.headers }
@@ -150,8 +123,7 @@ async function api(inf) {
 }
 
 async function file(inf) {
-    let ret = { 'ret': false }
-    try { // PASSAR NO jsonInterpret
+    let ret = { 'ret': false }; try { // PASSAR NO jsonInterpret
         if (/\$\[[^\]]+\]/.test(JSON.stringify(inf))) { let rji = await jsonInterpret({ 'json': inf }); if (rji.ret) { rji = JSON.parse(rji.res); inf = rji } }
         if (!inf.action || !['write', 'read', 'del', 'inf', 'relative', 'list', 'change'].includes(inf.action)) {
             ret['msg'] = `\n\n #### ERRO #### FILE \n INFORMAR O 'action' \n\n`;
@@ -211,7 +183,7 @@ async function file(inf) {
                         }; functionLocal = await getRoot(fileOk);
                         fileOk = fileOk.replace(`${functionLocal}/`, ''); jsonFile = await _fs.promises.readFile(`${functionLocal}/${conf}`, 'utf8');
                         jsonFile = JSON.parse(jsonFile).conf
-                        conf = [conf[0], jsonFile[0], functionLocal.replace(`${jsonFile[0]}:/`, ''), process.cwd().replace(/\\/g, '/').replace(`${jsonFile[0]}:/`, ''), `${fileOk}.js`]
+                        conf = [conf[0], jsonFile[0], functionLocal.split(':/')[1], process.cwd().replace(/\\/g, '/').split(':/')[1], `${fileOk}.js`]
                     }
                 } else { // NOME DO ARQUIVO
                     text = e; const pattern = new RegExp(`at.*?${typeof window !== 'undefined' ? conf[2] : conf[3]}(.*?)\\.js`)
@@ -261,78 +233,87 @@ async function file(inf) {
 }
 
 async function configStorage(inf) {
-    let ret = { 'ret': false }
-    try {
-        let run = false; if (!inf.action || !['set', 'get', 'del'].includes(inf.action)) { ret['msg'] = `\n\n #### ERRO #### CONFIG STORAGE \n INFORMAR O 'action' \n\n` }
-        else {
-            if ((!inf.key || inf.key == '')) { ret['msg'] = `\n\n #### ERRO #### CONFIG STORAGE \n INFORMAR A 'key' \n\n`; }
-            else { if (inf.action == 'set' && !inf.value) { ret['msg'] = `\n\n #### ERRO #### CONFIG STORAGE \n INFORMAR O 'value' \n\n` } else { run = true } }
-        }; if (run) {
-            if (typeof window !== 'undefined') { // CHROME
-                if (inf.action == 'set') { // #### STORAGE: SET
-                    await storageSet(inf); async function storageSet(inf) {
-                        return new Promise((resolve) => {
-                            const data = {}; data[inf.key] = inf.value; chrome.storage.local.set(data, async () => {
-                                if (chrome.runtime.lastError) { ret['msg'] = `\n\n #### ERRO #### STORAGE SET \n ${chrome.runtime.lastError} \n\n` }
-                                else { ret['ret'] = true; ret['msg'] = 'STORAGE SET: OK' }; resolve(ret);
+    let ret = { 'ret': false }; try {
+        if (inf instanceof Array && inf.length == 1) { // ### CS
+            inf['path'] = `${conf[1]}:/${conf[2]}/log/reg.json`; let dt, rf = {}; if (inf[0] == '' || inf[0] == '*') {
+                rf = await file({ 'action': 'read', 'path': inf.path }); if (!rf.ret) { dt = {} } else { dt = JSON.parse(rf.res).dt }
+            } else { dt = typeof inf[0] === 'object' ? inf[0] : { 'key': inf[0] } };
+            if (!rf.ret) { rf = await file({ 'action': 'write', 'path': inf.path, 'rewrite': false, 'text': JSON.stringify({ 'dt': dt }, null, 2) }) }
+            ret['res'] = dt; ret['ret'] = true; ret['msg'] = 'CS: OK'
+        } else {
+            let run = false; if (!inf.action || !['set', 'get', 'del'].includes(inf.action)) { ret['msg'] = `\n\n #### ERRO #### CONFIG STORAGE \n INFORMAR O 'action' \n\n` } else {
+                if ((!inf.key || inf.key == '')) { ret['msg'] = `\n\n #### ERRO #### CONFIG STORAGE \n INFORMAR A 'key' \n\n`; }
+                else { if (inf.action == 'set' && !inf.value) { ret['msg'] = `\n\n #### ERRO #### CONFIG STORAGE \n INFORMAR O 'value' \n\n` } else { run = true } }
+            }; if (run) {
+                if (typeof window !== 'undefined') { // CHROME
+                    if (inf.action == 'set') { // #### STORAGE: SET
+                        await storageSet(inf); async function storageSet(inf) {
+                            return new Promise((resolve) => {
+                                const data = {}; data[inf.key] = inf.value; chrome.storage.local.set(data, async () => {
+                                    if (chrome.runtime.lastError) { ret['msg'] = `\n\n #### ERRO #### STORAGE SET \n ${chrome.runtime.lastError} \n\n` }
+                                    else { ret['ret'] = true; ret['msg'] = 'STORAGE SET: OK' }; resolve(ret);
+                                });
                             });
-                        });
-                    }
-                } else if (inf.action == 'get') { // #### STORAGE: GET
-                    await storageGet(inf); async function storageGet(inf) {
-                        return new Promise((resolve) => {
-                            chrome.storage.local.get(inf.key, async (result) => {
-                                if (chrome.runtime.lastError) { ret['msg'] = `\n\n #### ERRO #### STORAGE GET \n ${chrome.runtime.lastError} \n\n` }
-                                else if (Object.keys(result).length == 0) {
-                                    async function checkConfig() {
-                                        const infFile = { 'action': 'read', 'path': conf[0], 'functionLocal': true }
-                                        const retFile = await file(infFile); const config = JSON.parse(retFile.res);
-                                        if (config[inf.key]) {
-                                            const data = {}; data[inf.key] = config[inf.key]; return new Promise((resolve) => {
-                                                chrome.storage.local.set(data, async () => {
-                                                    if (chrome.runtime.lastError) { ret['msg'] = `\n\n #### ERRO #### STORAGE SET* \n ${chrome.runtime.lastError} \n\n` }
-                                                    else { ret['ret'] = true; ret['msg'] = 'STORAGE GET: OK'; ret['res'] = config[inf.key] }; resolve(ret)
-                                                });
-                                            })
-                                        } else { ret['msg'] = `\n\n #### ERRO #### STORAGE GET \n CHAVE '${inf.key}' NAO ENCONTRADA \n\n`; }
-                                    }; await checkConfig()
-                                } else { ret['ret'] = true; ret['msg'] = 'STORAGE GET: OK'; ret['res'] = result[inf.key] }; resolve(ret);
+                        }
+                    } else if (inf.action == 'get') { // #### STORAGE: GET
+                        await storageGet(inf); async function storageGet(inf) {
+                            return new Promise((resolve) => {
+                                chrome.storage.local.get(inf.key, async (result) => {
+                                    if (chrome.runtime.lastError) { ret['msg'] = `\n\n #### ERRO #### STORAGE GET \n ${chrome.runtime.lastError} \n\n` }
+                                    else if (Object.keys(result).length == 0) {
+                                        async function checkConfig() {
+                                            const infFile = { 'action': 'read', 'path': conf[0], 'functionLocal': true }
+                                            const retFile = await file(infFile); const config = JSON.parse(retFile.res);
+                                            if (config[inf.key]) {
+                                                const data = {}; data[inf.key] = config[inf.key]; return new Promise((resolve) => {
+                                                    chrome.storage.local.set(data, async () => {
+                                                        if (chrome.runtime.lastError) { ret['msg'] = `\n\n #### ERRO #### STORAGE SET* \n ${chrome.runtime.lastError} \n\n` }
+                                                        else { ret['ret'] = true; ret['msg'] = 'STORAGE GET: OK'; ret['res'] = config[inf.key] }; resolve(ret)
+                                                    });
+                                                })
+                                            } else { ret['msg'] = `\n\n #### ERRO #### STORAGE GET \n CHAVE '${inf.key}' NAO ENCONTRADA \n\n`; }
+                                        }; await checkConfig()
+                                    } else { ret['ret'] = true; ret['msg'] = 'STORAGE GET: OK'; ret['res'] = result[inf.key] }; resolve(ret);
+                                });
                             });
-                        });
+                        }
+                    } else if (inf.action == 'del') { // #### STORAGE: DEL
+                        await storageDel(inf); async function storageDel(inf) {
+                            return new Promise((resolve) => {
+                                chrome.storage.local.get(inf.key, async (result) => {
+                                    if (chrome.runtime.lastError) { ret['msg'] = `\n\n #### ERRO #### STORAGE DEL \n ${chrome.runtime.lastError} \n\n` }
+                                    else if (Object.keys(result).length == 0) { ret['msg'] = `\n\n #### ERRO #### STORAGE DEL \n CHAVE '${inf.key}' NAO ENCONTRADA \n\n` }
+                                    else { chrome.storage.local.remove(inf.key, async () => { }); ret['ret'] = true; ret['msg'] = 'STORAGE DEL: OK' }; resolve(ret)
+                                }); return
+                            });
+                        }
                     }
-                } else if (inf.action == 'del') { // #### STORAGE: DEL
-                    await storageDel(inf); async function storageDel(inf) {
-                        return new Promise((resolve) => {
-                            chrome.storage.local.get(inf.key, async (result) => {
-                                if (chrome.runtime.lastError) { ret['msg'] = `\n\n #### ERRO #### STORAGE DEL \n ${chrome.runtime.lastError} \n\n` }
-                                else if (Object.keys(result).length == 0) { ret['msg'] = `\n\n #### ERRO #### STORAGE DEL \n CHAVE '${inf.key}' NAO ENCONTRADA \n\n` }
-                                else { chrome.storage.local.remove(inf.key, async () => { }); ret['ret'] = true; ret['msg'] = 'STORAGE DEL: OK' }; resolve(ret)
-                            }); return
-                        });
+                } else { // ################## NODE
+                    let infFile, retFile, config, path, ret_Fs = false; if (inf.path && inf.path.includes(':')) { path = inf.path } else {
+                        if (inf.path && typeof inf.functionLocal == 'boolean') { infFile = { 'action': 'relative', 'path': inf.path, 'functionLocal': inf.functionLocal } }
+                        else { infFile = { 'action': 'relative', 'path': conf[0], 'functionLocal': true } }; retFile = await file(infFile); path = retFile.res[0]
+                    }; try { await _fs.promises.access(path); ret_Fs = true } catch (e) { }
+                    if (ret_Fs) { const configFile = await _fs.promises.readFile(path, 'utf8'); config = JSON.parse(configFile) } else { config = {} }
+                    if (!inf.key || inf.key == '') { ret['msg'] = `\n\n #### ERRO #### CONFIG \n INFORMAR A 'key' \n\n`; }
+                    else if (inf.action == 'set') { // #### CONFIG: SET
+                        if (!inf.value && !inf.value == false) { ret['msg'] = `\n\n #### ERRO #### CONFIG \n INFORMAR O 'value' \n\n` } else {
+                            if (inf.key == '*' && typeof inf.value !== 'object') { ret['msg'] = `\n\n #### ERRO #### CONFIG \n VALOR NAO É OBJETO \n\n` }
+                            else if (inf.key == '*') { config = inf.value } else { config[inf.key] = inf.value }; if (!ret.msg) {
+                                infFile = { 'action': 'write', 'path': path, 'rewrite': false, 'text': JSON.stringify(config, null, 2) }
+                                retFile = await file(infFile); ret['ret'] = true; ret['msg'] = `CONFIG SET: OK`
+                            }
+                        }
+                    } else if (inf.action == 'get') { // #### CONFIG NODE: GET
+                        if (!ret_Fs) { ret['msg'] = `\n\n #### ERRO #### CONFIG GET \n ARQUIVO '${path}' NAO ENCONTRADO \n\n` }
+                        else if (inf.key == '*' || (inf.key !== '*' && config[inf.key])) {
+                            ret['ret'] = true; ret['msg'] = `CONFIG GET: OK`; ret['res'] = inf.key == '*' ? config : config[inf.key]
+                        } else { ret['msg'] = `\n\n #### ERRO #### CONFIG GET \n CHAVE '${inf.key}' NAO ENCONTRADA \n\n` }
+                    } else if (inf.action == 'del') { // #### CONFIG NODE: DEL
+                        if (!ret_Fs) { ret['msg'] = `\n\n #### ERRO #### CONFIG DEL\n ARQUIVO '${path}' NAO ENCONTRADO \n\n` } else if (config[inf.key]) {
+                            delete config[inf.key]; infFile = { 'action': 'write', 'path': path, 'rewrite': false, 'text': JSON.stringify(config, null, 2) }
+                            retFile = await file(infFile); ret['ret'] = true; ret['msg'] = `CONFIG DEL: OK`
+                        } else { ret['msg'] = `\n\n #### ERRO #### CONFIG DEL \n CHAVE '${inf.key}' NAO ENCONTRADA \n\n`; }
                     }
-                }
-            } else { // ################## NODE
-                let infFile, retFile, config, path, ret_Fs = false; if (inf.path && inf.path.includes(':')) { path = inf.path } else {
-                    if (inf.path && typeof inf.functionLocal == 'boolean') { infFile = { 'action': 'relative', 'path': inf.path, 'functionLocal': inf.functionLocal } }
-                    else { infFile = { 'action': 'relative', 'path': conf[0], 'functionLocal': true } }; retFile = await file(infFile); path = retFile.res[0]
-                }; try { await _fs.promises.access(path); ret_Fs = true } catch (e) { }
-                if (ret_Fs) { const configFile = await _fs.promises.readFile(path, 'utf8'); config = JSON.parse(configFile) } else { config = {} }
-                if (!inf.key || inf.key == '') { ret['msg'] = `\n\n #### ERRO #### CONFIG \n INFORMAR A 'key' \n\n`; }
-                else if (inf.action == 'set') { // CONFIG: SET
-                    if (!inf.value && !inf.value == false) { ret['msg'] = `\n\n #### ERRO #### CONFIG \n INFORMAR O 'value' \n\n` } else {
-                        config[inf.key] = inf.value; infFile = { 'action': 'write', 'path': path, 'rewrite': false, 'text': JSON.stringify(config, null, 2) }
-                        retFile = await file(infFile); ret['ret'] = true; ret['msg'] = `CONFIG SET: OK`
-                    }
-                } else if (inf.action == 'get') { // #### CONFIG NODE: GET
-                    if (!ret_Fs) { ret['msg'] = `\n\n #### ERRO #### CONFIG GET \n ARQUIVO '${path}' NAO ENCONTRADO \n\n` }
-                    else if (inf.key == '*' || (inf.key !== '*' && config[inf.key])) {
-                        ret['ret'] = true; ret['msg'] = `CONFIG GET: OK`; ret['res'] = inf.key == '*' ? config : config[inf.key]
-                    } else { ret['msg'] = `\n\n #### ERRO #### CONFIG GET \n CHAVE '${inf.key}' NAO ENCONTRADA \n\n` }
-                } else if (inf.action == 'del') { // #### CONFIG NODE: DEL
-                    if (!ret_Fs) { ret['msg'] = `\n\n #### ERRO #### CONFIG DEL\n ARQUIVO '${path}' NAO ENCONTRADO \n\n` } else if (config[inf.key]) {
-                        delete config[inf.key]; infFile = { 'action': 'write', 'path': path, 'rewrite': false, 'text': JSON.stringify(config, null, 2) }
-                        retFile = await file(infFile); ret['ret'] = true; ret['msg'] = `CONFIG DEL: OK`
-                    } else { ret['msg'] = `\n\n #### ERRO #### CONFIG DEL \n CHAVE '${inf.key}' NAO ENCONTRADA \n\n`; }
                 }
             }
         }
@@ -340,8 +321,7 @@ async function configStorage(inf) {
 }
 
 function dateHour(inf = 0) { // NAO POR COMO 'async'!!!
-    let ret = { 'ret': false }
-    try {
+    let ret = { 'ret': false }; try {
         const dt1 = new Date(); dt1.setSeconds(new Date().getSeconds() + inf).setSeconds; const dt2 = Date.now() + (inf * 1000); ret['res'] = {
             'day': String(dt1.getDate()).padStart(2, '0'), 'mon': String(dt1.getMonth() + 1).padStart(2, '0'),
             'yea': String(dt1.getFullYear()), 'hou': String(dt1.getHours()).padStart(2, '0'),
@@ -353,8 +333,7 @@ function dateHour(inf = 0) { // NAO POR COMO 'async'!!!
 }
 
 function secToHour(inf) { // NAO POR COMO 'async'!!!
-    let ret = { 'ret': false }
-    try {
+    let ret = { 'ret': false }; try {
         const hou = Math.floor(inf / 3600).toString().padStart(2, "0"); const min = Math.floor((inf % 3600) / 60).toString().padStart(2, "0");
         const sec = (inf % 60).toString().padStart(2, "0"); ret['res'] = String(`${hou}:${min}:${sec}`)
         ret['ret'] = true; ret['msg'] = `SEC TO HOUR: OK` // manter o 'String' para forcar o '0' (zero) na frente → '001'
@@ -362,8 +341,7 @@ function secToHour(inf) { // NAO POR COMO 'async'!!!
 }
 
 function regex(inf) { // NAO POR COMO 'async'!!!
-    let ret = { 'ret': false }
-    try {
+    let ret = { 'ret': false }; try {
         if (inf.pattern.includes('(.*?)')) {
             let res = {}; let ok = false; const patternSplit = inf.pattern.split('(.*?)'); const split1 = patternSplit[0].replace(/[.+?^${}()|[\]\\]/g, '\\$&')
             const split2 = patternSplit[1].replace(/[.+?^${}()|[\]\\]/g, '\\$&'); const result1 = inf.text.match(`${split1}(.*?)${split2}`);
@@ -386,8 +364,7 @@ function regex(inf) { // NAO POR COMO 'async'!!!
 }
 
 async function random(inf) {
-    let ret = { 'ret': false }
-    try {
+    let ret = { 'ret': false }; try {
         const min = inf.min; const max = inf.max; const message = inf.await ? true : false
         const number = Math.floor(Math.random() * (max - min + 1) + min) * 1000;
         if (message) { console.log(`AGUARDANDO: ${number / 1000} SEGUNDOS`); await new Promise(resolve => setTimeout(resolve, number)); }
@@ -406,8 +383,7 @@ async function globalChanged(i) {
 } // ############### ###############
 
 async function regexE(inf) {
-    let ret = { 'ret': false }
-    try {
+    let ret = { 'ret': false }; try {
         ret['msg'] = `REGEX E: OK`; const match = inf.e.stack.match(/(\w+\.\w+):(\d+):\d+/)
         if (match && match.length == 3) { ret['a'] = `#### ERRO #### ${match[1]} [${match[2]}]` }
         else { ret['a'] = `NAO IDENTIFICADO [NAO IDENTIFICADA]` }; ret['b'] = inf.e.toString(); ret['res'] = `\n\n ${ret.a} \n ${ret.b} \n\n`
@@ -426,16 +402,14 @@ async function regexE(inf) {
 function orderObj(o) { return Object.fromEntries(Object.entries(o).sort((a, b) => a[0].localeCompare(b[0]))) }
 
 async function jsonInterpret(inf) {
-    let ret = { 'ret': false }
-    try {
+    let ret = { 'ret': false }; try {
         const json = JSON.stringify(inf.json); const res = json.replace(/\$\[(.*?)\]/g, (match, p1) => g[p1])
         ret['ret'] = true; ret['msg'] = `JSON INTERPRET: OK`; ret['res'] = res;
     } catch (e) { const m = await regexE({ 'e': e }); ret['msg'] = m.res }; if (!ret.ret) { console.log(ret.msg) }; return ret
 }
 
 async function log(inf) {
-    let ret = { 'ret': false }
-    try {
+    let ret = { 'ret': false }; try {
         let time = dateHour().res, mon = `MES_${time.mon}_${time.monNam}`, day = `DIA_${time.day}`, hou = `${time.hou}.${time.min}.${time.sec}.${time.mil}`, pathOk, rewrite = false
         let text = inf.text; pathOk = `log/${inf.folder}`; if (['reg.txt', 'reg1.txt', 'reg2.txt', 'reset.js'].includes(inf.path)) { pathOk = `${pathOk}/${inf.path}` }
         else if (['log.txt', 'err.txt'].includes(inf.path)) { pathOk = `${pathOk}/${mon}/${day}_${inf.path}`; rewrite = true }
@@ -447,8 +421,7 @@ async function log(inf) {
 }
 
 function hasKey(inf) { // NAO POR COMO 'async'!!!
-    let ret = { 'ret': false }
-    try {
+    let ret = { 'ret': false }; try {
         function hk(key, obj) {
             if (obj.hasOwnProperty(key)) { return true }; for (let prop in obj) {
                 if (typeof obj[prop] === 'object' && obj[prop] !== null) { if (hk(key, obj[prop])) { return true } }
@@ -458,8 +431,7 @@ function hasKey(inf) { // NAO POR COMO 'async'!!!
 }
 
 async function clipboard(inf) {
-    let ret = { 'ret': false }
-    try {
+    let ret = { 'ret': false }; try {
         if (inf.value == null || inf.value == '') { ret['msg'] = `\n\n #### ERRO #### CLIPBOARD \n INFORMAR O 'value' \n\n` } else {
             let text = inf.value; if (typeof text === 'object') { text = JSON.stringify(text, null, 2) }  // OBJETO INDENTADO EM TEXTO BRUTO
             if (typeof window !== 'undefined') { // CHROME
@@ -471,8 +443,7 @@ async function clipboard(inf) {
 }
 
 async function translate(inf) {
-    let ret = { 'ret': false }
-    try {
+    let ret = { 'ret': false }; try {
         const infApi = { method: 'GET', url: `https://translate.google.com/m?sl=${inf.source}&tl=${inf.target}&q=${encodeURIComponent(inf.text)}&hl=pt-BR`, headers: {} };
         const retApi = await api(infApi); if (!retApi.ret) { return ret }; const res = retApi.res.body;
         const retRegex = regex({ 'pattern': 'class="result-container">(.*?)</div>', 'text': res }); if (!retRegex.ret) { return ret }; let d, $
@@ -496,8 +467,7 @@ async function webSocketRet(inf) {
     //     }]
     // }
 
-    let ret = { 'ret': false }
-    try {
+    let ret = { 'ret': false }; try {
         const infConfigStorage = { 'action': 'get', 'key': 'webSocket' }; let retConfigStorage = await configStorage(infConfigStorage)
         if (!retConfigStorage.ret) { return ret } else { retConfigStorage = retConfigStorage.res }
         const data = JSON.parse(inf.data); const securityPass = retConfigStorage.securityPass
@@ -513,17 +483,14 @@ async function webSocketRet(inf) {
                 }; ret['ret'] = true
             } // --------------------------------------------------
         }))
-    } catch (e) { const m = await regexE({ 'e': e }); ret['msg'] = m.res; }
-    if (!ret.ret) {
-        console.log(ret.msg); const retLog = await log({ 'folder': 'JavaScript', 'path': `log.txt`, 'text': ret.msg }); if (typeof window !== 'undefined') { // CHROME
-            const infConfigStorage = { 'action': 'del', 'key': 'webSocket' }; const retConfigStorage = await configStorage(infConfigStorage)
-        }
+    } catch (e) { const m = await regexE({ 'e': e }); ret['msg'] = m.res }; if (!ret.ret) {
+        console.log(ret.msg); const retLog = await log({ 'folder': 'JavaScript', 'path': `log.txt`, 'text': ret.msg });
+        if (typeof window !== 'undefined') { const retConfigStorage = await configStorage({ 'action': 'del', 'key': 'webSocket' }) } // CHROME
     }; return ret
 }
 
 async function chatGpt(inf) { // https://chat.openai.com/api/auth/session
-    let ret = { 'ret': false }
-    try {
+    let ret = { 'ret': false }; try {
         let infConfigStorage, retConfigStorage; if (inf.provider == 'ora.ai') { // ######## ora.ai
             infConfigStorage = { 'action': 'get', 'key': 'chatGptOra.ai' }; retConfigStorage = await configStorage(infConfigStorage)
             if (!retConfigStorage.ret) { return ret } else { retConfigStorage = retConfigStorage.res }; if (!retConfigStorage['cookie']) {
@@ -597,8 +564,7 @@ async function chatGpt(inf) { // https://chat.openai.com/api/auth/session
 }
 
 async function devAndFun(inf) {
-    let ret = { 'ret': false }
-    try {
+    let ret = { 'ret': false }; try {
         let dev, r = await configStorage({ 'action': 'get', 'key': 'webSocket' });
         if (!r.ret) { return ret } else { r = r.res }; let stop = false; for (let [index, value] of r.devices.entries()) {
             const a = value; for (let [i, v] of a.functions.entries()) { if (v == inf.name) { dev = value; stop = true; break } }; if (stop) { break }
@@ -612,8 +578,7 @@ async function devAndFun(inf) {
 }
 
 async function chromeActions(inf) {
-    let ret = { 'ret': false }
-    try {
+    let ret = { 'ret': false }; try {
         if (typeof window == 'undefined') { // [ENCONTRAR DEVICE] NODEJS
             const infDevAndFun = {
                 'wsUrl': wsUrl, 'name': 'chromeActions', 'retUrl': inf.retUrl,
@@ -634,8 +599,7 @@ async function chromeActions(inf) {
 }
 
 async function getCookies(inf) {
-    let ret = { 'ret': false }
-    try {
+    let ret = { 'ret': false }; try {
         if (typeof window == 'undefined') { // [ENCONTRAR DEVICE] NODEJS
             const infDevAndFun = { 'wsUrl': wsUrl, 'name': 'getCookies', 'retUrl': inf.retUrl, 'par': { 'url': inf.url, 'cookieSearch': inf.cookieSearch } }
             const retDevAndFun = await devAndFun(infDevAndFun); return retDevAndFun
@@ -652,8 +616,7 @@ async function getCookies(inf) {
 };
 
 async function notification(infOk) {
-    let ret = { 'ret': false }
-    try {
+    let ret = { 'ret': false }; try {
         let inf, imgBase64; if (!infOk) { inf = {} } else { inf = infOk }; if (typeof window == 'undefined') { // [ENCONTRAR DEVICE] NODEJS
             const infDevAndFun = {
                 'wsUrl': wsUrl, 'name': 'notification', 'retUrl': inf.retUrl,
@@ -670,8 +633,7 @@ async function notification(infOk) {
             type: json.type, iconUrl: json.icon, title: json.title.substring(0, 88),   // máximo [considerando tudo 'i'] + 1 caractere
             message: json.text.substring(0, 349), buttons: json.buttons // máximo [considerando tudo 'i'] + 1 caractere
         }; chrome.notifications.create(not, (notificationId) => {
-            // ALGUM BOTAO PRESSIONADO
-            chrome.notifications.onButtonClicked.addListener((notifId, btnIdx) => { // 
+            chrome.notifications.onButtonClicked.addListener((notifId, btnIdx) => { // ALGUM BOTAO PRESSIONADO
                 if (notifId === notificationId && btnIdx === 0) { alert('1') }; if (notifId === notificationId && btnIdx === 1) { alert('2') }
             }); setTimeout(() => { chrome.notifications.clear(notificationId) }, json.duration * 1000)
         }); ret['ret'] = true; ret['msg'] = 'NOTIFICATION: OK'
@@ -679,8 +641,7 @@ async function notification(infOk) {
 }
 
 async function promptChrome(inf) {
-    let ret = { 'ret': false }
-    try {
+    let ret = { 'ret': false }; try {
         const title = (inf.title) ? `${inf.title} | Digite o comando:` : `Digite o comando:`; if (typeof window == 'undefined') { // [ENCONTRAR DEVICE] NODEJS
             const infDevAndFun = { 'wsUrl': wsUrl, 'name': 'promptChrome', 'retUrl': inf.retUrl, 'par': { 'title': inf.title } }
             const retDevAndFun = await devAndFun(infDevAndFun); return retDevAndFun
@@ -697,8 +658,7 @@ async function promptChrome(inf) {
 }
 
 async function getPage(inf) {
-    let ret = { 'ret': false }
-    try {
+    let ret = { 'ret': false }; try {
         if (typeof window == 'undefined') { // [ENCONTRAR DEVICE] NODEJS
             const infDevAndFun = { 'wsUrl': wsUrl, 'name': 'getPage', 'retUrl': inf.retUrl, 'par': { 'id': inf.id } };
             const retDevAndFun = await devAndFun(infDevAndFun); return retDevAndFun
@@ -784,8 +744,7 @@ async function openTab(inf) { // NAO USAR
         })
     } catch (e) { (async () => { const m = await regexE({ 'e': e }); return `\n #### ERRO #### SEARCH TAB \n ${m.res}` })() }
 }; async function tabSearch(inf) {
-    let ret = { 'ret': false }
-    try {
+    let ret = { 'ret': false }; try {
         if (typeof window == 'undefined') { // [ENCONTRAR DEVICE] NODEJS
             const infDevAndFun = {
                 'wsUrl': wsUrl, 'name': 'tabSearch', 'retUrl': inf.retUrl,
@@ -804,9 +763,8 @@ async function openTab(inf) { // NAO USAR
             result = await new Promise(resolve => {
                 chrome.tabs.query({}, function (tabs) {
                     if (!(typeof tabs === 'undefined') && (tabs.length > 0)) {
-                        const abaInf = tabs.map(function (tab) {
-                            return { 'id': tab.id, 'title': tab.title, 'url': tab.url, 'active': tab.active, 'index': tab.index, 'pinned': tab.pinned }
-                        }); resolve({ 'res': abaInf })
+                        const abaInf = tabs.map(function (tab) { return { 'id': tab.id, 'title': tab.title, 'url': tab.url, 'active': tab.active, 'index': tab.index, 'pinned': tab.pinned } })
+                        resolve({ 'res': abaInf })
                     } else { resolve(result) }
                 })
             })
@@ -848,8 +806,7 @@ async function openTab(inf) { // NAO USAR
 }
 
 async function commandLine(inf) {
-    let ret = { 'ret': false }
-    try {
+    let ret = { 'ret': false }; try {
         if (typeof window !== 'undefined') { // [ENCONTRAR DEVICE] CHROME
             const infDevAndFun = { 'wsUrl': wsUrl, 'name': 'commandLine', 'retUrl': inf.retUrl, 'par': { 'command': inf.command } }
             const retDevAndFun = await devAndFun(infDevAndFun); return retDevAndFun
@@ -863,8 +820,7 @@ async function commandLine(inf) {
 }
 
 async function splitText(inf) {
-    let ret = { 'ret': false }
-    try {
+    let ret = { 'ret': false }; try {
         const text = inf.text.replace(/\n/g, '\\n'); const maxLength = inf.maxLength; const chunks = []; let currentChunk = ''; for (let word of text.split(/\s+/)) {
             if (currentChunk.length + word.length > maxLength) { chunks.push(currentChunk.trim()); currentChunk = '' }
             currentChunk += (currentChunk ? ' ' : '') + word; if (/\n/.test(word)) { chunks.push(currentChunk.trim()); currentChunk = '' }
@@ -873,25 +829,21 @@ async function splitText(inf) {
 }
 
 async function wsConnect(inf) {
-    let ret = { 'ret': false }
-    try {
+    let ret = { 'ret': false }; try {
         async function logOk(inf) { if (typeof window == 'undefined') { await log({ 'folder': 'JavaScript', 'path': `log.txt`, 'text': inf }) } } // NODEJSt
         await logOk('ONSTART: START'); wsUrl = inf; function wsRun(url) {
             let ws = new _WebS(url); ws.onerror = async (e) => { }; ws.onopen = async () => { let a = `WS OK:\n${url}`; console.log(a); await logOk(a) }
             ws.onclose = async (event) => {
-                let a = `WS RECONEXAO EM 10 SEGUNDOS:\n${url}`; console.log(a); await logOk(a); await new Promise(r => setTimeout(r, 10000)); wsRun(url)
+                let a = `WS RECONEXAO EM 5 SEGUNDOS:\n${url}`; console.log(a); await logOk(a); await new Promise(r => setTimeout(r, 5000)); wsRun(url)
             }; ws.onmessage = async (event) => { listSend(url, event.data) }; wsArr.push({ url: url, ws: ws })
         }; for (let i = 0; i < wsUrl.length; i++) { wsRun(wsUrl[i]) }; ret['ret'] = true
     } catch (e) { const m = await regexE({ 'e': e }); ret['msg'] = m.res }; if (!ret.ret) { console.log(ret.msg) }; return ret
 }
 
 // ############### CLEAR CONSOLE ###############
-console.clear(); let messageCount = 0; const clearConsole = console.log;
-console.log = async function () {
-    clearConsole.apply(console, arguments); messageCount++;
-    if (messageCount >= 50) { console.clear(); messageCount = 0; console.log('CONSOLE LIMPO!') }
-};
-// ############### ###############
+console.clear(); let msgQtd = 0; const clearConsole = console.log;
+console.log = async function () { clearConsole.apply(console, arguments); msgQtd++; if (msgQtd >= 50) { console.clear(); msgQtd = 0; console.log('CONSOLE LIMPO!') } }
+// ###############               ###############
 
 const infFile = { 'action': 'inf', 'functionLocal': false }; const retFile = await file(infFile);
 let wsUrl = [], wsArr = [], list = {}; function wsList(s, o) { if (!list[s]) { list[s] = [] }; list[s].push(o) }
@@ -903,33 +855,26 @@ async function wsSend(s, msg) {
     } catch (e) { const m = await regexE({ 'e': e }); console.log(m) }
 }; async function listSend(s, m) { for (let i = 0; i < wsArr.length; i++) { if (wsArr[i].url === s && list[s]) { list[s].forEach((o) => { o(m) }) } } }
 if (typeof window !== 'undefined') { // CHROME
-    window['g'] = g; window['conf'] = retFile.res; window['_WebS'] = _WebS;
+    window['gLet'] = gLet; window['conf'] = retFile.res; window['_WebS'] = _WebS;
     window['wsUrl'] = wsUrl; window['wsArr'] = wsArr; window['list'] = list; window['wsList'] = wsList; window['wsSend'] = wsSend; window['listSend'] = listSend
     // ## functions
-    window['api'] = api; window['file'] = file; window['configStorage'] = configStorage;
-    window['dateHour'] = dateHour; window['secToHour'] = secToHour;
-    window['regex'] = regex; window['random'] = random; window['regexE'] = regexE;
-    window['gO'] = gO; window['gOAdd'] = gOAdd; window['gORem'] = gORem; window['orderObj'] = orderObj;
-    window['jsonInterpret'] = jsonInterpret; window['log'] = log; window['hasKey'] = hasKey; window['clipboard'] = clipboard;
-    window['translate'] = translate; window['webSocketRet'] = webSocketRet; window['chatGpt'] = chatGpt; window['devAndFun'] = devAndFun;
-    window['chromeActions'] = chromeActions; window['getCookies'] = getCookies; window['notification'] = notification;
-    window['promptChrome'] = promptChrome; window['getPage'] = getPage; window['sniffer'] = sniffer; window['tabSearch'] = tabSearch;
+    window['api'] = api; window['file'] = file; window['configStorage'] = configStorage; window['dateHour'] = dateHour; window['secToHour'] = secToHour; window['regex'] = regex;
+    window['random'] = random; window['regexE'] = regexE; window['gO'] = gO; window['gOAdd'] = gOAdd; window['gORem'] = gORem; window['orderObj'] = orderObj;
+    window['jsonInterpret'] = jsonInterpret; window['log'] = log; window['hasKey'] = hasKey; window['clipboard'] = clipboard; window['translate'] = translate;
+    window['webSocketRet'] = webSocketRet; window['chatGpt'] = chatGpt; window['devAndFun'] = devAndFun; window['chromeActions'] = chromeActions; window['getCookies'] = getCookies;
+    window['notification'] = notification; window['promptChrome'] = promptChrome; window['getPage'] = getPage; window['sniffer'] = sniffer; window['tabSearch'] = tabSearch;
     window['commandLine'] = commandLine; window['splitText'] = splitText; window['wsConnect'] = wsConnect;
 } else { // NODEJS 
-    global['g'] = g; global['conf'] = retFile.res;
-    global['_WebS'] = _WebS; global['_fs'] = _fs; global['_path'] = _path; global['_cheerio'] = _cheerio;
-    global['_clipboard'] = _clipboard;
+    global['gLet'] = gLet; global['conf'] = retFile.res;
+    global['_WebS'] = _WebS; global['_fs'] = _fs; global['_path'] = _path; global['_cheerio'] = _cheerio; global['_clipboard'] = _clipboard;
     global['_http'] = _http; const { WebSocketServer } = await import('ws'); global['_WebSServer'] = WebSocketServer;
     global['wsUrl'] = wsUrl; global['wsArr'] = wsArr; global['list'] = list; global['wsList'] = wsList; global['wsSend'] = wsSend; global['listSend'] = listSend;
     // ## functions
-    global['api'] = api; global['file'] = file; global['configStorage'] = configStorage;
-    global['dateHour'] = dateHour; global['secToHour'] = secToHour; global['regex'] = regex;
-    global['random'] = random; global['regexE'] = regexE; global['gO'] = gO; global['gOAdd'] = gOAdd;
-    global['gORem'] = gORem; global['orderObj'] = orderObj; global['jsonInterpret'] = jsonInterpret;
-    global['log'] = log; global['hasKey'] = hasKey; global['clipboard'] = clipboard; global['translate'] = translate;
-    global['webSocketRet'] = webSocketRet; global['chatGpt'] = chatGpt; global['devAndFun'] = devAndFun;
-    global['chromeActions'] = chromeActions; global['getCookies'] = getCookies; global['notification'] = notification;
-    global['promptChrome'] = promptChrome; global['getPage'] = getPage; global['sniffer'] = sniffer; global['tabSearch'] = tabSearch;
+    global['api'] = api; global['file'] = file; global['configStorage'] = configStorage; global['dateHour'] = dateHour; global['secToHour'] = secToHour; global['regex'] = regex;
+    global['random'] = random; global['regexE'] = regexE; global['gO'] = gO; global['gOAdd'] = gOAdd; global['gORem'] = gORem; global['orderObj'] = orderObj;
+    global['jsonInterpret'] = jsonInterpret; global['log'] = log; global['hasKey'] = hasKey; global['clipboard'] = clipboard; global['translate'] = translate;
+    global['webSocketRet'] = webSocketRet; global['chatGpt'] = chatGpt; global['devAndFun'] = devAndFun; global['chromeActions'] = chromeActions; global['getCookies'] = getCookies;
+    global['notification'] = notification; global['promptChrome'] = promptChrome; global['getPage'] = getPage; global['sniffer'] = sniffer; global['tabSearch'] = tabSearch;
     global['commandLine'] = commandLine; global['splitText'] = splitText; global['wsConnect'] = wsConnect;
 }
 
