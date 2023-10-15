@@ -4,7 +4,7 @@
 *.z_tempCodeRunner*
 *.z_CR*
 *config.json*
-*log*
+*log/*
 *teste*
 *Teste*
 *TESTE*
