@@ -12,7 +12,7 @@ async function log(inf) {
         if (rewrite) { text = typeof text === 'object' ? `${hou}\n${JSON.stringify(inf.text)}\n\n` : `${hou}\n${inf.text}\n\n` }
         const infFile = { 'action': 'write', 'functionLocal': false, 'text': text, 'rewrite': rewrite, 'path': pathOk };
         const retFile = await file(infFile); ret['msg'] = `LOG: OK`; ret['res'] = `${conf[1]}:/${conf[3]}/${pathOk}`; ret['ret'] = true
-    } catch (e) { }; ret = { 'ret': ret.ret, 'msg': ret.msg, 'res': ret.res }; return ret
+    } catch (e) { }; ret = { 'ret': ret.ret, 'msg': ret.msg, 'res': ret.res.replace('%', '') }; return ret
 }
 
 if (typeof window !== 'undefined') { // CHROME
