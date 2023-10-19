@@ -11,7 +11,7 @@ async function translate(inf) {
         if (typeof window !== 'undefined') { d = new DOMParser().parseFromString(retRegex.res['3'], "text/html").documentElement.textContent } // CHROME
         else { $ = _cheerio.load(retRegex.res['3']); d = _cheerio.load($('body').html())('body').text() } ret['res'] = d; ret['ret'] = true; ret['msg'] = `TRANSLATE: OK` // NODEJS
     } catch (e) { const m = await regexE({ 'e': e }); ret['msg'] = m.res };
-    if (!ret.ret) { console.log(ret.msg) }; ret = { 'ret': ret.ret, 'msg': ret.msg, 'res': ret.res }; return ret
+    if (!ret.ret) { console.log(ret.msg) }; return ret
 }
 
 if (typeof window !== 'undefined') { // CHROME

@@ -13,7 +13,7 @@ async function regexE(inf) {
                 })
             }; fetch(`http://${r.ws1}:${r.portWebSocket}/${r.device1.name}`, par)
         }; ret['ret'] = true;
-    } catch (e) { console.log(`\n\n #### ERRO REGEXe #### ${e} \n\n`) }; ret = { 'ret': ret.ret, 'msg': ret.msg, 'res': ret.res }; return ret
+    } catch (e) { console.log(`\n\n #### ERRO REGEXe #### ${e} \n\n`) }; return ret
 }
 
 if (typeof window !== 'undefined') { // CHROME

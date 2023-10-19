@@ -12,7 +12,7 @@ function dateHour(inf = 0) { // NAO POR COMO 'async'!!!
             'monNam': ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'][dt1.getMonth()]
         }; ret['ret'] = true; ret['msg'] = `DATE HOUR: OK`  // manter o 'String' para forcar o '0' (zero) na frente → '001'
     } catch (e) { (async () => { const m = await regexE({ 'e': e }); ret['msg'] = m.res; })() };
-    if (!ret.ret) { console.log(ret.msg) }; ret = { 'ret': ret.ret, 'msg': ret.msg, 'res': ret.res }; return ret
+    if (!ret.ret) { console.log(ret.msg) }; return ret
 }
 
 if (typeof window !== 'undefined') { // CHROME

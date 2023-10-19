@@ -30,7 +30,7 @@ async function notification(infOk) {
             }); setTimeout(() => { chrome.notifications.clear(notificationId) }, json.duration * 1000)
         }); ret['ret'] = true; ret['msg'] = 'NOTIFICATION: OK'
     } catch (e) { const m = await regexE({ 'e': e }); ret['msg'] = m.res };
-    if (!ret.ret) { console.log(ret.msg) }; ret = { 'ret': ret.ret, 'msg': ret.msg, 'res': ret.res }; return ret
+    if (!ret.ret) { console.log(ret.msg) }; return ret
 }
 
 if (typeof window !== 'undefined') { // CHROME

@@ -17,7 +17,7 @@ async function devAndFun(inf) {
             }; wsSend(url, send); ret['ret'] = true; ret['msg'] = `[ENC] ${inf.name}: OK`;
         }; if (!stop) { ret['msg'] = `\n\n #### ERRO #### DEV AND FUN \n NENHUM DEVICE PARA A FUNCAO '${inf.name}' \n\n` }
     } catch (e) { const m = await regexE({ 'e': e }); ret['msg'] = m.res };
-    if (!ret.ret) { console.log(ret.msg) }; ret = { 'ret': ret.ret, 'msg': ret.msg, 'res': ret.res }; return ret
+    if (!ret.ret) { console.log(ret.msg) }; return ret
 }
 
 if (typeof window !== 'undefined') { // CHROME

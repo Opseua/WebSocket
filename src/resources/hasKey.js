@@ -12,7 +12,7 @@ function hasKey(inf) { // NAO POR COMO 'async'!!!
             }; return false
         }; ret['msg'] = `HAS KEY: OK`; ret['res'] = hk(inf.key, typeof inf.obj === 'object' ? inf.obj : JSON.parse(inf.obj)); ret['ret'] = true
     } catch (e) { (async () => { const m = await regexE({ 'e': e }); ret['msg'] = m.res; })() };
-    if (!ret.ret) { console.log(ret.msg) }; ret = { 'ret': ret.ret, 'msg': ret.msg, 'res': ret.res }; return ret
+    if (!ret.ret) { console.log(ret.msg) }; return ret
 }
 
 if (typeof window !== 'undefined') { // CHROME

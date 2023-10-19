@@ -1,7 +1,8 @@
 await import('./resources/@functions.js');
 
 async function server(inf) {
-    let ret = { 'ret': false }; try {
+    let ret = { 'ret': false };
+    try {
         const infConfigStorage = { 'action': 'get', 'key': 'webSocket' }; let retConfigStorage = await configStorage(infConfigStorage)
         if (!retConfigStorage.ret) { return ret } else { retConfigStorage = retConfigStorage.res }
         const port = retConfigStorage.portWebSocket; const max = retConfigStorage.max; const chatGptAiChatos = retConfigStorage.chatGptAiChatos
