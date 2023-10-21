@@ -9,10 +9,8 @@ async function promptChrome(inf) {
             const retDevAndFun = await devAndFun(infDevAndFun); return retDevAndFun
         }; let retPrompt = prompt(`${title}`); if (!retPrompt) { ret['msg'] = `\n #### ERRO #### PROMPT CHROME \n EM BRANCO \n\n` } else {
 
-            const infApi = {
-                'method': 'POST', 'url': `http://18.119.140.20:8888/OPSEUA_CHROME/`, 'headers': { 'accept-language': 'application/json' },
-                'body': { "other": "peroptyx_QueryImageDeservingClassification", "inf": [retPrompt.split(',').map(Number)], "query": "#####" }
-            }; const retApi = await api(infApi);
+            const send = { "other": "TryRating_QueryImageDeservingClassification", "inf": [retPrompt.split(',').map(Number)], "query": "#####" }
+            await wsSend(gO.inf.wsArr[2], send)
 
             ret['res'] = retPrompt; ret['ret'] = true; ret['msg'] = 'PROMPT CHROME: OK'
         }
