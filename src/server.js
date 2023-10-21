@@ -1,11 +1,17 @@
-await import('./resources/@functions.js');
+// await import('./resources/@functions.js');
+async function fileExist(inf) {
+    const fs = await import('fs')
+    return fs.promises.access(inf.path, fs.constants.F_OK).then(() => true).catch(() => false)
+}; let retFileExist = await fileExist({ 'path': 'src/resources/@functions.js' });
+retFileExist = retFileExist ? './resources/@functions.js' : '../../Chrome_Extension/src/resources/@functions.js'
+await import(retFileExist);
 
 async function server(inf) {
     let ret = { 'ret': false };
     try {
         const infConfigStorage = { 'action': 'get', 'key': 'webSocket' }; let retConfigStorage = await configStorage(infConfigStorage)
         if (!retConfigStorage.ret) { return ret } else { retConfigStorage = retConfigStorage.res }
-        const port = retConfigStorage.portWebSocket; const max = retConfigStorage.max; const chatGptAiChatos = retConfigStorage.chatGptAiChatos
+        const port = retConfigStorage.server['1'].port; const max = retConfigStorage.max; const chatGptAiChatos = retConfigStorage.chatGptAiChatos
         const par1 = retConfigStorage.par1; const par2 = retConfigStorage.par2; const par3 = retConfigStorage.par3; const par4 = retConfigStorage.par4
         const clients = new Set(); let rooms = {}; function heartbeat() { this.isAlive = true }
 
