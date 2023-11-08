@@ -3,6 +3,7 @@
   "dependencies": {
     "cheerio": "^1.0.0-rc.12",
     "clipboardy": "^3.0.0",
+    "googleapis": "^128.0.0",
     "ws": "^8.14.0"
   }
 }

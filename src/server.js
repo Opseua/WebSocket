@@ -13,6 +13,7 @@ async function server(inf) {
         if (!retConfigStorage.ret) { return ret } else { retConfigStorage = retConfigStorage.res }
         const port = retConfigStorage.server['1'].port; const max = retConfigStorage.max; const chatGptAiChatos = retConfigStorage.chatGptAiChatos
         const par1 = retConfigStorage.par1; const par2 = retConfigStorage.par2; const par3 = retConfigStorage.par3; const par4 = retConfigStorage.par4
+        const par5 = retConfigStorage.par5
         const clients = new Set(); let rooms = {}; function heartbeat() { this.isAlive = true }
 
         function getClients() {
@@ -28,18 +29,32 @@ async function server(inf) {
 
         const server = _http.createServer(async (req, res) => {
             res.writeHead(200, { 'Content-Type': 'text/plain' }); const urlParts = req.url.split('/');
-            if (urlParts.length < 3 && urlParts['1'] == '') { res.end(`${req.method}: ERRO | INFORMAR A SALA`) } else {
-                const room = urlParts[1]; if (req.method == 'GET' || req.method == 'POST') {
-                    let message = ''; if (req.method == 'GET') { message = decodeURIComponent(urlParts.slice(2).join('/')) }
-                    else { await new Promise((resolve) => { req.on('data', (chunk) => { message += chunk.toString() }); req.on('end', () => { resolve(message) }) }) }
-                    if (room.toLowerCase() == par1 || message.toLowerCase() == par1) { res.end(`${req.method}: OK | CLIENTS:\n\n${getClients()}`) }
-                    else if (room.toLowerCase() == par3 || message.toLowerCase() == par3) {
+            if (urlParts.length < 3 && urlParts['1'] == '') {
+                res.end(`${req.method}: ERRO | INFORMAR A SALA`)
+            }
+            else {
+                const room = urlParts[1];
+                if (req.method == 'GET' || req.method == 'POST') {
+                    let message = '';
+                    if (req.method == 'GET') {
+                        message = decodeURIComponent(urlParts.slice(2).join('/'))
+                    } else {
+                        await new Promise((resolve) => { req.on('data', (chunk) => { message += chunk.toString() }); req.on('end', () => { resolve(message) }) })
+                    }
+                    if (room.toLowerCase() == par1 || message.toLowerCase() == par1) {
+                        res.end(`${req.method}: OK | CLIENTS:\n\n${getClients()}`)
+                    } else if (room.toLowerCase() == par3 || message.toLowerCase() == par3) {
                         res.end(`${req.method}: OK ### RESET ###`); await log({ 'folder': 'JavaScript', 'path': `log.txt`, 'text': 'RESET' })
                         await log({ 'folder': 'JavaScript', 'path': `reset.js`, 'text': ' ' })
                     } else if (req.method == 'POST' && room.toLowerCase() == par4) {
                         try {
-                            if (!message.length > 0) { throw new Error() } else {
-                                message = JSON.parse(message); if (!message.prompt) { res.end(`INFORMAR O 'prompt'`) } else {
+                            if (!message.length > 0) {
+                                throw new Error()
+                            } else {
+                                message = JSON.parse(message);
+                                if (!message.prompt) {
+                                    res.end(`INFORMAR O 'prompt'`)
+                                } else {
                                     const network = message.network ? true : false; const infApi = {
                                         'method': 'POST', 'url': chatGptAiChatos,
                                         'headers': {
@@ -53,9 +68,35 @@ async function server(inf) {
                                 }
                             }
                         } catch (e) { res.end(`BODY INVALIDO`) }
-                    } else if (!rooms[room]) { res.end(`${req.method}: ERRO | NAO EXISTE '${room}'`) }
-                    else if (message.length == 0) { res.end(`${req.method}: ERRO | MENSAGEM VAZIA '${room}'`) }
-                    else { sendRoom(room, message, null); res.end(`${req.method}: OK '${room}'`) }
+                    } else if (req.method == 'POST' && room.toLowerCase() == par5) {
+
+                        let infApi, retApi
+                        infApi = { // ########## TYPE → json
+                            'method': 'POST', 'url': `https://ntfy.sh/`, 'headers': { 'accept-language': 'application/json' },
+                            'body': { 'Chave': 'aaa', 'Valor': 'bbb' }
+                        };
+                        infApi = { // ########## TYPE → text
+                            'method': 'POST', 'url': `https://ntfy.sh/`, 'headers': { 'content-type': 'text/plain;charset=UTF-8' },
+                            'body': '{"topic":"OPSEUA","message":"a"}'
+                        };
+                        const formData = new URLSearchParams(); // ########## TYPE → x-www-form-urlencoded
+                        formData.append('grant_type', 'client_credentials');
+                        formData.append('resource', 'https://graph.microsoft.com');
+                        infApi = {
+                            'method': 'POST', 'url': `https://ntfy.sh/`, 'headers': { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            'body': formData.toString()
+                        };
+                        retApi = await api(infApi);
+                        console.log(retApi)
+                        res.end(`${req.method}: ERRO | NAO EXISTE '${room}'`)
+
+                    } else if (!rooms[room]) {
+                        res.end(`${req.method}: ERRO | NAO EXISTE '${room}'`)
+                    } else if (message.length == 0) {
+                        res.end(`${req.method}: ERRO | MENSAGEM VAZIA '${room}'`)
+                    } else {
+                        sendRoom(room, message, null); res.end(`${req.method}: OK '${room}'`)
+                    }
                 } else { res.end(`METODOS ACEITOS 'GET' OU 'POST'`) }
             }
         });
