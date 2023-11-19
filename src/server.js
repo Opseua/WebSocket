@@ -1,6 +1,6 @@
 // await import('./resources/@functions.js');
 async function fileExist(inf) {
-    const fs = await import('fs')
+    let fs = await import('fs')
     return fs.promises.access(inf.path, fs.constants.F_OK).then(() => true).catch(() => false)
 };
 let retFileExist = await fileExist({ 'path': 'src/resources/@functions.js' });
@@ -10,41 +10,49 @@ await import(retFileExist);
 async function server(inf) {
     let ret = { 'ret': false };
     try {
-        const infConfigStorage = { 'action': 'get', 'key': 'webSocket' };
+        let infConfigStorage = { 'action': 'get', 'key': 'webSocket' };
         let retConfigStorage = await configStorage(infConfigStorage); if (!retConfigStorage.ret) { return retConfigStorage } else { retConfigStorage = retConfigStorage.res }
-        const port = retConfigStorage.server['1'].port;
-        const max = retConfigStorage.max;
-        const chatGptAiChatos = retConfigStorage.chatGptAiChatos
-        const par1 = retConfigStorage.par1;
-        const par2 = retConfigStorage.par2;
-        const par3 = retConfigStorage.par3;
-        const par4 = retConfigStorage.par4
-        const par5 = retConfigStorage.par5
-        const clients = new Set();
+        let port = retConfigStorage.server['1'].port;
+        let max = retConfigStorage.max;
+        let chatGptAiChatos = retConfigStorage.chatGptAiChatos
+        let par1 = retConfigStorage.par1;
+        let par2 = retConfigStorage.par2;
+        let par3 = retConfigStorage.par3;
+        let par4 = retConfigStorage.par4
+        let par5 = retConfigStorage.par5
+        let clients = new Set();
         let rooms = {}; function heartbeat() { this.isAlive = true }
 
         function getClients() {
             let res = Object.keys(rooms).map(r => ({ 'sala': r, 'qtd': rooms[r].size }));
-            const dH = dateHour().res;
+            let dH = dateHour().res;
             res.unshift({ 'hour': `${dH.hou}:${dH.min}:${dH.sec}` });
             return JSON.stringify(res)
         };
         await log({ 'folder': 'JavaScript', 'path': `log.txt`, 'text': 'START' })
 
         function sendRoom(room, message, sender) {
-            const clientsInRoom = rooms[room];
+            let clientsInRoom = rooms[room];
             if (clientsInRoom) {
-                clientsInRoom.forEach((c) => { if (c !== sender) { c.send(message) } else { if (message.includes(par2)) { c.send(`WEBSOCKET: OK '${room}'`); } } })
+                clientsInRoom.forEach((c) => {
+                    if (c !== sender) {
+                        c.send(message)
+                    } else {
+                        if (message.includes(par2)) {
+                            c.send(`WEBSOCKET: OK '${room}'`);
+                        }
+                    }
+                })
             }
         }
 
-        const server = _http.createServer(async (req, res) => {
+        let server = _http.createServer(async (req, res) => {
             res.writeHead(200, { 'Content-Type': 'text/plain' });
-            const urlParts = req.url.split('/');
+            let urlParts = req.url.split('/');
             if (urlParts.length < 3 && urlParts['1'] == '') {
                 res.end(`${req.method}: ERRO | INFORMAR A SALA`)
             } else {
-                const room = urlParts[1];
+                let room = urlParts[1];
                 if (req.method == 'GET' || req.method == 'POST') {
                     let message = '';
                     if (req.method == 'GET') {
@@ -72,7 +80,7 @@ async function server(inf) {
                                 if (!message.prompt) {
                                     res.end(`INFORMAR O 'prompt'`)
                                 } else {
-                                    const network = message.network ? true : false; const infApi = {
+                                    let network = message.network ? true : false; let infApi = {
                                         'method': 'POST', 'url': chatGptAiChatos,
                                         'headers': {
                                             'sec-ch-ua': '"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"', 'accept': 'application/json, text/plain, */*',
@@ -82,7 +90,7 @@ async function server(inf) {
                                             'sec-fetch-dest': 'empty', 'referer': 'https://chat9.yqcloud.top/', 'accept-language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7,it;q=0.6'
                                         }, 'body': { "prompt": message.prompt, "userId": "#/chat/1695782874949", "network": network, "system": "", "withoutContext": false, "stream": false }
                                     };
-                                    const r = await api(infApi);
+                                    let r = await api(infApi);
                                     res.end(JSON.stringify({ 'ret': r.res.code == 200 ? true : false, 'res': r.res.body }))
                                 }
                             }
@@ -99,7 +107,7 @@ async function server(inf) {
                             'method': 'POST', 'url': `https://ntfy.sh/`, 'headers': { 'content-type': 'text/plain;charset=UTF-8' },
                             'body': '{"topic":"OPSEUA","message":"a"}'
                         };
-                        const formData = new URLSearchParams(); // ########## TYPE → x-www-form-urlencoded
+                        let formData = new URLSearchParams(); // ########## TYPE → x-www-form-urlencoded
                         formData.append('grant_type', 'client_credentials');
                         formData.append('resource', 'https://graph.microsoft.com');
                         infApi = {
@@ -107,7 +115,6 @@ async function server(inf) {
                             'body': formData.toString()
                         };
                         retApi = await api(infApi);
-                        console.log(retApi)
                         res.end(`${req.method}: ERRO | NAO EXISTE '${room}'`)
                     } else if (!rooms[room]) {
                         res.end(`${req.method}: ERRO | NAO EXISTE '${room}'`)
@@ -123,7 +130,7 @@ async function server(inf) {
             }
         });
 
-        const wss = new _WebSServer({ server });
+        let wss = new _WebSServer({ server });
         wss.on('connection', async (ws, req) => {
             ws.isAlive = true;
             ws.on('error', async (text) => {
@@ -132,12 +139,12 @@ async function server(inf) {
             })
             ws.on('pong', heartbeat);
             clients.add(ws);
-            const urlParts = req.url.split('/')
+            let urlParts = req.url.split('/')
             if (urlParts.length < 3 && urlParts['1'] == '') {
                 ws.send(`WEBSOCKET: ERRO | INFORMAR A SALA`);
                 ws.terminate()
             } else {
-                const room = urlParts[1];
+                let room = urlParts[1];
                 if (room.toLowerCase() == par1) {
                     ws.send(`WEBSOCKET: OK | CLIENTS:\n\n${getClients()}`);
                     ws.terminate()
@@ -153,7 +160,7 @@ async function server(inf) {
                 };
                 await log({ 'folder': 'JavaScript', 'path': `log.txt`, 'text': `WEBSOCKET: NOVO CLIENTE '${room}'` });
                 ws.on('message', async (text) => {
-                    const message = text.toString('utf-8');
+                    let message = text.toString('utf-8');
                     if (message.length == 0) {
                         ws.send(`WEBSOCKET:  ERRO | MENSAGEM VAZIA '${room}'`)
                     } else {
@@ -180,14 +187,18 @@ async function server(inf) {
             }
         });
         setInterval(function ping() {
-            wss.clients.forEach(function each(ws) { if (ws.isAlive == false) return ws.terminate(); ws.isAlive = false; ws.ping() })
+            wss.clients.forEach(function each(ws) {
+                if (ws.isAlive == false) return ws.terminate();
+                ws.isAlive = false;
+                ws.ping();
+            });
         }, max * 1000);
         server.listen(port, () => {
-            console.log(`SERVER PORTA: ${port}`)
+            let time = dateHour().res; console.log(`${time.day}/${time.mon} ${time.hou}:${time.min}:${time.sec}`, `server PORTA: ${port}`);
         });
         ret['ret'] = true
     } catch (e) {
-        const m = await regexE({ 'e': e });
+        let m = await regexE({ 'e': e });
         ret['msg'] = m.res
     };
     return ret
