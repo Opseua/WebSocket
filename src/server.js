@@ -12,16 +12,22 @@ async function server(inf) {
     try {
         let infConfigStorage = { 'action': 'get', 'key': 'webSocket' };
         let retConfigStorage = await configStorage(infConfigStorage); if (!retConfigStorage.ret) { return retConfigStorage } else { retConfigStorage = retConfigStorage.res }
-        let port = retConfigStorage.server['1'].port;
-        let max = retConfigStorage.max;
         let chatGptAiChatos = retConfigStorage.chatGptAiChatos
-        let par1 = retConfigStorage.par1;
-        let par2 = retConfigStorage.par2;
-        let par3 = retConfigStorage.par3;
-        let par4 = retConfigStorage.par4
-        let par5 = retConfigStorage.par5
         let clients = new Set();
-        let rooms = {}; function heartbeat() { this.isAlive = true }
+        let rooms = {};
+
+        setInterval(async () => {
+            for (const value of clients) {
+                let dif = value.pingLast ? Number(dateHour().res.tim) - value.pingLast : 0
+                if (dif > (secPing + 5)) {
+                    await log({ 'folder': 'JavaScript', 'path': `log.txt`, 'text': `WEBSOCKET: CLIENTE DESCONECTADO [PING ${dif}] '${value.pingRoom}'` })
+                    value.close()
+                    // console.log('DIF', dif, 'ENCERRANDO', value.pingRoom);
+                } else {
+                    // console.log('DIF', dif, 'MANTENDO', value.pingRoom);
+                }
+            }
+        }, (secPing * 1000));
 
         function getClients() {
             let res = Object.keys(rooms).map(r => ({ 'sala': r, 'qtd': rooms[r].size }));
@@ -34,12 +40,12 @@ async function server(inf) {
         function sendRoom(room, message, sender) {
             let clientsInRoom = rooms[room];
             if (clientsInRoom) {
-                clientsInRoom.forEach((c) => {
-                    if (c !== sender) {
-                        c.send(message)
+                clientsInRoom.forEach((client) => {
+                    if (client !== sender) {
+                        client.send(message)
                     } else {
                         if (message.includes(par2)) {
-                            c.send(`WEBSOCKET: OK '${room}'`);
+                            client.send(`WEBSOCKET: OK '${room}'`);
                         }
                     }
                 })
@@ -130,15 +136,13 @@ async function server(inf) {
             }
         });
 
-        let wss = new _WebSServer({ server });
+        let wss = new _WebSocketServer({ server });
         wss.on('connection', async (ws, req) => {
             ws.isAlive = true;
             ws.on('error', async (text) => {
                 (console.error);
                 await log({ 'folder': 'JavaScript', 'path': `log.txt`, 'text': error })
             })
-            ws.on('pong', heartbeat);
-            clients.add(ws);
             let urlParts = req.url.split('/')
             if (urlParts.length < 3 && urlParts['1'] == '') {
                 ws.send(`WEBSOCKET: ERRO | INFORMAR A SALA`);
@@ -153,6 +157,8 @@ async function server(inf) {
                     await log({ 'folder': 'JavaScript', 'path': `log.txt`, 'text': 'RESET' })
                     await log({ 'folder': 'JavaScript', 'path': `reset.js`, 'text': ' ' })
                 } else {
+                    ws['pingRoom'] = room
+                    clients.add(ws);
                     if (!rooms[room]) {
                         rooms[room] = new Set()
                     };
@@ -170,11 +176,16 @@ async function server(inf) {
                             ws.send(`WEBSOCKET: OK ### RESET ###`);
                             await log({ 'folder': 'JavaScript', 'path': `log.txt`, 'text': 'RESET' })
                             await log({ 'folder': 'JavaScript', 'path': `reset.js`, 'text': ' ' })
+                        } else if (message.toLowerCase() == par6) {
+                            ws.send(par7);
+                            ws['pingLast'] = Number(dateHour().res.tim)
+                            // console.log('RECEBIDO ping:', ws.pingLast, ws.pingRoom)
                         } else {
                             sendRoom(room, message, ws)
                         }
                     }
-                }); ws.on('close', async () => {
+                });
+                ws.on('close', async () => {
                     await log({ 'folder': 'JavaScript', 'path': `log.txt`, 'text': `WEBSOCKET: CLIENTE DESCONECTADO '${room}'` })
                     clients.delete(ws);
                     if (rooms[room]) {
@@ -186,13 +197,6 @@ async function server(inf) {
                 });
             }
         });
-        setInterval(function ping() {
-            wss.clients.forEach(function each(ws) {
-                if (ws.isAlive == false) return ws.terminate();
-                ws.isAlive = false;
-                ws.ping();
-            });
-        }, max * 1000);
         server.listen(port, () => {
             let time = dateHour().res; console.log(`${time.day}/${time.mon} ${time.hou}:${time.min}:${time.sec}`, `server PORTA: ${port}`);
         });
