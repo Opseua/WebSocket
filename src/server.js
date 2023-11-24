@@ -17,7 +17,7 @@ async function server(inf) {
         let rooms = {};
 
         setInterval(async () => {
-            for (const value of clients) {
+            for (let value of clients) {
                 let dif = value.pingLast ? Number(dateHour().res.tim) - value.pingLast : 0
                 if (dif > (secPing + 5)) {
                     await log({ 'folder': 'JavaScript', 'path': `log.txt`, 'text': `WEBSOCKET: CLIENTE DESCONECTADO [PING ${dif}] '${value.pingRoom}'` })
