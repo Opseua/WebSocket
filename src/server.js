@@ -197,8 +197,14 @@ async function server(inf) {
                 });
             }
         });
-        server.listen(port, () => {
+        server.listen(port, async () => {
             let time = dateHour().res; console.log(`${time.day}/${time.mon} ${time.hou}:${time.min}:${time.sec}`, `server PORTA: ${port}`);
+
+            // SERVERNODE
+            await new Promise(resolve => { setTimeout(resolve, 1000) })
+            console.log('\n')
+            await serverNode()
+
         });
         ret['ret'] = true
     } catch (e) {
