@@ -3,7 +3,7 @@ async function fileExist(inf) {
     let fs = await import('fs')
     return fs.promises.access(inf.path, fs.constants.F_OK).then(() => true).catch(() => false)
 };
-let retFileExist = await fileExist({ 'path': 'src/resources/@functions.js' });
+let retFileExist = await fileExist({ 'path': 'src/resources/@functions.js' })
 retFileExist = retFileExist ? './resources/@functions.js' : '../../Chrome_Extension/src/resources/@functions.js'
 await import(retFileExist);
 
