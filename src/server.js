@@ -27,7 +27,7 @@ async function server(inf) {
             res.unshift({ 'hour': `${dH.hou}:${dH.min}:${dH.sec}` });
             return JSON.stringify(res)
         };
-        await log({ 'folder': 'JavaScript', 'path': `log.txt`, 'text': 'START' })
+        await log({ 'folder': 'JavaScript', 'path': `log.txt`, 'text': 'SERVER: START' })
 
         function sendRoom(room, message, sender) {
             let clientsInRoom = rooms[room];
