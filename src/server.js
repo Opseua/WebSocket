@@ -1,12 +1,4 @@
-// await import('./resources/@functions.js');
-async function fileExist(inf) {
-    let fs = await import('fs')
-    return fs.promises.access(inf.path, fs.constants.F_OK).then(() => true).catch(() => false)
-};
-let retFileExist = await fileExist({ 'path': 'src/resources/@functions.js' })
-retFileExist = retFileExist ? './resources/@functions.js' : '../../Chrome_Extension/src/resources/@functions.js'
-await import(retFileExist);
-
+await import('./resources/@export.js');
 async function server(inf) {
     let ret = { 'ret': false };
     try {
@@ -198,13 +190,11 @@ async function server(inf) {
             }
         });
         server.listen(port, async () => {
-            let time = dateHour().res; console.log(`${time.day}/${time.mon} ${time.hou}:${time.min}:${time.sec}`, `server PORTA: ${port}`);
+            let time = dateHour().res; console.log(`${time.day}/${time.mon} ${time.hou}:${time.min}:${time.sec}`, `server [WebSocket] PORTA: ${port}`, '\n');
 
             // SERVERNODE
             await new Promise(resolve => { setTimeout(resolve, 1000) })
-            console.log('\n')
             await serverNode()
-
         });
         ret['ret'] = true
     } catch (e) {
@@ -212,9 +202,9 @@ async function server(inf) {
         ret['msg'] = m.res
     };
     return {
-        ...(ret.ret && { ret: ret.ret }),
+        ...({ ret: ret.ret }),
         ...(ret.msg && { msg: ret.msg }),
         ...(ret.res && { res: ret.res }),
     };
 }
-server()
+await server()
