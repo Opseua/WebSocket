@@ -192,9 +192,14 @@ async function server(inf) {
         server.listen(port, async () => {
             let time = dateHour().res; console.log(`${time.day}/${time.mon} ${time.hou}:${time.min}:${time.sec}`, `server [WebSocket] PORTA: ${port}`, '\n');
 
-            // SERVERNODE
-            await new Promise(resolve => { setTimeout(resolve, 1000) })
-            await serverNode()
+            // SERVER NODE
+            try {
+                await new Promise(resolve => { setTimeout(resolve, 1000) })
+                await serverNode()
+            } catch (e) {
+                let m = await regexE({ 'e': e });
+                ret['msg'] = m.res
+            };
         });
         ret['ret'] = true
     } catch (e) {
