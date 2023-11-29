@@ -200,6 +200,11 @@ async function server(inf) {
                 let m = await regexE({ 'e': e });
                 ret['msg'] = m.res
             };
+
+            // URA_Reversa
+            if (letter !== 'D') {
+                await import('../../URA_Reversa/src/server.js');
+            }
         });
         ret['ret'] = true
     } catch (e) {
