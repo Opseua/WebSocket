@@ -203,7 +203,7 @@ async function server(inf) {
 
             // URA_Reversa
             if (letter !== 'D') {
-                await import('../../URA_Reversa/src/server.js');
+                // await import('../../URA_Reversa/src/server.js');
             }
         });
         ret['ret'] = true
