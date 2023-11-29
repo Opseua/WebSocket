@@ -1,5 +1,5 @@
-await import('./resources/@export.js');
 async function server(inf) {
+    await import('./resources/@export.js');
     let ret = { 'ret': false };
     try {
         let infConfigStorage = { 'action': 'get', 'key': 'webSocket' };
