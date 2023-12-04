@@ -1,9 +1,13 @@
 let e = import.meta.url;
 async function client(inf) {
-    let ret = { 'ret': false };
-    e = inf && inf.e ? inf.e : e;
+    let ret = { 'ret': false }; e = inf && inf.e ? inf.e : e;
+    if (catchGlobal) {
+        const errs = async (err, ret) => { if (!ret.stop) { ret['stop'] = true; let retRegexE = await regexE({ 'e': err, 'inf': inf, 'catchGlobal': true }) } }
+        if (typeof window !== 'undefined') { window.addEventListener('error', (err) => errs(err, ret)); window.addEventListener('unhandledrejection', (err) => errs(err, ret)) }
+        else { process.on('uncaughtException', (err) => errs(err, ret)); process.on('unhandledRejection', (err) => errs(err, ret)) }
+    }
     try {
-        let time = dateHour().res; console.log(`${time.day}/${time.mon} ${time.hou}:${time.min}:${time.sec}`, 'client [WebSocket');
+        let time = dateHour().res; console.log(`${time.day}/${time.mon} ${time.hou}:${time.min}:${time.sec}`, 'client [WebSocket]');
 
         // DEV - [WEB] WEB {IMPAR}
         let dev1 = devChromeWeb
@@ -63,7 +67,7 @@ async function client(inf) {
         ret['ret'] = true
         ret['msg'] = `CLIENT [Chrome_Extension]: OK`
     } catch (e) {
-        let retRegexE = await regexE({ 'inf': inf, 'e': e });
+        let retRegexE = await regexE({ 'inf': inf, 'e': e, 'catchGlobal': false });
         ret['msg'] = retRegexE.res
     };
     if (!ret.ret) {
