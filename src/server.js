@@ -1,8 +1,10 @@
+await import('./resources/@export.js');
+let e = import.meta.url;
 async function server(inf) {
-    await import('./resources/@export.js');
     let ret = { 'ret': false };
+    e = inf && inf.e ? inf.e : e;
     try {
-        let infConfigStorage = { 'action': 'get', 'key': 'webSocket' };
+        let infConfigStorage = { 'e': e, 'action': 'get', 'key': 'webSocket' };
         let retConfigStorage = await configStorage(infConfigStorage); if (!retConfigStorage.ret) { return retConfigStorage } else { retConfigStorage = retConfigStorage.res }
         let chatGptAiChatos = retConfigStorage.chatGptAiChatos
         let clients = new Set();
@@ -12,7 +14,7 @@ async function server(inf) {
             for (let value of clients) {
                 let dif = value.pingLast ? Number(dateHour().res.tim) - value.pingLast : 0
                 if (dif > (secPing + 5)) {
-                    await log({ 'folder': 'JavaScript', 'path': `log.txt`, 'text': `WEBSOCKET: CLIENTE DESCONECTADO [PING ${dif}] '${value.pingRoom}'` })
+                    await log({ 'e': e, 'folder': 'JavaScript', 'path': `log.txt`, 'text': `WEBSOCKET: CLIENTE DESCONECTADO [PING ${dif}] '${value.pingRoom}'` })
                     value.close()
                     // console.log('DIF', dif, 'ENCERRANDO', value.pingRoom);
                 } else {
@@ -27,7 +29,7 @@ async function server(inf) {
             res.unshift({ 'hour': `${dH.hou}:${dH.min}:${dH.sec}` });
             return JSON.stringify(res)
         };
-        await log({ 'folder': 'JavaScript', 'path': `log.txt`, 'text': 'SERVER: START' })
+        await log({ 'e': e, 'folder': 'JavaScript', 'path': `log.txt`, 'text': 'SERVER: START [WebSocket]' })
 
         function sendRoom(room, message, sender) {
             let clientsInRoom = rooms[room];
@@ -67,8 +69,8 @@ async function server(inf) {
                         res.end(`${req.method}: OK | CLIENTS:\n\n${getClients()}`)
                     } else if (room.toLowerCase() == par3 || message.toLowerCase() == par3) {
                         res.end(`${req.method}: OK ### RESET ###`);
-                        await log({ 'folder': 'JavaScript', 'path': `log.txt`, 'text': 'RESET' })
-                        await log({ 'folder': 'JavaScript', 'path': `reset.js`, 'text': ' ' })
+                        await log({ 'e': e, 'folder': 'JavaScript', 'path': `log.txt`, 'text': 'RESET' })
+                        await log({ 'e': e, 'folder': 'JavaScript', 'path': `reset.js`, 'text': ' ' })
                     } else if (req.method == 'POST' && room.toLowerCase() == par4) {
                         try {
                             if (!message.length > 0) {
@@ -133,7 +135,7 @@ async function server(inf) {
             ws.isAlive = true;
             ws.on('error', async (text) => {
                 (console.error);
-                await log({ 'folder': 'JavaScript', 'path': `log.txt`, 'text': error })
+                await log({ 'e': e, 'folder': 'JavaScript', 'path': `log.txt`, 'text': error })
             })
             let urlParts = req.url.split('/')
             if (urlParts.length < 3 && urlParts['1'] == '') {
@@ -146,8 +148,8 @@ async function server(inf) {
                     ws.terminate()
                 } else if (room.toLowerCase() == par3) {
                     ws.send(`WEBSOCKET: OK ### RESET ###`);
-                    await log({ 'folder': 'JavaScript', 'path': `log.txt`, 'text': 'RESET' })
-                    await log({ 'folder': 'JavaScript', 'path': `reset.js`, 'text': ' ' })
+                    await log({ 'e': e, 'folder': 'JavaScript', 'path': `log.txt`, 'text': 'RESET' })
+                    await log({ 'e': e, 'folder': 'JavaScript', 'path': `reset.js`, 'text': ' ' })
                 } else {
                     ws['pingRoom'] = room
                     clients.add(ws);
@@ -156,7 +158,7 @@ async function server(inf) {
                     };
                     rooms[room].add(ws)
                 };
-                await log({ 'folder': 'JavaScript', 'path': `log.txt`, 'text': `WEBSOCKET: NOVO CLIENTE '${room}'` });
+                await log({ 'e': e, 'folder': 'JavaScript', 'path': `log.txt`, 'text': `WEBSOCKET: NOVO CLIENTE '${room}'` });
                 ws.on('message', async (text) => {
                     let message = text.toString('utf-8');
                     if (message.length == 0) {
@@ -166,8 +168,8 @@ async function server(inf) {
                             ws.send(`WEBSOCKET: OK | CLIENTS:\n\n${getClients()}`)
                         } else if (message.toLowerCase() == par3) {
                             ws.send(`WEBSOCKET: OK ### RESET ###`);
-                            await log({ 'folder': 'JavaScript', 'path': `log.txt`, 'text': 'RESET' })
-                            await log({ 'folder': 'JavaScript', 'path': `reset.js`, 'text': ' ' })
+                            await log({ 'e': e, 'folder': 'JavaScript', 'path': `log.txt`, 'text': 'RESET' })
+                            await log({ 'e': e, 'folder': 'JavaScript', 'path': `reset.js`, 'text': ' ' })
                         } else if (message.toLowerCase() == par6) {
                             ws.send(par7);
                             ws['pingLast'] = Number(dateHour().res.tim)
@@ -178,7 +180,7 @@ async function server(inf) {
                     }
                 });
                 ws.on('close', async () => {
-                    await log({ 'folder': 'JavaScript', 'path': `log.txt`, 'text': `WEBSOCKET: CLIENTE DESCONECTADO '${room}'` })
+                    await log({ 'e': e, 'folder': 'JavaScript', 'path': `log.txt`, 'text': `WEBSOCKET: CLIENTE DESCONECTADO '${room}'` })
                     clients.delete(ws);
                     if (rooms[room]) {
                         rooms[room].delete(ws);
@@ -191,25 +193,27 @@ async function server(inf) {
         });
         server.listen(port, async () => {
             let time = dateHour().res; console.log(`${time.day}/${time.mon} ${time.hou}:${time.min}:${time.sec}`, `server [WebSocket] PORTA: ${port}`, '\n');
+            await new Promise(resolve => { setTimeout(resolve, 2000) })
 
-            // SERVER NODE
-            try {
-                await new Promise(resolve => { setTimeout(resolve, 1000) })
-                await serverNode()
-            } catch (e) {
-                let m = await regexE({ 'e': e });
-                ret['msg'] = m.res
-            };
+            // client
+            await client({ 'e': e })
 
-            // URA_Reversa
-            if (letter !== 'D') {
+            // [URA_Reversa]
+            if (letter == 'D') {
                 // await import('../../URA_Reversa/src/server.js');
             }
+
+            // [WebScraper]
+            if (letter == 'D') {
+                // await import('../../WebScraper/src/server.js');
+            }
+
         });
+
         ret['ret'] = true
     } catch (e) {
-        let m = await regexE({ 'e': e });
-        ret['msg'] = m.res
+        let retRegexE = await regexE({ 'inf': inf, 'e': e });
+        ret['msg'] = retRegexE.res
     };
     return {
         ...({ ret: ret.ret }),
