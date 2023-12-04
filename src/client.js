@@ -39,8 +39,6 @@ async function client(inf) {
             });
         }
 
-        return
-
         // RUN LIS
         async function runLis(nomeList, par1) {
             let data = {};
@@ -78,13 +76,13 @@ async function client(inf) {
         }
     }
 }
-//await client()
+await client()
 
-if (eng) { // CHROME
-    window['client'] = client;
-} else { // NODEJS
-    global['client'] = client;
-}
+// if (eng) { // CHROME
+//     window['client'] = client;
+// } else { // NODEJS
+//     global['client'] = client;
+// }
 
 
 

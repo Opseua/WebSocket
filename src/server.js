@@ -200,18 +200,18 @@ async function server(inf) {
             await new Promise(resolve => { setTimeout(resolve, 2000) })
 
             // client
-            await client({ 'e': e })
+            async function runFun1() {
+                await import('./client.js');
+            }
+            runFun1()
 
             // [URA_Reversa]
-            if (letter == 'D') {
-                // await import('../../URA_Reversa/src/server.js');
+            async function runFun2() {
+                if (letter !== 'D') {
+                    await import('../../URA_Reversa/src/server.js');
+                }
             }
-
-            // [WebScraper]
-            if (letter == 'D') {
-                // await import('../../WebScraper/src/server.js');
-            }
-
+            runFun2()
         });
 
         ret['ret'] = true
