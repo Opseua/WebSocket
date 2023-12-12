@@ -2,11 +2,11 @@ await import('./resources/@export.js');
 let e = import.meta.url;
 async function server(inf) {
     let ret = { 'ret': false }; e = inf && inf.e ? inf.e : e;
-    if (catchGlobal) {
-        const errs = async (errC, ret) => { if (!ret.stop) { ret['stop'] = true; let retRegexE = await regexE({ 'e': errC, 'inf': inf, 'catchGlobal': true }) } }
-        if (typeof window !== 'undefined') { window.addEventListener('error', (errC) => errs(errC, ret)); window.addEventListener('unhandledrejection', (errC) => errs(errC, ret)) }
-        else { process.on('uncaughtException', (errC) => errs(errC, ret)); process.on('unhandledRejection', (errC) => errs(errC, ret)) }
-    }
+    // if (catchGlobal) {
+    //     const errs = async (errC, ret) => { if (!ret.stop) { ret['stop'] = true; let retRegexE = await regexE({ 'e': errC, 'inf': inf, 'catchGlobal': true }) } }
+    //     if (typeof window !== 'undefined') { window.addEventListener('error', (errC) => errs(errC, ret)); window.addEventListener('unhandledrejection', (errC) => errs(errC, ret)) }
+    //     else { process.on('uncaughtException', (errC) => errs(errC, ret)); process.on('unhandledRejection', (errC) => errs(errC, ret)) }
+    // }
     try {
         let infConfigStorage = { 'e': e, 'action': 'get', 'key': 'webSocket' };
         let retConfigStorage = await configStorage(infConfigStorage); if (!retConfigStorage.ret) { return retConfigStorage } else { retConfigStorage = retConfigStorage.res }
@@ -204,7 +204,7 @@ async function server(inf) {
             }
             runFun1()
 
-            // [URA_Reversa]
+            // // [URA_Reversa]
             // async function runFun2() {
             //     if (letter !== 'D') {
             //         await import('../../URA_Reversa/src/server.js');
