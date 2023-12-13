@@ -47,10 +47,86 @@ async function server(inf) {
             }
         }
 
+        async function serverFiles(res, req) {
+            let formatarData = (data) => {
+                let options = { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true, };
+                return new Intl.DateTimeFormat('pt-BR', options).format(data);
+            };
+
+            let resultado, infFile, retFile
+            let script = `<script> document.addEventListener('keydown', function(event) { if (event.key === 'Escape') {history.back();}});</script>`;
+            if (req.url.startsWith('/listar-arquivos')) {
+                let tableHtml = '', link = '', tipoEstilo = '';
+                res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+                try {
+                    let url = decodeURIComponent(req.url).replace('!letter!', letter);
+                    infFile = {
+                        'e': e, 'action': 'list', 'functionLocal': false,
+                        'path': url == '/listar-arquivos' ? `${letter}:/ARQUIVOS/PROJETOS` : `${url.replace('/listar-arquivos/', '')}`, 'max': 500,
+                    };
+                    retFile = await file(infFile);
+                    tableHtml += '<table border="1"><tr>';
+                    tableHtml += '<th style="width: 100px; text-align: center;">TAMANHO</th>';
+                    tableHtml += '<th style="width: 200px; text-align: center;">MODIFICAÇÃO</th>';
+                    tableHtml += '<th style="width: 100; text-align: center;">TIPO</th>';
+                    tableHtml += '<th style="width: 1500; text-align: center;">PATH</th>';
+                    tableHtml += '</tr>';
+                    for (let item of retFile.res) {
+                        if (item.isFolder) {
+                            // link = `<a href="/listar-arquivos/${encodeURIComponent(item.path)}">${item.path}</a>`;
+                            link = `<a href="/listar-arquivos/${item.path}">${item.path}</a>`;
+                            tipoEstilo = 'background-color: #1bcf45; color: #ffffff;'; // Azul para pastas
+                        } else {
+                            // link = `<a href="/exibir-arquivo/${encodeURIComponent(item.path)}">${item.path}</a>`;
+                            link = `<a href="/exibir-arquivo/${item.path}">${item.path}</a>`;
+                            tipoEstilo = 'background-color: #db3434; color: #ffffff;'; // Verde para arquivos
+                        }
+                        let dataFormatada = item.edit ? formatarData(new Date(item.edit)) : '';
+                        tableHtml += `<tr>`;
+                        tableHtml += `<td style="text-align: center;">${item.size || ''}</td>`;
+                        tableHtml += `<td style="text-align: center;">${dataFormatada}</td>`;
+                        tableHtml += `<td style="text-align: center; ${tipoEstilo}">${item.isFolder ? 'PASTA' : 'ARQUIVO'}</td>`;
+                        tableHtml += `<td style="text-align: left;">${link}&nbsp;&nbsp;&nbsp;[${item.name || ''}]&nbsp;</td>`;
+                        tableHtml += `</tr>`;
+                    }
+                    tableHtml += '</table>';
+                    res.end(tableHtml + script);
+                } catch (error) {
+                    res.end(`Erro ao listar arquivos: ${error.message}` + script);
+                }
+            } else if (req.url.startsWith('/exibir-arquivo')) {
+                try {
+                    let filePath = decodeURIComponent(req.url.replace('/exibir-arquivo/', ''));
+                    if (filePath.includes('/src/') && (filePath.includes('.json'))) {
+                        resultado = 'ARQUIVO PROTEGIDO!';
+                        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+                        res.end(resultado + script);
+                    } else {
+                        infFile = { 'e': e, 'action': 'read', 'path': filePath }
+                        retFile = await file(infFile);
+                        resultado = retFile.res;
+                        if (filePath.match(/\.(jpg|jpeg|png|ico)$/)) {
+                            res.writeHead(200, { 'Content-Type': 'image/png', 'Content-Length': resultado.length });
+                            res.end(resultado);
+                        } else {
+                            res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+                            res.end(`<pre>${resultado}</pre>` + script);
+                        }
+                    }
+                } catch (error) {
+                    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+                    res.end(`Erro ao exibir arquivo: ${error.message}` + script);;
+                }
+            } else {
+                res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+                res.end('Rota não encontrada' + script);
+            }
+        }
+
         let server = _http.createServer(async (req, res) => {
-            res.writeHead(200, { 'Content-Type': 'text/plain' });
             let urlParts = req.url.split('/');
             if (urlParts.length < 3 && urlParts['1'] == '') {
+                res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
                 res.end(`${req.method}: ERRO | INFORMAR A SALA`)
             } else {
                 let room = urlParts[1];
@@ -67,24 +143,34 @@ async function server(inf) {
                         })
                     }
                     if (room.toLowerCase() == par1 || message.toLowerCase() == par1) {
+                        res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
                         res.end(`${req.method}: OK | CLIENTS:\n\n${getClients()}`)
                     } else if (room.toLowerCase() == par3 || message.toLowerCase() == par3) {
+                        res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
                         res.end(`${req.method}: OK ### RESET ###`);
                         await log({ 'e': e, 'folder': 'JavaScript', 'path': `log.txt`, 'text': 'RESET' })
                         await log({ 'e': e, 'folder': 'JavaScript', 'path': `reset.js`, 'text': ' ' })
                     } else if (req.method == 'POST' && room.toLowerCase() == par4) {
+                        res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
                         res.end(`CHAT GPT`)
                     } else if (req.method == 'POST' && room.toLowerCase() == par5) {
+                        res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
                         res.end(`API`)
+                    } else if (room.toLowerCase().includes('listar-arquivos') || room.toLowerCase().includes('exibir-arquivo')) {
+                        await serverFiles(res, req)
                     } else if (!rooms[room]) {
+                        res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
                         res.end(`${req.method}: ERRO | NAO EXISTE '${room}'`)
                     } else if (message.length == 0) {
+                        res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
                         res.end(`${req.method}: ERRO | MENSAGEM VAZIA '${room}'`)
                     } else {
                         sendRoom(room, message, null);
+                        res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
                         res.end(`${req.method}: OK '${room}'`)
                     }
                 } else {
+                    res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
                     res.end(`METODOS ACEITOS 'GET' OU 'POST'`)
                 }
             }
