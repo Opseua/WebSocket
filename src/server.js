@@ -55,30 +55,39 @@ async function server(inf) {
 
             let resultado, infFile, retFile
             let script = `<script> document.addEventListener('keydown', function(event) { if (event.key === 'Escape') {history.back();}});</script>`;
-            if (req.url.startsWith('/listar-arquivos')) {
+            if (req.url.startsWith(`/${par8}`)) {
                 let tableHtml = '', link = '', tipoEstilo = '';
                 res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
                 try {
                     let url = decodeURIComponent(req.url).replace('!letter!', letter);
                     infFile = {
                         'e': e, 'action': 'list', 'functionLocal': false,
-                        'path': url == '/listar-arquivos' ? `${letter}:/ARQUIVOS/PROJETOS` : `${url.replace('/listar-arquivos/', '')}`, 'max': 500,
+                        'path': url == `/${par8}` ? `${letter}:/ARQUIVOS/PROJETOS` : `${url.replace(`/${par8}/`, '')}`, 'max': 500,
                     };
                     retFile = await file(infFile);
-                    tableHtml += '<table border="1"><tr>';
-                    tableHtml += '<th style="width: 100px; text-align: center;">TAMANHO</th>';
-                    tableHtml += '<th style="width: 200px; text-align: center;">MODIFICAÇÃO</th>';
-                    tableHtml += '<th style="width: 100; text-align: center;">TIPO</th>';
-                    tableHtml += '<th style="width: 1500; text-align: center;">PATH</th>';
-                    tableHtml += '</tr>';
-                    for (let item of retFile.res) {
+                    retFile = retFile.res
+                    let qtdFolder = 0, qtdFile = 0
+                    for (let item of retFile) {
                         if (item.isFolder) {
-                            // link = `<a href="/listar-arquivos/${encodeURIComponent(item.path)}">${item.path}</a>`;
-                            link = `<a href="/listar-arquivos/${item.path}">${item.path}</a>`;
+                            qtdFolder++
+                        } else {
+                            qtdFile++
+                        }
+                    }
+                    tableHtml += '<table border="1"><tr>';
+                    tableHtml += `<th style="width: 100px; text-align: center;">TAMANHO</th>`;
+                    tableHtml += `<th style="width: 200px; text-align: center;">MODIFICAÇÃO</th>`;
+                    tableHtml += `<th style="width: 100; text-align: center;">TIPO</th>`;
+                    tableHtml += `<th style="width: 1500; text-align: center;">PATH [pastas: ${qtdFolder} | arquivos: ${qtdFile} | total: ${retFile.length}]</th>`;
+                    tableHtml += '</tr>';
+                    for (let item of retFile) {
+                        if (item.isFolder) {
+                            // link = `<a href="/${par8}/${encodeURIComponent(item.path)}">${item.path}</a>`;
+                            link = `<a href="/${par8}/${item.path}">${item.path.replace(`/${item.name}`, '')}</a>`;
                             tipoEstilo = 'background-color: #1bcf45; color: #ffffff;'; // Azul para pastas
                         } else {
-                            // link = `<a href="/exibir-arquivo/${encodeURIComponent(item.path)}">${item.path}</a>`;
-                            link = `<a href="/exibir-arquivo/${item.path}">${item.path}</a>`;
+                            // link = `<a href="/${par9}/${encodeURIComponent(item.path)}">${item.path}</a>`;
+                            link = `<a href="/${par9}/${item.path}">${item.path.replace(`/${item.name}`, '')}</a>`;
                             tipoEstilo = 'background-color: #db3434; color: #ffffff;'; // Verde para arquivos
                         }
                         let dataFormatada = item.edit ? formatarData(new Date(item.edit)) : '';
@@ -94,9 +103,9 @@ async function server(inf) {
                 } catch (error) {
                     res.end(`Erro ao listar arquivos: ${error.message}` + script);
                 }
-            } else if (req.url.startsWith('/exibir-arquivo')) {
+            } else if (req.url.startsWith(`/${par9}`)) {
                 try {
-                    let filePath = decodeURIComponent(req.url.replace('/exibir-arquivo/', ''));
+                    let filePath = decodeURIComponent(req.url.replace(`/${par9}/`, ''));
                     if (filePath.includes('/src/') && (filePath.includes('.json'))) {
                         resultado = 'ARQUIVO PROTEGIDO!';
                         res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
@@ -156,7 +165,7 @@ async function server(inf) {
                     } else if (req.method == 'POST' && room.toLowerCase() == par5) {
                         res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
                         res.end(`API`)
-                    } else if (room.toLowerCase().includes('listar-arquivos') || room.toLowerCase().includes('exibir-arquivo')) {
+                    } else if (room.toLowerCase().includes(`${par8}`) || room.toLowerCase().includes(`${par9}`)) {
                         await serverFiles(res, req)
                     } else if (!rooms[room]) {
                         res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
