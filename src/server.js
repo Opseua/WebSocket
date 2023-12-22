@@ -50,6 +50,11 @@ async function server(inf) {
             }
         }
 
+        // BODY HTML
+        let bodyHtml = `
+        <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> 
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>WebSocket</title> </head> <body> ####REPLACE####
+        <script> document.addEventListener('keydown', function(event) { if (event.key === 'Escape') {history.back();}});</script> </body></html>`;
         // ARQUIVOS WEB
         let lisTime = { 'lists': {}, 'tims': {}, 'ids': [] }
         function lisAdd(eve, cal) { if (!lisTime.lists[eve]) { lisTime.lists[eve] = []; }; lisTime.lists[eve].push(cal); }
@@ -65,6 +70,7 @@ async function server(inf) {
             let params = inf.params.split('/')
             let room = params[0]
             let path = decodeURIComponent(inf.params.replace(`${room}/`, '')).replace('!letter!', letter);
+            path = path.length < 3 ? `${letter}:/` : path.includes('z/w/a/b/c/d') ? `${letter}:/` : path
             let id = `TIMEOUT_ID_${new Date().getTime()}`
             let message = {
                 'fun': [{
@@ -89,18 +95,22 @@ async function server(inf) {
             async function lisRet(inf) {
                 lisDel(`timeClear_${inf.id}`, timeClear);
                 let resOk = !inf.res ? false : JSON.parse(inf.res)
-
                 let resultado, infFile, retFile
-                let script = `<script> document.addEventListener('keydown', function(event) { if (event.key === 'Escape') {history.back();}});</script>`;
                 if (!resOk || resOk && !resOk?.retWs.ret) {
-                    console.log('EXPIROU')
-                    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-                    res.end(`${resOk?.retWs.msg ? resOk.retWs.msg : `Erro ao listar/ler: '${path}'`}` + script);;
+                    res.writeHead(200, { 'Content-Type': 'text/html' });
+                    res.end(bodyHtml.replace('####REPLACE####', `<pre>${resOk?.retWs?.msg ? resOk.retWs.msg : `Erro ao listar/ler: '${path}'`}</pre>`));
                 } else {
                     retFile = resOk.retWs.res
+                    let pathFile
+                    if (path.length > 3) {
+                        pathFile = path.lastIndexOf("/");
+                        pathFile = path.substring(pathFile + 1);
+                    } else {
+                        pathFile = path.replace('/', '')
+                    }
                     if (retFile instanceof Array) {
                         let tableHtml = '', link = '', tipoEstilo = '';
-                        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+                        res.writeHead(200, { 'Content-Type': 'text/html' });
                         try {
                             let qtdFolder = 0, qtdFile = 0
                             for (let item of retFile) {
@@ -114,7 +124,7 @@ async function server(inf) {
                             tableHtml += `<th style="width: 100px; text-align: center;">TAMANHO</th>`;
                             tableHtml += `<th style="width: 200px; text-align: center;">MODIFICAÇÃO</th>`;
                             tableHtml += `<th style="width: 100; text-align: center;">TIPO</th>`;
-                            tableHtml += `<th style="width: 1500; text-align: center;">PATH [pastas: ${qtdFolder} | arquivos: ${qtdFile} | total: ${retFile.length}]</th>`;
+                            tableHtml += `<th style="width: 78%; text-align: center;">PATH [pastas: ${qtdFolder} | arquivos: ${qtdFile} | total: ${retFile.length}]</th>`;
                             tableHtml += '</tr>';
                             for (let item of retFile) {
                                 link = `<a href="/${par8}/${room}/${item.path}">${item.path.replace(`/${item.name}`, '')}</a>`;
@@ -128,141 +138,39 @@ async function server(inf) {
                                 tableHtml += `</tr>`;
                             }
                             tableHtml += '</table>';
-                            res.end(tableHtml + script);
+                            res.end(bodyHtml.replace('####REPLACE####', tableHtml).replace('WebSocket', `${pathFile}`));
                         } catch (error) {
-                            res.end(`Erro ao listar arquivos: ${error.message}` + script);
+                            res.end(bodyHtml.replace('####REPLACE####', `<pre>Erro ao listar arquivos: ${error.message}</pre>`));
                         }
                     } else {
                         try {
                             if (path.includes('/src/') && (path.includes('.json'))) {
-                                resultado = 'ARQUIVO PROTEGIDO!';
-                                res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-                                res.end(resultado + script);
+                                res.writeHead(200, { 'Content-Type': 'text/html' });
+                                res.end(bodyHtml.replace('####REPLACE####', `<pre>ARQUIVO PROTEGIDO!</pre>`));
                             } else {
                                 resultado = retFile;
                                 if (path.match(/\.(jpg|jpeg|png|ico)$/)) {
                                     let imagemBase64 = Buffer.from({ type: 'Buffer', data: resultado.data }).toString('base64');
-                                    let paginaHTML = `
-                                        <!DOCTYPE html>
-                                        <html lang="en">
-                                        <head>
-                                            <meta charset="UTF-8">
-                                            <meta http-equiv="X-UA-Compatible" content="IE=edge">
-                                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                                            <title>Exibir Imagem</title>
-                                        </head>
-                                        <body>
-                                            <img src="data:image/png;base64,${imagemBase64}" alt="Imagem">
-                                        </body>
-                                        ${script}
-                                        </html>
-                                    `;
-                                    res.writeHead(200, { 'Content-Type': 'text/html' });
-                                    res.end(paginaHTML);
+                                    res.end(bodyHtml.replace('####REPLACE####', `<img src="data:image/png;base64,${imagemBase64}" alt="Imagem">`).replace('WebSocket', `${pathFile}`));
                                 } else {
                                     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-                                    res.end(`<pre>${resultado}</pre>` + script);
+                                    res.end(bodyHtml.replace('####REPLACE####', `<pre>${resultado}</pre>`).replace('WebSocket', `${pathFile}`));
                                 }
                             }
                         } catch (error) {
-                            res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-                            res.end(`Erro ao exibir arquivo: ${error.message}` + script);;
+                            res.writeHead(200, { 'Content-Type': 'text/html' });
+                            res.end(bodyHtml.replace('####REPLACE####', `<pre>Erro ao exibir arquivo: ${error.message}</pre>`));
                         }
                     }
                 }
             }
-
-            return
-
-
-
-
-
-
-
-
-            // if (req.url.startsWith(`/${par8}`)) {
-            //     let tableHtml = '', link = '', tipoEstilo = '';
-            //     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-            //     try {
-            //         let url = decodeURIComponent(req.url).replace('!letter!', letter);
-            //         infFile = {
-            //             'e': e, 'action': 'list', 'functionLocal': false,
-            //             'path': url == `/${par8}` ? `${letter}:/ARQUIVOS/PROJETOS` : `${url.replace(`/${par8}/`, '')}`, 'max': 500,
-            //         };
-            //         retFile = await file(infFile);
-            //         retFile = retFile.res
-            //         let qtdFolder = 0, qtdFile = 0
-            //         for (let item of retFile) {
-            //             if (item.isFolder) {
-            //                 qtdFolder++
-            //             } else {
-            //                 qtdFile++
-            //             }
-            //         }
-            //         tableHtml += '<table border="1"><tr>';
-            //         tableHtml += `<th style="width: 100px; text-align: center;">TAMANHO</th>`;
-            //         tableHtml += `<th style="width: 200px; text-align: center;">MODIFICAÇÃO</th>`;
-            //         tableHtml += `<th style="width: 100; text-align: center;">TIPO</th>`;
-            //         tableHtml += `<th style="width: 1500; text-align: center;">PATH [pastas: ${qtdFolder} | arquivos: ${qtdFile} | total: ${retFile.length}]</th>`;
-            //         tableHtml += '</tr>';
-            //         for (let item of retFile) {
-            //             if (item.isFolder) {
-            //                 // link = `<a href="/${par8}/${encodeURIComponent(item.path)}">${item.path}</a>`;
-            //                 link = `<a href="/${par8}/${item.path}">${item.path.replace(`/${item.name}`, '')}</a>`;
-            //                 tipoEstilo = 'background-color: #1bcf45; color: #ffffff;'; // Azul para pastas
-            //             } else {
-            //                 // link = `<a href="/${par9}/${encodeURIComponent(item.path)}">${item.path}</a>`;
-            //                 link = `<a href="/${par9}/${item.path}">${item.path.replace(`/${item.name}`, '')}</a>`;
-            //                 tipoEstilo = 'background-color: #db3434; color: #ffffff;'; // Verde para arquivos
-            //             }
-            //             let dataFormatada = item.edit ? formatarData(new Date(item.edit)) : '';
-            //             tableHtml += `<tr>`;
-            //             tableHtml += `<td style="text-align: center;">${item.size || ''}</td>`;
-            //             tableHtml += `<td style="text-align: center;">${dataFormatada}</td>`;
-            //             tableHtml += `<td style="text-align: center; ${tipoEstilo}">${item.isFolder ? 'PASTA' : 'ARQUIVO'}</td>`;
-            //             tableHtml += `<td style="text-align: left;">${link}&nbsp;&nbsp;&nbsp;[${item.name || ''}]&nbsp;</td>`;
-            //             tableHtml += `</tr>`;
-            //         }
-            //         tableHtml += '</table>';
-            //         res.end(tableHtml + script);
-            //     } catch (error) {
-            //         res.end(`Erro ao listar arquivos: ${error.message}` + script);
-            //     }
-            // } else if (req.url.startsWith(`/${par9}`)) {
-            //     try {
-            //         let filePath = decodeURIComponent(req.url.replace(`/${par9}/`, ''));
-            //         if (filePath.includes('/src/') && (filePath.includes('.json'))) {
-            //             resultado = 'ARQUIVO PROTEGIDO!';
-            //             res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-            //             res.end(resultado + script);
-            //         } else {
-            //             infFile = { 'e': e, 'action': 'read', 'path': filePath }
-            //             retFile = await file(infFile);
-            //             resultado = retFile.res;
-            //             if (filePath.match(/\.(jpg|jpeg|png|ico)$/)) {
-            //                 res.writeHead(200, { 'Content-Type': 'image/png', 'Content-Length': resultado.length });
-            //                 res.end(resultado);
-            //             } else {
-            //                 res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-            //                 res.end(`<pre>${resultado}</pre>` + script);
-            //             }
-            //         }
-            //     } catch (error) {
-            //         res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-            //         res.end(`Erro ao exibir arquivo: ${error.message}` + script);;
-            //     }
-            // } else {
-            //     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-            //     res.end('Rota não encontrada' + script);
-            // }
         }
 
         let server = _http.createServer(async (req, res) => {
             let urlParts = req.url.split('/');
             if (urlParts.length < 3 && urlParts['1'] == '') {
-                res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
-                res.end(`${req.method}: ERRO | INFORMAR A SALA`)
+                res.writeHead(200, { 'Content-Type': 'text/html' });
+                res.end(bodyHtml.replace('####REPLACE####', `<pre>${req.method}: ERRO | INFORMAR A SALA</pre>`));
             } else {
                 let room = urlParts[1];
                 let params = req.url.replace(`/${room}/`, '')
@@ -278,37 +186,36 @@ async function server(inf) {
                             req.on('end', () => { resolve(message) })
                         })
                     }
-                    if (room.toLowerCase() == par1 || message.toLowerCase() == par1) {
-                        res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
-                        res.end(`${req.method}: OK | CLIENTS:\n\n${getClients()}`)
-                    } else if (room.toLowerCase() == par3 || message.toLowerCase() == par3) {
-                        res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
-                        res.end(`${req.method}: OK ### RESET ###`);
+                    if (room.toLowerCase() == par1.toLowerCase() || message.toLowerCase() == par1.toLowerCase()) {
+                        res.writeHead(200, { 'Content-Type': 'text/html' });
+                        res.end(bodyHtml.replace('####REPLACE####', `<pre>${req.method}: OK | CLIENTS:\n\n${getClients()}</pre>`));
+                    } else if (room.toLowerCase() == par3.toLowerCase() || message.toLowerCase() == par3.toLowerCase()) {
+                        res.writeHead(200, { 'Content-Type': 'text/html' });
+                        res.end(bodyHtml.replace('####REPLACE####', `<pre>${req.method}: OK ### RESET ###</pre>`));
                         await log({ 'e': e, 'folder': 'JavaScript', 'path': `log.txt`, 'text': 'RESET' })
                         await log({ 'e': e, 'folder': 'JavaScript', 'path': `reset.js`, 'text': ' ' })
-                    } else if (req.method == 'POST' && room.toLowerCase() == par4) {
-                        res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
-                        res.end(`CHAT GPT`)
-                    } else if (req.method == 'POST' && room.toLowerCase() == par5) {
-                        res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
-                        res.end(`API`)
-                    } else if (room.toLowerCase().includes(`${par8}`) || room.toLowerCase().includes(`${par9}`)) {
-                        let infServerFiles = { 'res': res, 'req': req, 'params': params }
-                        await serverFiles(infServerFiles)
+                    } else if (req.method == 'POST' && room.toLowerCase() == par4.toLowerCase()) {
+                        res.writeHead(200, { 'Content-Type': 'text/html' });
+                        res.end(bodyHtml.replace('####REPLACE####', `<pre>CHAT GPT</pre>`));
+                    } else if (req.method == 'POST' && room.toLowerCase() == par5.toLowerCase()) {
+                        res.writeHead(200, { 'Content-Type': 'text/html' });
+                        res.end(bodyHtml.replace('####REPLACE####', `<pre>API</pre>`));
+                    } else if (room.toLowerCase().includes(`${par8.toLowerCase()}`)) {
+                        await serverFiles({ 'res': res, 'req': req, 'params': params })
                     } else if (!rooms[room]) {
-                        res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
-                        res.end(`${req.method}: ERRO | NAO EXISTE '${room}'`)
+                        res.writeHead(200, { 'Content-Type': 'text/html' });
+                        res.end(bodyHtml.replace('####REPLACE####', `<pre>${req.method}: ERRO | NAO EXISTE '${room}'</pre>`));
                     } else if (message.length == 0) {
-                        res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
-                        res.end(`${req.method}: ERRO | MENSAGEM VAZIA '${room}'`)
+                        res.writeHead(200, { 'Content-Type': 'text/html' });
+                        res.end(bodyHtml.replace('####REPLACE####', `<pre>${req.method}: ERRO | MENSAGEM VAZIA '${room}'</pre>`));
                     } else {
                         sendRoom(room, message, null);
-                        res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
-                        res.end(`${req.method}: OK '${room}'`)
+                        res.writeHead(200, { 'Content-Type': 'text/html' });
+                        res.end(bodyHtml.replace('####REPLACE####', `<pre>${req.method}: OK '${room}'</pre>`));
                     }
                 } else {
-                    res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
-                    res.end(`METODOS ACEITOS 'GET' OU 'POST'`)
+                    res.writeHead(200, { 'Content-Type': 'text/html' });
+                    res.end(bodyHtml.replace('####REPLACE####', `<pre>METODOS ACEITOS 'GET' OU 'POST'</pre>`));
                 }
             }
         });
@@ -382,8 +289,8 @@ async function server(inf) {
                 });
             }
         });
-        server.listen(port, async () => {
-            let time = dateHour().res; console.log(`${time.day}/${time.mon} ${time.hou}:${time.min}:${time.sec}`, `server [WebSocket] PORTA: ${port}`, '\n');
+        server.listen(portLocal, async () => {
+            let time = dateHour().res; console.log(`${time.day}/${time.mon} ${time.hou}:${time.min}:${time.sec}`, `server [WebSocket] PORTA: ${portLocal}`, '\n');
             await new Promise(resolve => { setTimeout(resolve, 2000) })
 
             // CLIENT
