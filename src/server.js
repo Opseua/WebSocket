@@ -42,7 +42,7 @@ async function server(inf) {
                     if (client !== sender) {
                         client.send(typeof message === 'object' ? JSON.stringify(message) : message)
                     } else {
-                        if (message.includes(par2)) {
+                        if (message.toLowerCase().includes(par2.toLowerCase())) {
                             client.send(`WEBSOCKET: OK '${room}'`);
                         }
                     }
@@ -62,15 +62,20 @@ async function server(inf) {
         function lisRun(eve, param) { if (lisTime.lists[eve]) { lisTime.lists[eve].forEach(cal => cal(param)); } }
         async function serverFiles(inf) {
             let formatarData = (data) => {
-                let options = { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true, };
-                return new Intl.DateTimeFormat('pt-BR', options).format(data);
+                let options = { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, };
+                return new Intl.DateTimeFormat('pt-BR', options).format(data).replace(',', '')
             };
 
             let res = inf.res
             let params = inf.params.split('/')
             let room = params[0]
-            let path = decodeURIComponent(inf.params.replace(`${room}/`, '')).replace('!letter!', letter);
-            path = path.length < 3 ? `${letter}:/` : path.includes('z/w/a/b/c/d') ? `${letter}:/` : path
+            if (!rooms[room]) {
+                res.writeHead(200, { 'Content-Type': 'text/html' });
+                res.end(bodyHtml.replace('####REPLACE####', `<pre>ERRO | NÃO EXISTE '${room}'</pre>`));
+                return
+            }
+            let path = decodeURIComponent(inf.params.replace(`${room}/`, ''))
+            path = path.length < 3 ? `!letter!:/` : path.includes('z/w/a/b/c/d') ? `!letter!:/` : path
             let id = `TIMEOUT_ID_${new Date().getTime()}`
             let message = {
                 'fun': [{
@@ -121,10 +126,11 @@ async function server(inf) {
                                 }
                             }
                             tableHtml += '<table border="1"><tr>';
-                            tableHtml += `<th style="width: 100px; text-align: center;">TAMANHO</th>`;
-                            tableHtml += `<th style="width: 200px; text-align: center;">MODIFICAÇÃO</th>`;
-                            tableHtml += `<th style="width: 100; text-align: center;">TIPO</th>`;
-                            tableHtml += `<th style="width: 78%; text-align: center;">PATH [pastas: ${qtdFolder} | arquivos: ${qtdFile} | total: ${retFile.length}]</th>`;
+                            tableHtml += `<th style="width: 95px; text-align: center;">TAMANHO</th>`;
+                            tableHtml += `<th style="width: 150px; text-align: center;">MODIFICAÇÃO</th>`;
+                            tableHtml += `<th style="width: 260px; text-align: center;">MD5</th>`;
+                            tableHtml += `<th style="width: 80px; text-align: center;">TIPO</th>`;
+                            tableHtml += `<th style="width: 65%; text-align: center;">PATH [pastas: ${qtdFolder} | arquivos: ${qtdFile} | total: ${retFile.length}]</th>`;
                             tableHtml += '</tr>';
                             for (let item of retFile) {
                                 link = `<a href="/${par8}/${room}/${item.path}">${item.path.replace(`/${item.name}`, '')}</a>`;
@@ -133,6 +139,7 @@ async function server(inf) {
                                 tableHtml += `<tr>`;
                                 tableHtml += `<td style="text-align: center;">${item.size || ''}</td>`;
                                 tableHtml += `<td style="text-align: center;">${dataFormatada}</td>`;
+                                tableHtml += `<td style="text-align: center;">${item.md5 || ''}</td>`;
                                 tableHtml += `<td style="text-align: center; ${tipoEstilo}">${item.isFolder ? 'PASTA' : 'ARQUIVO'}</td>`;
                                 tableHtml += `<td style="text-align: left;">${link}&nbsp;&nbsp;&nbsp;[${item.name || ''}]&nbsp;</td>`;
                                 tableHtml += `</tr>`;
@@ -144,7 +151,7 @@ async function server(inf) {
                         }
                     } else {
                         try {
-                            if (path.includes('/src/') && (path.includes('.json'))) {
+                            if (path.includes('/srcAAAA/') && (path.includes('.json'))) {
                                 res.writeHead(200, { 'Content-Type': 'text/html' });
                                 res.end(bodyHtml.replace('####REPLACE####', `<pre>ARQUIVO PROTEGIDO!</pre>`));
                             } else {
@@ -200,11 +207,11 @@ async function server(inf) {
                     } else if (req.method == 'POST' && room.toLowerCase() == par5.toLowerCase()) {
                         res.writeHead(200, { 'Content-Type': 'text/html' });
                         res.end(bodyHtml.replace('####REPLACE####', `<pre>API</pre>`));
-                    } else if (room.toLowerCase().includes(`${par8.toLowerCase()}`)) {
+                    } else if (room.toLowerCase().includes(par8.toLowerCase())) {
                         await serverFiles({ 'res': res, 'req': req, 'params': params })
                     } else if (!rooms[room]) {
                         res.writeHead(200, { 'Content-Type': 'text/html' });
-                        res.end(bodyHtml.replace('####REPLACE####', `<pre>${req.method}: ERRO | NAO EXISTE '${room}'</pre>`));
+                        res.end(bodyHtml.replace('####REPLACE####', `<pre>${req.method}: ERRO | NÃO EXISTE '${room}'</pre>`));
                     } else if (message.length == 0) {
                         res.writeHead(200, { 'Content-Type': 'text/html' });
                         res.end(bodyHtml.replace('####REPLACE####', `<pre>${req.method}: ERRO | MENSAGEM VAZIA '${room}'</pre>`));
@@ -232,10 +239,10 @@ async function server(inf) {
                 ws.terminate()
             } else {
                 let room = urlParts[1];
-                if (room.toLowerCase() == par1) {
+                if (room.toLowerCase() == par1.toLowerCase()) {
                     ws.send(`WEBSOCKET: OK | CLIENTS:\n\n${getClients()}`);
                     ws.terminate()
-                } else if (room.toLowerCase() == par3) {
+                } else if (room.toLowerCase() == par3.toLowerCase()) {
                     ws.send(`WEBSOCKET: OK ### RESET ###`);
                     await log({ 'e': e, 'folder': 'JavaScript', 'path': `log.txt`, 'text': 'RESET' })
                     await log({ 'e': e, 'folder': 'JavaScript', 'path': `reset.js`, 'text': ' ' })
@@ -255,11 +262,11 @@ async function server(inf) {
                     } else {
                         if (message.toLowerCase() == par1) {
                             ws.send(`WEBSOCKET: OK | CLIENTS:\n\n${getClients()}`)
-                        } else if (message.toLowerCase() == par3) {
+                        } else if (message.toLowerCase() == par3.toLowerCase()) {
                             ws.send(`WEBSOCKET: OK ### RESET ###`);
                             await log({ 'e': e, 'folder': 'JavaScript', 'path': `log.txt`, 'text': 'RESET' })
                             await log({ 'e': e, 'folder': 'JavaScript', 'path': `reset.js`, 'text': ' ' })
-                        } else if (message.toLowerCase() == par6) {
+                        } else if (message.toLowerCase() == par6.toLowerCase()) {
                             ws.send(par7);
                             ws['pingLast'] = Number(dateHour().res.tim)
                             // console.log('RECEBIDO ping:', ws.pingLast, ws.pingRoom)
