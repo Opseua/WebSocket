@@ -81,7 +81,7 @@ async function server(inf) {
             let message = {
                 'fun': [{
                     'securityPass': securityPass, 'retInf': id,
-                    'name': 'file', 'par': { 'action': 'isFolder', 'max': 10, 'functionLocal': false, 'path': path, 'listRead': true }
+                    'name': 'file', 'par': { 'action': 'isFolder', 'max': 1000, 'functionLocal': false, 'path': path, 'listRead': true }
                 }]
             }
             lisTime.ids.push(id);
