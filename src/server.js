@@ -61,10 +61,11 @@ async function server(inf) {
         function lisDel(eve, cal) { if (lisTime.lists[eve]) { lisTime.lists[eve] = lisTime.lists[eve].filter(cb => cb !== cal); } }
         function lisRun(eve, param) { if (lisTime.lists[eve]) { lisTime.lists[eve].forEach(cal => cal(param)); } }
         async function serverFiles(inf) {
-            let formatarData = (data) => {
-                let options = { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, };
-                return new Intl.DateTimeFormat('pt-BR', options).format(data).replace(',', '')
-            };
+            function setData(inf) {
+                let day = inf.substring(8, 10), mon = inf.substring(5, 7), yer = inf.substring(0, 4);
+                let hou = inf.substring(11, 13), min = inf.substring(14, 16), sec = inf.substring(17, 19);
+                return day + "/" + mon + "/" + yer + " " + hou + ":" + min + ":" + sec;
+            }
 
             let res = inf.res
             let params = inf.params.split('/')
@@ -135,7 +136,7 @@ async function server(inf) {
                             for (let item of retFile) {
                                 link = `<a href="/${par8}/${room}/${item.path}">${item.path.replace(`/${item.name}`, '')}</a>`;
                                 tipoEstilo = item.isFolder ? 'background-color: #1bcf45; color: #ffffff;' : 'background-color: #db3434; color: #ffffff;'
-                                let dataFormatada = item.edit ? formatarData(new Date(item.edit)) : '';
+                                let dataFormatada = item.edit ? setData(item.edit) : '';
                                 tableHtml += `<tr>`;
                                 tableHtml += `<td style="text-align: center;">${item.size || ''}</td>`;
                                 tableHtml += `<td style="text-align: center;">${dataFormatada}</td>`;
