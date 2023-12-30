@@ -50,6 +50,25 @@ async function server(inf) {
             }
         }
 
+        // LOOP A CADA 1 MINUTO EM TODOS OS CLIENTES 'NODEJS' (SOMENTE NO EC2)
+        if (devMaster == 'EC2') {
+            setInterval(() => {
+                let message = {
+                    'fun': [{
+                        'securityPass': securityPass, 'retInf': false, 'name': 'commandLine', 'par': {
+                            'awaitFinish': true, 'command': `nircmd savescreenshot "!letter!:/ARQUIVOS/PROJETOS/WebSocket/log/screenshot.png"`
+                        }
+                    }]
+                };
+                for (let room in rooms) {
+                    if (room.toLowerCase().includes(`nodejs`)) {
+                        // ENVIAR COMANDO PARA TIRAR PRINT
+                        sendRoom(room, message, null);
+                    }
+                }
+            }, secScreenShot * 1000);
+        }
+
         // BODY HTML
         let bodyHtml = `
         <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> 
