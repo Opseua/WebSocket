@@ -10,6 +10,7 @@ async function server(inf) {
     try {
         let clients = new Set();
         let rooms = {};
+        await log({ 'e': e, 'folder': 'JavaScript', 'path': `log.txt`, 'text': 'SERVER: START [WebSocket]' })
 
         // PING
         setInterval(async () => {
@@ -18,54 +19,14 @@ async function server(inf) {
                 if (dif > (secPing + 5)) {
                     await log({ 'e': e, 'folder': 'JavaScript', 'path': `log.txt`, 'text': `WEBSOCKET: CLIENTE DESCONECTADO [PING ${dif}] '${value.pingRoom}'` })
                     value.close()
-                    // console.log('DIF', dif, 'ENCERRANDO', value.pingRoom);
-                } else {
-                    // console.log('DIF', dif, 'MANTENDO', value.pingRoom);
                 }
             }
         }, (secPing * 1000));
 
-        // LISTAR CLIENTES CONECTADOS
-        function getClients() {
-            let res = Object.keys(rooms).map(r => ({ 'sala': r, 'qtd': rooms[r].size }));
-            let dH = dateHour().res;
-            res.unshift({ 'hour': `${dH.hou}:${dH.min}:${dH.sec}` });
-            return JSON.stringify(res)
-        };
-        await log({ 'e': e, 'folder': 'JavaScript', 'path': `log.txt`, 'text': 'SERVER: START [WebSocket]' })
-
-        // ENVIAR MENSAGEM PARA SALA
-        function sendRoom(room, message, sender) {
-            let clientsInRoom = rooms[room];
-            if (clientsInRoom) {
-                clientsInRoom.forEach((client) => {
-                    if (client !== sender) {
-                        client.send(typeof message === 'object' ? JSON.stringify(message) : message)
-                    } else {
-                        if (message.toLowerCase().includes(par2.toLowerCase())) {
-                            client.send(`WEBSOCKET: OK '${room}'`);
-                        }
-                    }
-                })
-            }
-        }
-
         // LOOP A CADA 1 MINUTO EM TODOS OS CLIENTES 'NODEJS' (SOMENTE NO EC2)
         if (devMaster == 'EC2') {
             setInterval(() => {
-                let message = {
-                    'fun': [{
-                        'securityPass': securityPass, 'retInf': false, 'name': 'commandLine', 'par': {
-                            'awaitFinish': true, 'command': `nircmd savescreenshot "!letter!:/ARQUIVOS/PROJETOS/WebSocket/log/screenshot.png"`
-                        }
-                    }]
-                };
-                for (let room in rooms) {
-                    if (room.toLowerCase().includes(`nodejs`)) {
-                        // ENVIAR COMANDO PARA TIRAR PRINT
-                        sendRoom(room, message, null);
-                    }
-                }
+                loop({ 'rooms': rooms, 'sender': null })
             }, secScreenShot * 1000);
         }
 
@@ -85,7 +46,6 @@ async function server(inf) {
                 let hou = inf.substring(11, 13), min = inf.substring(14, 16), sec = inf.substring(17, 19);
                 return day + "/" + mon + "/" + yer + " " + hou + ":" + min + ":" + sec;
             }
-
             let res = inf.res
             let params = inf.params.split('/')
             let room = params[0]
@@ -104,7 +64,6 @@ async function server(inf) {
                 }]
             }
             lisTime.ids.push(id);
-
             let timeClear = async (param) => {
                 clearTimeout(lisTime.tims[id]);
                 await lisRet({ 'id': id, 'res': param })
@@ -115,7 +74,7 @@ async function server(inf) {
             lisAdd(`timeClear_${id}`, timeClear);
 
             // ENVIAR COMANDO PARA LISTAR ARQUIVOS
-            sendRoom(room, message, null);
+            sendRoom({ 'rooms': rooms, 'room': room, 'message': message, 'sender': null })
 
             async function lisRet(inf) {
                 lisDel(`timeClear_${inf.id}`, timeClear);
@@ -197,7 +156,7 @@ async function server(inf) {
             let urlParts = req.url.split('/');
             if (urlParts.length < 3 && urlParts['1'] == '') {
                 res.writeHead(200, { 'Content-Type': 'text/html' });
-                res.end(bodyHtml.replace('####REPLACE####', `<pre>${req.method}: ERRO | INFORMAR A SALA</pre>`));
+                res.end(bodyHtml.replace('####REPLACE####', `<pre>ERRO | INFORMAR A SALA</pre>`));
             } else {
                 let room = urlParts[1];
                 let params = req.url.replace(`/${room}/`, '')
@@ -213,19 +172,10 @@ async function server(inf) {
                             req.on('end', () => { resolve(message) })
                         })
                     }
-                    if (room.toLowerCase() == par1.toLowerCase() || message.toLowerCase() == par1.toLowerCase()) {
-                        res.writeHead(200, { 'Content-Type': 'text/html' });
-                        res.end(bodyHtml.replace('####REPLACE####', `<pre>${req.method}: OK | CLIENTS:\n\n${getClients()}</pre>`));
-                    } else if (room.toLowerCase() == par3.toLowerCase() || message.toLowerCase() == par3.toLowerCase()) {
-                        res.writeHead(200, { 'Content-Type': 'text/html' });
-                        res.end(bodyHtml.replace('####REPLACE####', `<pre>${req.method}: OK ### RESET ###</pre>`));
-                        let infCommandLine, retCommandLine
-                        infCommandLine = { 'awaitFinish': true, 'command': `"C:/Program Files (x86)/AnyDesk/AnyDesk.exe" --restart-service` }
-                        retCommandLine = await commandLine(infCommandLine);
-                        infCommandLine = { 'awaitFinish': false, 'command': `"C:/Program Files (x86)/AnyDesk/AnyDesk.exe"` }
-                        retCommandLine = await commandLine(infCommandLine);
-                        await log({ 'e': e, 'folder': 'JavaScript', 'path': `log.txt`, 'text': 'RESET' })
-                        await log({ 'e': e, 'folder': 'JavaScript', 'path': `reset.js`, 'text': ' ' })
+                    if (room.toLowerCase() == par1.toLowerCase()) {
+                        getClients({ 'rooms': rooms, 'res': res, 'bodyHtml': bodyHtml })
+                    } else if (room.toLowerCase() == par3.toLowerCase()) {
+                        resetServer({ 'rooms': rooms, 'res': res, 'params': params, 'room': room, 'bodyHtml': bodyHtml })
                     } else if (req.method == 'POST' && room.toLowerCase() == par4.toLowerCase()) {
                         res.writeHead(200, { 'Content-Type': 'text/html' });
                         res.end(bodyHtml.replace('####REPLACE####', `<pre>CHAT GPT</pre>`));
@@ -233,17 +183,15 @@ async function server(inf) {
                         res.writeHead(200, { 'Content-Type': 'text/html' });
                         res.end(bodyHtml.replace('####REPLACE####', `<pre>API</pre>`));
                     } else if (room.toLowerCase().includes(par8.toLowerCase())) {
-                        await serverFiles({ 'res': res, 'req': req, 'params': params })
+                        await serverFiles({ 'res': res, 'params': params })
                     } else if (!rooms[room]) {
                         res.writeHead(200, { 'Content-Type': 'text/html' });
-                        res.end(bodyHtml.replace('####REPLACE####', `<pre>${req.method}: ERRO | NÃO EXISTE '${room}'</pre>`));
+                        res.end(bodyHtml.replace('####REPLACE####', `<pre>ERRO | NÃO EXISTE '${room}'</pre>`));
                     } else if (message.length == 0) {
                         res.writeHead(200, { 'Content-Type': 'text/html' });
-                        res.end(bodyHtml.replace('####REPLACE####', `<pre>${req.method}: ERRO | MENSAGEM VAZIA '${room}'</pre>`));
+                        res.end(bodyHtml.replace('####REPLACE####', `<pre>ERRO | MENSAGEM VAZIA '${room}'</pre>`));
                     } else {
-                        sendRoom(room, message, null);
-                        res.writeHead(200, { 'Content-Type': 'text/html' });
-                        res.end(bodyHtml.replace('####REPLACE####', `<pre>${req.method}: OK '${room}'</pre>`));
+                        sendRoom({ 'rooms': rooms, 'room': room, 'message': message, 'sender': null, 'res': res, 'bodyHtml': bodyHtml })
                     }
                 } else {
                     res.writeHead(200, { 'Content-Type': 'text/html' });
@@ -260,44 +208,28 @@ async function server(inf) {
             })
             let urlParts = req.url.split('/')
             if (urlParts.length < 3 && urlParts['1'] == '') {
-                ws.send(`WEBSOCKET: ERRO | INFORMAR A SALA`);
+                ws.send(`ERRO | INFORMAR A SALA`);
                 ws.terminate()
             } else {
                 let room = urlParts[1];
-                if (room.toLowerCase() == par1.toLowerCase()) {
-                    ws.send(`WEBSOCKET: OK | CLIENTS:\n\n${getClients()}`);
-                    ws.terminate()
-                } else if (room.toLowerCase() == par3.toLowerCase()) {
-                    ws.send(`WEBSOCKET: OK ### RESET ###`);
-                    await log({ 'e': e, 'folder': 'JavaScript', 'path': `log.txt`, 'text': 'RESET' })
-                    await log({ 'e': e, 'folder': 'JavaScript', 'path': `reset.js`, 'text': ' ' })
-                } else {
-                    ws['pingRoom'] = room
-                    clients.add(ws);
-                    if (!rooms[room]) {
-                        rooms[room] = new Set()
-                    };
-                    rooms[room].add(ws)
+                ws['pingRoom'] = room
+                clients.add(ws);
+                if (!rooms[room]) {
+                    rooms[room] = new Set()
                 };
+                rooms[room].add(ws)
                 await log({ 'e': e, 'folder': 'JavaScript', 'path': `log.txt`, 'text': `WEBSOCKET: NOVO CLIENTE '${room}'` });
                 ws.on('message', async (text) => {
                     let message = text.toString('utf-8');
                     if (message.length == 0) {
-                        ws.send(`WEBSOCKET:  ERRO | MENSAGEM VAZIA '${room}'`)
+                        ws.send(`ERRO | MENSAGEM VAZIA '${room}'`)
                     } else {
-                        if (message.toLowerCase() == par1) {
-                            ws.send(`WEBSOCKET: OK | CLIENTS:\n\n${getClients()}`)
-                        } else if (message.toLowerCase() == par3.toLowerCase()) {
-                            ws.send(`WEBSOCKET: OK ### RESET ###`);
-                            await log({ 'e': e, 'folder': 'JavaScript', 'path': `log.txt`, 'text': 'RESET' })
-                            await log({ 'e': e, 'folder': 'JavaScript', 'path': `reset.js`, 'text': ' ' })
-                        } else if (message.toLowerCase() == par6.toLowerCase()) {
+                        if (message.toLowerCase() == par6.toLowerCase()) {
                             ws.send(par7);
                             ws['pingLast'] = Number(dateHour().res.tim)
-                            // console.log('RECEBIDO ping:', ws.pingLast, ws.pingRoom)
                         } else {
                             if (!message.includes('TIMEOUT_ID_')) {
-                                sendRoom(room, message, ws)
+                                sendRoom({ 'rooms': rooms, 'room': room, 'message': message, 'sender': ws })
                             } else {
                                 // ARQUIVOS WEB
                                 for (let [index, value] of lisTime.ids.entries()) {
