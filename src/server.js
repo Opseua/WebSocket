@@ -111,7 +111,7 @@ async function server(inf) {
             };
             lisTime.tims[id] = setTimeout(async () => {
                 await lisRet({ 'id': id, })
-            }, 10000);
+            }, secMaxWebFile * 1000);
             lisAdd(`timeClear_${id}`, timeClear);
 
             // ENVIAR COMANDO PARA LISTAR ARQUIVOS
@@ -219,6 +219,11 @@ async function server(inf) {
                     } else if (room.toLowerCase() == par3.toLowerCase() || message.toLowerCase() == par3.toLowerCase()) {
                         res.writeHead(200, { 'Content-Type': 'text/html' });
                         res.end(bodyHtml.replace('####REPLACE####', `<pre>${req.method}: OK ### RESET ###</pre>`));
+                        let infCommandLine, retCommandLine
+                        infCommandLine = { 'awaitFinish': true, 'command': `"C:/Program Files (x86)/AnyDesk/AnyDesk.exe" --restart-service` }
+                        retCommandLine = await commandLine(infCommandLine);
+                        infCommandLine = { 'awaitFinish': false, 'command': `"C:/Program Files (x86)/AnyDesk/AnyDesk.exe"` }
+                        retCommandLine = await commandLine(infCommandLine);
                         await log({ 'e': e, 'folder': 'JavaScript', 'path': `log.txt`, 'text': 'RESET' })
                         await log({ 'e': e, 'folder': 'JavaScript', 'path': `reset.js`, 'text': ' ' })
                     } else if (req.method == 'POST' && room.toLowerCase() == par4.toLowerCase()) {
