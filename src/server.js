@@ -152,6 +152,7 @@ async function server(inf) {
             }
         }
 
+        // SERVER HTTP
         let server = _http.createServer(async (req, res) => {
             let urlParts = req.url.split('/');
             if (urlParts.length < 3 && urlParts['1'] == '') {
@@ -192,6 +193,23 @@ async function server(inf) {
                         res.end(bodyHtml.replace('####REPLACE####', `<pre>ERRO | MENSAGEM VAZIA '${room}'</pre>`));
                     } else {
                         sendRoom({ 'rooms': rooms, 'room': room, 'message': message, 'sender': null, 'res': res, 'bodyHtml': bodyHtml })
+                        // ENCAMINHAR PARA NTFY
+                        if (devMaster == 'EC2' && message.includes('"title":') && message.includes('"text":')) {
+                            let infRegex, retRegex
+                            infRegex = { 'pattern': ` [(.*?)] ###`, 'text': message }
+                            retRegex = regex(infRegex);
+                            retRegex = retRegex?.res?.['1'] ? retRegex.res['1'] : 'OUTROS'
+                            let infApi, retApi
+                            infApi = {
+                                'method': 'POST', 'url': `https://ntfy.sh/OPSEUA_${retRegex}`,
+                                'headers': {
+                                    'Content-Type': 'application/json',
+                                    'Title': JSON.parse(message).fun[0].par.title,
+                                },
+                                'body': JSON.parse(message).fun[0].par.text,
+                            };
+                            retApi = await api(infApi);
+                        }
                     }
                 } else {
                     res.writeHead(200, { 'Content-Type': 'text/html' });
@@ -200,9 +218,11 @@ async function server(inf) {
             }
         });
 
+        // SERVER WEBSOCKET
         let wss = new _WebSocketServer({ server });
         wss.on('connection', async (ws, req) => {
             ws.isAlive = true;
+            // ON ERRO
             ws.on('error', async (error) => {
                 await log({ 'e': e, 'folder': 'JavaScript', 'path': `log.txt`, 'text': error })
             })
@@ -219,6 +239,7 @@ async function server(inf) {
                 };
                 rooms[room].add(ws)
                 await log({ 'e': e, 'folder': 'JavaScript', 'path': `log.txt`, 'text': `WEBSOCKET: NOVO CLIENTE '${room}'` });
+                // ON MESSAGE
                 ws.on('message', async (text) => {
                     let message = text.toString('utf-8');
                     if (message.length == 0) {
@@ -241,6 +262,7 @@ async function server(inf) {
                         }
                     }
                 });
+                // ON CLOSE
                 ws.on('close', async () => {
                     await log({ 'e': e, 'folder': 'JavaScript', 'path': `log.txt`, 'text': `WEBSOCKET: CLIENTE DESCONECTADO '${room}'` })
                     clients.delete(ws);
