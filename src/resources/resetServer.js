@@ -38,7 +38,7 @@ function resetServer(inf) {
                 },
                 {
                     'securityPass': securityPass, 'retInf': false,
-                    'name': 'log', 'par': { 'e': e, 'folder': 'JavaScript', 'path': `reset.js`, 'text': ' ' }
+                    'name': 'commandLine', 'par': { 'awaitFinish': false, 'command': `"${letter}:/ARQUIVOS/PROJETOS/WebSocket/src/z_OutrosWebSocket/z_RestartAll.lnk"` }
                 },
             ]
         }
