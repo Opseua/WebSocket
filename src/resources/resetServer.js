@@ -38,7 +38,7 @@ function resetServer(inf) {
                 },
                 {
                     'securityPass': securityPass, 'retInf': false,
-                    'name': 'commandLine', 'par': { 'awaitFinish': false, 'command': `"${letter}:/ARQUIVOS/PROJETOS/WebSocket/src/z_OutrosWebSocket/z_RestartAll.lnk"` }
+                    'name': 'commandLine', 'par': { 'awaitFinish': false, 'command': `"!letter!:/ARQUIVOS/PROJETOS/WebSocket/src/z_OutrosWebSocket/z_RestartAll.lnk"` }
                 },
             ]
         }
