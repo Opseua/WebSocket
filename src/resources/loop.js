@@ -16,7 +16,7 @@ function loop(inf) {
         let message = {
             'fun': [{
                 'securityPass': securityPass, 'retInf': false, 'name': 'commandLine', 'par': {
-                    'awaitFinish': true, 'command': `nircmd savescreenshot "${letter}:/ARQUIVOS/PROJETOS/WebSocket/log/screenshot.png"`
+                    'awaitFinish': true, 'command': `nircmd savescreenshot "!letter!:/ARQUIVOS/PROJETOS/WebSocket/log/screenshot.png"`
                 }
             }]
         };
