@@ -52,13 +52,6 @@ async function client(inf) {
             }
         }
 
-        // async function keepCookieLiveRun() {
-        //     await new Promise(resolve => { setTimeout(resolve, 15000) });
-        //     wsSend({ 'e': e, 'url': devSend, 'message': { 'other': 'keepCookieLive' } })
-
-        // };
-        // // keepCookieLiveRun();
-
         ret['ret'] = true
         ret['msg'] = `CLIENT [WebSocket]: OK`
     } catch (e) {
