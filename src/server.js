@@ -119,12 +119,9 @@ server.listen(portLocal, async () => {
     await file(infFile);
 
     logServer({ 'write': true, 'server': false, 'msg': `[WebSocket] PORTA: ${portLocal}\n` });
+
     // CLIENT
-    async function runFun1() {
-        await new Promise(resolve => { setTimeout(resolve, 2000) });
-        // await import('./client.js');
-        client({ 'e': e })
-    };
-    runFun1()
+    await new Promise(resolve => { setTimeout(resolve, 2000) });
+    client({ 'e': e })
 });
 
