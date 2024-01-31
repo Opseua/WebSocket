@@ -1,13 +1,13 @@
-let e = import.meta.url;
+let e = import.meta.url, ee = e
 async function client(inf) {
     let ret = { 'ret': false }; e = inf && inf.e ? inf.e : e;
     if (catchGlobal) {
-        let errs = async (errC, ret) => { if (!ret.stop) { ret['stop'] = true; let retRegexE = await regexE({ 'e': errC, 'inf': inf, 'catchGlobal': true }) } };
+        let errs = async (errC, ret) => { if (!ret.stop) { ret['stop'] = true; regexE({ 'e': errC, 'inf': inf, 'catchGlobal': true }) } };
         if (typeof window !== 'undefined') { window.addEventListener('error', (errC) => errs(errC, ret)); window.addEventListener('unhandledrejection', (errC) => errs(errC, ret)) }
         else { process.on('uncaughtException', (errC) => errs(errC, ret)); process.on('unhandledRejection', (errC) => errs(errC, ret)) }
     }
     try {
-        let time = dateHour().res; console.log(`${time.day}/${time.mon} ${time.hou}:${time.min}:${time.sec}`, 'client [WebSocket]');
+        logConsole({ 'e': e, 'ee': ee, 'write': false, 'msg': `[WebSocket]\n` });
 
         // DEV - SEND
         let dev1 = devSend
@@ -39,16 +39,14 @@ async function client(inf) {
             // RUN LIS
             async function runLis(nomeList, param1) {
                 let data = {};
-                try {
-                    data = JSON.parse(param1)
-                } catch (e) { };
+                try { data = JSON.parse(param1) } catch (e) { };
                 if (data.fun) { // FUN
                     let infDevFun = { 'e': e, 'data': data, 'wsOrigin': nomeList }
-                    let retDevFun = await devFun(infDevFun)
+                    devFun(infDevFun)
                 } else if (data.other) { // OTHER
-                    console.log('OTHER', data.other)
+                    logConsole({ 'e': e, 'ee': ee, 'write': false, 'msg': `OTHER\n${data.other}` });
                 } else {
-                    console.log(`\nMENSAGEM DO WEBSCKET\n\n${param1}\n`)
+                    logConsole({ 'e': e, 'ee': ee, 'write': false, 'msg': `MENSAGEM DO WEBSCKET\n${param1}` });
                 }
             }
         }
@@ -61,9 +59,9 @@ async function client(inf) {
     };
     if (!ret.ret) {
         if (eng) { // CHROME
-            let retConfigStorage = await configStorage({ 'e': e, 'action': 'del', 'key': 'webSocket' })
+            configStorage({ 'e': e, 'action': 'del', 'key': 'webSocket' })
         } else { // NODEJS
-            await log({ 'e': e, 'folder': 'JavaScript', 'path': `log.txt`, 'text': `SERVER NODEJS: ${ret.msg}` })
+            log({ 'e': e, 'folder': 'JavaScript', 'path': `log.txt`, 'text': `SERVER NODEJS: ${ret.msg}` })
         }
     }
 }

@@ -19,12 +19,12 @@ function lisAdd(eve, cal) { if (!lisTime.lists[eve]) { lisTime.lists[eve] = []; 
 function lisDel(eve, cal) { if (lisTime.lists[eve]) { lisTime.lists[eve] = lisTime.lists[eve].filter(cb => cb !== cal); } }
 function lisRun(eve, param) { if (lisTime.lists[eve]) { lisTime.lists[eve].forEach(cal => cal(param)); } }
 
-let e = import.meta.url;
+let e = import.meta.url, ee = e
 // ##################################################################################################
 async function sendAwait(inf) {
     let ret = { 'ret': false }; e = inf && inf.e ? inf.e : e;
     if (catchGlobal) {
-        let errs = async (errC, ret) => { if (!ret.stop) { ret['stop'] = true; let retRegexE = await regexE({ 'e': errC, 'inf': inf, 'catchGlobal': true }) } };
+        let errs = async (errC, ret) => { if (!ret.stop) { ret['stop'] = true; regexE({ 'e': errC, 'inf': inf, 'catchGlobal': true }) } };
         if (typeof window !== 'undefined') { window.addEventListener('error', (errC) => errs(errC, ret)); window.addEventListener('unhandledrejection', (errC) => errs(errC, ret)) }
         else { process.on('uncaughtException', (errC) => errs(errC, ret)); process.on('unhandledRejection', (errC) => errs(errC, ret)) }
     }
@@ -80,8 +80,8 @@ async function sendAwait(inf) {
 
         // ### LOG FUN ###
         if (inf && inf.logFun) {
-            let infFile = { 'e': e, 'action': 'write', 'functionLocal': false, 'logFun': new Error().stack, 'path': 'AUTO', }, retFile
-            infFile['rewrite'] = false; infFile['text'] = { 'inf': inf, 'ret': ret }; retFile = await file(infFile);
+            let infFile = { 'e': e, 'action': 'write', 'functionLocal': false, 'logFun': new Error().stack, 'path': 'AUTO', }
+            infFile['rewrite'] = false; infFile['text'] = { 'inf': inf, 'ret': ret }; file(infFile);
         }
     } catch (e) {
         let retRegexE = await regexE({ 'inf': inf, 'e': e, 'catchGlobal': false });
@@ -98,7 +98,7 @@ async function sendAwait(inf) {
 async function received(inf) {
     let ret = { 'ret': false }; e = inf && inf.e ? inf.e : e;
     if (catchGlobal) {
-        let errs = async (errC, ret) => { if (!ret.stop) { ret['stop'] = true; let retRegexE = await regexE({ 'e': errC, 'inf': inf, 'catchGlobal': true }) } };
+        let errs = async (errC, ret) => { if (!ret.stop) { ret['stop'] = true; regexE({ 'e': errC, 'inf': inf, 'catchGlobal': true }) } };
         if (typeof window !== 'undefined') { window.addEventListener('error', (errC) => errs(errC, ret)); window.addEventListener('unhandledrejection', (errC) => errs(errC, ret)) }
         else { process.on('uncaughtException', (errC) => errs(errC, ret)); process.on('unhandledRejection', (errC) => errs(errC, ret)) }
     }
@@ -147,7 +147,6 @@ async function received(inf) {
                     await log({ 'e': e, 'folder': 'JavaScriptNovo', 'path': `log.txt`, 'text': `received 2` });
                 } else {
                     // ### MENSAGEM
-                    console.log(`${action} | ${message}`)
                     sendAwait(infSendAwait)
                 }
 
@@ -162,7 +161,7 @@ async function received(inf) {
                         'headers': { 'Content-Type': 'application/json', 'Title': JSON.parse(message).fun[0].par.title, },
                         'body': JSON.parse(message).fun[0].par.text,
                     };
-                    retApi = await api(infApi);
+                    api(infApi);
                 }
             }
             // ENVIAR RETORNO HTTP
@@ -174,8 +173,8 @@ async function received(inf) {
 
         // ### LOG FUN ###
         if (inf && inf.logFun) {
-            let infFile = { 'e': e, 'action': 'write', 'functionLocal': false, 'logFun': new Error().stack, 'path': 'AUTO', }, retFile
-            infFile['rewrite'] = false; infFile['text'] = { 'inf': inf, 'ret': ret }; retFile = await file(infFile);
+            let infFile = { 'e': e, 'action': 'write', 'functionLocal': false, 'logFun': new Error().stack, 'path': 'AUTO', }
+            infFile['rewrite'] = false; infFile['text'] = { 'inf': inf, 'ret': ret }; file(infFile);
         }
     } catch (e) {
         let retRegexE = await regexE({ 'inf': inf, 'e': e, 'catchGlobal': false });
