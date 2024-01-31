@@ -13,16 +13,33 @@ setInterval(async () => {
     // LOOP SOMENTE SE FOR NO EC2
     if (devMaster == 'EC2') {
         let infReceivedSendAwait, retReceivedSendAwait
-        infReceivedSendAwait = { 'rooms': rooms, 'room': 'all', 'message': par10, 'action': par10, 'sender': null, 'server': 'res', 'method': 'WEBSOCKET' }
+        infReceivedSendAwait = { 'e': e, 'rooms': rooms, 'room': 'all', 'message': par10, 'action': par10, 'sender': null, 'server': 'res', 'method': 'WEBSOCKET' }
         received(infReceivedSendAwait)
     }
 }, (secPing * 1000));
+
+// LOG DO SERVER
+async function logServer(inf) {
+    console.log(`${inf.msg} '${inf.room}'`)
+    await log({ 'e': e, 'folder': 'JavaScript', 'path': `log.txt`, 'text': inf.text ? inf.text : `${inf.msg} '${inf.room}'` });
+    if (sheetServer.devs.includes(inf.room) && (inf.msg.includes('NOVO CLIENTE') || inf.msg.includes('CLIENTE DESCONECTADO'))) {
+        let infGoogleSheets, retGoogleSheets;
+        infGoogleSheets = { // A2  | B2 | C2 
+            'e': e, 'action': 'send', 'id': `1BKI7XsKTq896JcA-PLnrSIbyIK1PaakiAtoseWmML-Q`, 'tab': `SERVER`,
+            'range': `${sheetServer.cols[sheetServer.devs.indexOf(inf.room)]}2`,
+            'values': [[`${dateHour().res.tim} | ${inf.msg.includes('NOVO CLIENTE') ? 'ON' : 'OFF'}`]]
+        }
+        retGoogleSheets = await googleSheets(infGoogleSheets)
+    }
+}
 
 // SERVER HTTP
 let server = _http.createServer(async (req, res) => {
     if (req.url.includes('favicon.ico')) { return }
     // SALA E PARAMETROS
-    let retRoomParams = await roomParams({ 'method': 'HTTP', 'server': req })
+    await log({ 'e': e, 'folder': 'JavaScriptNovo', 'path': `log.txt`, 'text': `createServer 1` });
+    let retRoomParams = await roomParams({ 'e': e, 'method': 'HTTP', 'server': req })
+    await log({ 'e': e, 'folder': 'JavaScriptNovo', 'path': `log.txt`, 'text': `createServer 2` });
     let method = retRoomParams.res.method
     let room = retRoomParams.res.room
     let action = retRoomParams.res.action
@@ -31,7 +48,9 @@ let server = _http.createServer(async (req, res) => {
     // PROCESSAR MENSAGEM RECEBIDA (SALA OU TIMEOUT)
     let infReceivedSendAwait, retReceivedSendAwait
     infReceivedSendAwait = { 'rooms': rooms, 'room': room, 'message': message, 'sender': null, 'server': res, 'action': action, 'method': method }
-    received(infReceivedSendAwait)
+    await log({ 'e': e, 'folder': 'JavaScriptNovo', 'path': `log.txt`, 'text': `createServer 3` });
+    await received(infReceivedSendAwait)
+    await log({ 'e': e, 'folder': 'JavaScriptNovo', 'path': `log.txt`, 'text': `createServer 4` });
 });
 
 // SERVER WEBSOCKET | ### ON CONNECTION
@@ -40,12 +59,11 @@ wss.on('connection', async (ws, res) => {
     ws.isAlive = true;
     // ### ON ERRO
     ws.on('error', async (error) => {
-        // console.log(`WEBSOCKET: ERRO`)
-        // await log({ 'e': e, 'folder': 'JavaScript', 'path': `log.txt`, 'text': error })
+        logServer({ 'room': '', 'msg': 'WEBSOCKET: ERRO', 'text': error })
     })
 
     // SALA E PARAMETROS
-    let retRoomParams = await roomParams({ 'method': 'WEBSOCKET', 'server': res })
+    let retRoomParams = await roomParams({ 'e': e, 'method': 'WEBSOCKET', 'server': res })
     let method = retRoomParams.res.method
     let room = retRoomParams.res.room
 
@@ -57,8 +75,7 @@ wss.on('connection', async (ws, res) => {
         clients.add(ws);
         if (!rooms[room]) { rooms[room] = new Set() };
         rooms[room].add(ws)
-        // console.log(`WEBSOCKET: NOVO CLIENTE '${room}'`)
-        // await log({ 'e': e, 'folder': 'JavaScript', 'path': `log.txt`, 'text': `WEBSOCKET: NOVO CLIENTE '${room}'` });
+        logServer({ 'room': room, 'msg': 'WEBSOCKET: NOVO CLIENTE', 'text': false })
 
         // ### ON MESSAGE
         ws.on('message', async (text) => {
@@ -73,7 +90,7 @@ wss.on('connection', async (ws, res) => {
                 } else {
                     // PROCESSAR MENSAGEM RECEBIDA (SALA OU TIMEOUT)
                     let infReceivedSendAwait, retReceivedSendAwait
-                    infReceivedSendAwait = { 'rooms': rooms, 'room': room, 'message': message, 'sender': ws, 'server': res, 'method': method }
+                    infReceivedSendAwait = { 'e': e, 'rooms': rooms, 'room': room, 'message': message, 'action': '', 'sender': ws, 'server': res, 'method': method }
                     received(infReceivedSendAwait)
                 }
             }
@@ -81,8 +98,7 @@ wss.on('connection', async (ws, res) => {
 
         // ### ON CLOSE
         ws.on('close', async () => {
-            // console.log(`WEBSOCKET: CLIENTE DESCONECTADO '${room}'`)
-            // await log({ 'e': e, 'folder': 'JavaScript', 'path': `log.txt`, 'text': `WEBSOCKET: CLIENTE DESCONECTADO '${room}'` })
+            logServer({ 'room': room, 'msg': 'WEBSOCKET: CLIENTE DESCONECTADO', 'text': false })
             clients.delete(ws);
             if (rooms[room]) {
                 rooms[room].delete(ws);

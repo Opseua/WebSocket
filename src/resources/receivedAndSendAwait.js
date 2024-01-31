@@ -1,3 +1,18 @@
+// await new Promise(resolve => { setTimeout(resolve, 2000) })
+// let infReceivedSendAwait, retReceivedSendAwait, message = {
+//     'fun': [{
+//         'securityPass': securityPass, 'retInf': 'ID_AQUI', 'name': 'commandLine', 'par': {
+//             'awaitFinish': true, 'command': `nircmd savescreenshot "!letter!:/ARQUIVOS/PROJETOS/WebSocket/log/screenshotNovo.png"`
+//         }
+//     }]
+// };
+// // awaitRet: true → ENVIA PARA TODOS DA SALA (INCLUSIVE O PRÓPRIO CLIENTE) E ESPERA A RESPOSTA
+// // awaitRet: false → ENVIA PARA TODOS DA SALA (EXCETO O PRÓPRIO CLIENTE) E NÃO ESPERA A RESPOSTA
+// infReceivedSendAwait = { 'e': e, 'rooms': rooms, 'room': room, 'message': message, 'sender': 'null/ws', 'server': res, 'awaitRet': false,  }
+// retReceivedSendAwait = await sendAwait(infReceivedSendAwait)
+// retReceivedSendAwait = await received(infReceivedSendAwait)
+// console.log(retSendAwait)
+
 // LISTENER / TIMEOUT / BODY HTML
 let lisTime = { 'lists': {}, 'tims': {}, 'ids': [] }
 function lisAdd(eve, cal) { if (!lisTime.lists[eve]) { lisTime.lists[eve] = []; }; lisTime.lists[eve].push(cal); }
@@ -23,7 +38,7 @@ async function sendAwait(inf) {
         let idNew = `TIMEOUT_ID_${new Date().getTime()}_${Math.random().toString(36).substring(2, 5)}`;
 
         // ENVIAR MENSAGEM PARA A SALA
-        function com1(inf) { sendRoom({ 'rooms': rooms, 'room': room, 'message': inf.message, 'sender': awaitRet ? null : sender, }) };
+        function com1(inf) { sendRoom({ 'e': e, 'rooms': rooms, 'room': room, 'message': inf.message, 'sender': awaitRet ? null : sender, }) };
         // RET
         function com2(inf) {
             if (inf.retAwait == 'TEMPO_EXPIROU') {
@@ -127,20 +142,23 @@ async function received(inf) {
                 arrActions = arrActions.includes(action.toLowerCase() || message.toLowerCase())
                 if (arrActions) {
                     // ### AÇÃO
-                    actions(infSendAwait)
+                    await log({ 'e': e, 'folder': 'JavaScriptNovo', 'path': `log.txt`, 'text': `received 1` });
+                    await actions(infSendAwait)
+                    await log({ 'e': e, 'folder': 'JavaScriptNovo', 'path': `log.txt`, 'text': `received 2` });
                 } else {
                     // ### MENSAGEM
+                    console.log(`${action} | ${message}`)
                     sendAwait(infSendAwait)
                 }
 
                 // ENCAMINHAR PARA NTFY
                 if (devMaster == 'EC2' && message.includes('"title":') && message.includes('"text":')) {
                     let infRegex, retRegex, infApi, retApi
-                    infRegex = { 'pattern': ` [(.*?)] ###`, 'text': message }
+                    infRegex = { 'e': e, 'pattern': ` [(.*?)] ###`, 'text': message }
                     retRegex = regex(infRegex);
                     retRegex = retRegex?.res?.['1'] ? retRegex.res['1'] : 'OUTROS'
                     infApi = {
-                        'method': 'POST', 'url': `https://ntfy.sh/OPSEUA_${retRegex}`,
+                        'e': e, 'method': 'POST', 'url': `https://ntfy.sh/OPSEUA_${retRegex}`,
                         'headers': { 'Content-Type': 'application/json', 'Title': JSON.parse(message).fun[0].par.title, },
                         'body': JSON.parse(message).fun[0].par.text,
                     };
@@ -148,7 +166,7 @@ async function received(inf) {
                 }
             }
             // ENVIAR RETORNO HTTP
-            if (method !== 'WEBSOCKET' && !arrActions) { html({ 'server': server, 'body': body, 'room': room, 'infAdd': { 'type': 'text', 'title': 'Erro' } }) }
+            if (method !== 'WEBSOCKET' && !arrActions) { html({ 'e': e, 'server': server, 'body': body, 'room': room, 'infAdd': { 'type': 'text', 'title': 'Erro' } }) }
         }
 
         ret['ret'] = true;
@@ -179,17 +197,3 @@ if (eng) { // CHROME
 }
 
 
-// await new Promise(resolve => { setTimeout(resolve, 2000) })
-// let infReceivedSendAwait, retReceivedSendAwait, message = {
-//     'fun': [{
-//         'securityPass': securityPass, 'retInf': 'ID_AQUI', 'name': 'commandLine', 'par': {
-//             'awaitFinish': true, 'command': `nircmd savescreenshot "!letter!:/ARQUIVOS/PROJETOS/WebSocket/log/screenshotNovo.png"`
-//         }
-//     }]
-// };
-// // awaitRet: true → ENVIA PARA TODOS DA SALA (INCLUSIVE O PRÓPRIO CLIENTE) E ESPERA A RESPOSTA
-// // awaitRet: false → ENVIA PARA TODOS DA SALA (EXCETO O PRÓPRIO CLIENTE) E NÃO ESPERA A RESPOSTA
-// infReceivedSendAwait = { 'rooms': rooms, 'room': room, 'message': message, 'sender': 'null/ws', 'server': res, 'awaitRet': false,  }
-// retReceivedSendAwait = await sendAwait(infReceivedSendAwait)
-// retReceivedSendAwait = await received(infReceivedSendAwait)
-// console.log(retSendAwait)

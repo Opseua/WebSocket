@@ -16,7 +16,8 @@ async function client(inf) {
         let dev3 = devGet[1]
 
         // CONNECT
-        await wsConnect({ 'e': e, 'url': [dev1, dev2, dev3,] })
+        // await wsConnect({ 'e': e, 'url': [dev1, dev2, dev3,] })
+        await wsConnect({ 'e': e, 'url': [dev1, , dev3,] })
 
         // LISTENER SOMENTE SE NÃO FOR 'Sniffer_Python'
         let retGetPath
@@ -27,8 +28,8 @@ async function client(inf) {
                 runLis(nomeList, param1)
             });
 
-            // LISTENER SOMENTE SE NÃO FOR [EC2]
-            if (retGetPath?.res[1] !== 'C') {
+            // LISTENER SOMENTE SE FOR [NOTEBOOK]
+            if (retGetPath?.res[1] == 'D') {
                 // LIST - [LOC]
                 wsList(dev3, async (nomeList, param1) => {
                     runLis(nomeList, param1)
@@ -42,7 +43,7 @@ async function client(inf) {
                     data = JSON.parse(param1)
                 } catch (e) { };
                 if (data.fun) { // FUN
-                    let infDevFun = { 'ea': e, 'data': data, 'wsOrigin': nomeList }
+                    let infDevFun = { 'e': e, 'data': data, 'wsOrigin': nomeList }
                     let retDevFun = await devFun(infDevFun)
                 } else if (data.other) { // OTHER
                     console.log('OTHER', data.other)

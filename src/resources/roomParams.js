@@ -1,5 +1,9 @@
 // http://127.0.0.1:8888/?act=PasswordAqui=screenshot&roo=OPSEUA&mes=MensagemAqui
 
+// let infRoomParams, retRoomParams
+// retRoomParams = await roomParams({'e': e, 'method': 'HTTP/WEBSOCKET', 'server': req})
+// console.log(retRoomParams)
+
 let e = import.meta.url;
 async function roomParams(inf) {
     let ret = { 'ret': false }; e = inf && inf.e ? inf.e : e;

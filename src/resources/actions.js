@@ -1,3 +1,8 @@
+// let infSendAwait, retSendAwait
+// infSendAwait = { 'e': e, 'rooms': rooms, 'room': room, 'message': message, 'server': server, 'awaitRet': false, 'action': action, 'method': method }
+// retSendAwait = await actions(infSendAwait)
+// console.log(retSendAwait)
+
 let e = import.meta.url;
 async function actions(inf) {
     let ret = { 'ret': false }; e = inf && inf.e ? inf.e : e;
@@ -63,6 +68,7 @@ async function actions(inf) {
             // ### API [SOMENTE EC2]
         } else if (action.toLowerCase() == par8.toLowerCase()) {
             // ### WEBFILE [PARA O CLIENTE DO URL]
+            await log({ 'e': e, 'folder': 'JavaScriptNovo', 'path': `log.txt`, 'text': `actions 1` });
             let path = message.length < 3 ? `!letter!:/` : message.includes('z/w/a/b/c/d') ? `!letter!:/` : message
             infAdd.type = 'array'; infAdd.title = `WebFiles`; infAdd['path'] = path
             message = {
@@ -76,6 +82,7 @@ async function actions(inf) {
             }
         } else if (action.toLowerCase() == par9.toLowerCase()) {
             // ### SCREENSHOT [PARA O CLIENTE DO URL] path.match(/\.(jpg|jpeg|png|ico)$/)
+            await log({ 'e': e, 'folder': 'JavaScriptNovo', 'path': `log.txt`, 'text': `actions 1` });
             infAdd.type = 'image'; infAdd.title = `screenshot`
             let path = `!letter!:/ARQUIVOS/PROJETOS/WebSocket/log/screenshot.png`
             message = {
@@ -114,11 +121,12 @@ async function actions(inf) {
         }
 
         // ENVIAR COMANDO(s)
+        await log({ 'e': e, 'folder': 'JavaScriptNovo', 'path': `log.txt`, 'text': `actions 2` });
         for (let roomSend in rooms) {
             if (roomSend.includes(room) && message.fun && message.fun.length > 0) {
                 for (let [index, value] of message.fun.entries()) {
                     infReceivedSendAwait = {
-                        'rooms': rooms, 'room': roomSend, 'message': { 'fun': [value] }, 'sender': null,
+                        'e': e, 'rooms': rooms, 'room': roomSend, 'message': { 'fun': [value] }, 'sender': null,
                         'server': server, 'awaitRet': value.retInf == 'ID_AQUI' ? true : false,
                     }
                     retReceivedSendAwait = await sendAwait(infReceivedSendAwait)
@@ -131,7 +139,9 @@ async function actions(inf) {
         if (method !== 'WEBSOCKET') {
             infAdd.type = body?.res?.retWs?.ret ? infAdd.type : 'text'
             body = body?.res?.retWs?.ret ? body.res.retWs.res ? body.res.retWs.res : 'Ação executada com sucesso!' : 'Erro ao executar ação!'
-            html({ 'server': server, 'body': body, 'room': room, 'infAdd': infAdd })
+            await log({ 'e': e, 'folder': 'JavaScriptNovo', 'path': `log.txt`, 'text': `actions 3` });
+            await html({ 'e': e, 'server': server, 'body': body, 'room': room, 'infAdd': infAdd })
+            await log({ 'e': e, 'folder': 'JavaScriptNovo', 'path': `log.txt`, 'text': `actions 4` });
         }
 
         ret['ret'] = true;

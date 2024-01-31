@@ -1,7 +1,7 @@
 // let retSendRoom // 'logFun': true,
-// retSendRoom = sendRoom({ 'rooms': rooms, 'room': room, 'message': message, 'sender': ws }) // MESMO CLIENTE
-// retSendRoom = sendRoom({ 'rooms': rooms, 'room': room, 'message': message, 'sender': null }) // CLIENTE DIFERENTE
-// retSendRoom = sendRoom({ 'rooms': rooms, 'room': room, 'message': message, 'sender': null, 'res': res, 'bodyHtml': bodyHtml }) // HTTP GET/POST
+// retSendRoom = sendRoom({ 'e': e, 'rooms': rooms, 'room': room, 'message': message, 'sender': ws }) // MESMO CLIENTE
+// retSendRoom = sendRoom({ 'e': e, 'rooms': rooms, 'room': room, 'message': message, 'sender': null }) // CLIENTE DIFERENTE
+// retSendRoom = sendRoom({ 'e': e, 'rooms': rooms, 'room': room, 'message': message, 'sender': null, 'res': res, 'bodyHtml': bodyHtml }) // HTTP GET/POST
 // console.log(retSendRoom)
 
 let e = import.meta.url;

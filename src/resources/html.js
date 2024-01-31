@@ -1,3 +1,7 @@
+// let infHtml, retHtml, infAdd = { 'title': 'Erro', 'type': '' }
+// retHtml = await html({ 'e': e, 'server': server, 'body': body, 'room': room, 'infAdd': infAdd })
+// console.log(retHtml)
+
 let e = import.meta.url;
 async function html(inf) {
     let ret = { 'ret': false }; e = inf && inf.e ? inf.e : e;
@@ -57,8 +61,7 @@ async function html(inf) {
                     tableHtml += `<th style="width: 65%; text-align: center;">PATH [pastas: ${qtdFolder} | arquivos: ${qtdFile} | total: ${retFile.length}]</th>`;
                     tableHtml += '</tr>';
                     for (let item of retFile) {
-                        // ?act=Password@2023WebSocketRet=webfile&roo=OPSEUA_NODEJS&mes=!letter!:/ARQUIVOS/PROJETOS
-                        link = `<a href="/?act=${par8}&roo=${room}&mes=${item.path}">${item.path.replace(`/${item.name}`, '')}</a>`;
+                        link = `<a href="/?act=${par8}&roo=${room}&mes=${encodeURIComponent(encodeURIComponent(item.path))}">${item.path.replace(`/${item.name}`, '')}</a>`;
                         tipoEstilo = item.isFolder ? 'background-color: #1bcf45; color: #ffffff;' : 'background-color: #db3434; color: #ffffff;'
                         let dataFormatada = item.edit ? setData(item.edit) : '';
                         tableHtml += `<tr>`;
