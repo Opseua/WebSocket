@@ -6,8 +6,8 @@ let clients = new Set(), rooms = {}
 
 // LOG DO SERVER
 async function logServer(inf) {
-    logConsole({ 'e': e, 'ee': ee, 'write': inf.write, 'msg': `${inf.msg}${inf.server ? " '" + inf.server.room + "'" : ''}` });
-    if (inf.server && inf.server.master && sheetServer.devs.includes(inf.server.room) && inf.msg.includes('CONECTADO')) {
+    logConsole({ 'e': e, 'ee': ee, 'write': inf.write, 'msg': `${inf.msg}${inf.server ? " '" + inf.server.roomLocWeb + "'" : ''}` });
+    if (inf.server && inf.server.master && inf.server.roomLocWeb.includes('WEB') && sheetServer.devs.includes(inf.server.room) && inf.msg.includes('CONECTADO')) {
         let infGoogleSheets, retGoogleSheets;
         infGoogleSheets = { // A2  | B2 | C2 
             'e': e, 'action': 'send', 'id': `1BKI7XsKTq896JcA-PLnrSIbyIK1PaakiAtoseWmML-Q`, 'tab': `SERVER`,
@@ -72,6 +72,7 @@ wss.on('connection', async (ws, res) => {
         ws.terminate()
     } else {
         ws['room'] = room
+        ws['roomLocWeb'] = res.headers.host.includes('127.0.0') ? `[LOC] ${room}` : `[WEB] ${room}`
         clients.add(ws);
         if (!rooms[room]) { rooms[room] = new Set() };
         rooms[room].add(ws)
@@ -93,7 +94,7 @@ wss.on('connection', async (ws, res) => {
                 } else {
                     // PROCESSAR MENSAGEM RECEBIDA (SALA OU TIMEOUT)
                     let infReceivedSendAwait, retReceivedSendAwait
-                    infReceivedSendAwait = { 'e': e, 'rooms': rooms, 'room': ws, 'message': message, 'action': '', 'sender': ws, 'server': res, 'method': method }
+                    infReceivedSendAwait = { 'e': e, 'rooms': rooms, 'room': room, 'message': message, 'action': '', 'sender': ws, 'server': res, 'method': method }
                     received(infReceivedSendAwait)
                 }
             }
@@ -101,7 +102,7 @@ wss.on('connection', async (ws, res) => {
 
         // ### ON CLOSE
         ws.on('close', async () => {
-            logServer({ 'server': ws, 'msg': '[SERVER] CLIENTE DESCONECTADO', 'text': false })
+            logServer({ 'write': true, 'server': ws, 'msg': '[SERVER] CLIENTE DESCONECTADO', })
             clients.delete(ws);
             if (rooms[room]) {
                 rooms[room].delete(ws);
@@ -113,14 +114,13 @@ wss.on('connection', async (ws, res) => {
 
 // INICIAR SERVIDORES
 server.listen(portLocal, async () => {
-
     let infFile, retFile // 'logFun': true, 'raw': true,         rewrite TRUE → adicionar no mesmo arquivo
-    infFile = { 'e': e, 'action': 'write', 'functionLocal': false, 'path': "D:/ARQUIVOS/PROJETOS/WebSocket/log/JavaScript/MES_01_JAN/DIA_31_log.txt", 'rewrite': false, 'text': '\n' }
+    infFile = { 'e': e, 'action': 'write', 'functionLocal': false, 'path': './log/JavaScript/MES_01_JAN/DIA_31_log.txt', 'rewrite': false, 'text': '\n' }
     await file(infFile);
 
     logServer({ 'write': true, 'server': false, 'msg': `[WebSocket] PORTA: ${portLocal}\n` });
 
-    // CLIENT
+    // CLIENT (NÃO POR COMO 'await'!!!)
     await new Promise(resolve => { setTimeout(resolve, 2000) });
     client({ 'e': e })
 });

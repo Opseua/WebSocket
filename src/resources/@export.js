@@ -10,11 +10,3 @@ await import('./sendRoom.js');
 await import('./z_callOld.js');
 
 
-// ### WORK 
-// WebScraper [NECESSÁRIO PARA CHAMAR DE FORA]
-await import('../../../WebScraper/src/resources/sendData.js');
-
-
-
-
-

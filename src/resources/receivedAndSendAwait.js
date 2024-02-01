@@ -34,7 +34,7 @@ async function sendAwait(inf) {
         let message = inf.message
         let awaitRet = inf.awaitRet
         let sender = inf.sender
-        let max = 10
+        let max = 20
         let idNew = `TIMEOUT_ID_${new Date().getTime()}_${Math.random().toString(36).substring(2, 5)}`;
 
         // ENVIAR MENSAGEM PARA A SALA
@@ -121,51 +121,57 @@ async function received(inf) {
                 }
             }
         } else {
-            let arrActions, body = `ERRO NÃO DEFINIDO`
-            if ((!rooms[room] && action !== par10) || !(method == 'WEBSOCKET' || (method == 'GET' && action !== '') || (method == 'POST' && message !== ''))) {
-                // ERROS
-                if (method !== 'GET' && method !== 'POST') {
-                    body = `ERRO | METODOS ACEITOS 'GET' OU 'POST'`
-                } else if (room == '') {
-                    body = `ERRO | INFORMAR A SALA`
-                } else if (!rooms[room]) {
-                    body = `ERRO | NÃO EXISTE '${room}'`
-                } else if ((method == 'GET' && action == '') || (method == 'POST' && message == '')) {
-                    body = `ERRO | ACTION/MENSAGEM VAZIA '${room}'`
-                }
-            } else {
-                body = `OK: '${room}'`
-                // MENSAGEM NORMAL OU AÇÃO
-                let infSendAwait, retSendAwait
-                infSendAwait = { 'rooms': rooms, 'room': room, 'message': message, 'server': server, 'awaitRet': false, 'action': action, 'method': method }
-                arrActions = [par1.toLowerCase(), par3.toLowerCase(), par4.toLowerCase(), par5.toLowerCase(), par8.toLowerCase(), par9.toLowerCase(), par10.toLowerCase(),]
-                arrActions = arrActions.includes(action.toLowerCase() || message.toLowerCase())
-                if (arrActions) {
-                    // ### AÇÃO
-                    await log({ 'e': e, 'folder': 'JavaScriptNovo', 'path': `log.txt`, 'text': `received 1` });
-                    await actions(infSendAwait)
-                    await log({ 'e': e, 'folder': 'JavaScriptNovo', 'path': `log.txt`, 'text': `received 2` });
+            let infSendAwait, retSendAwait, arrActions, body = `ERRO NÃO DEFINIDO`
+            try {
+                if (method == 'WEBSOCKET' || room !== '' && rooms[room] && (['GET', 'POST'].includes(method) && (action !== '' || message !== ''))) {
+                    body = `OK: '${room}'`
+                    // MENSAGEM NORMAL OU AÇÃO
+                    arrActions = [
+                        par1.toLowerCase(), par3.toLowerCase(), par4.toLowerCase(), par5.toLowerCase(), par8.toLowerCase(), par9.toLowerCase(),
+                        par10.toLowerCase(), par11.toLowerCase(),
+                    ]; arrActions = arrActions.includes(action.toLowerCase() || message.toLowerCase())
+                    infSendAwait = { 'rooms': rooms, 'room': room, 'message': message, 'server': server, 'awaitRet': false, 'action': action, 'method': method, 'sender': sender, }
+                    if (arrActions) {
+                        // ### AÇÃO
+                        // await log({ 'e': e, 'folder': 'JavaScriptNovo', 'path': `log.txt`, 'text': `received 1` });
+                        await actions(infSendAwait)
+                        // await log({ 'e': e, 'folder': 'JavaScriptNovo', 'path': `log.txt`, 'text': `received 2` });
+                    } else {
+                        // ### MENSAGEM
+                        sendAwait(infSendAwait)
+                        body = `OK: '${room}' MENSAGEM '${message}'`
+                    }
+                    // ENCAMINHAR PARA NTFY
+                    if (devMaster == 'EC2' && message.includes('"title":') && message.includes('"text":')) {
+                        let infRegex, retRegex, infApi, retApi
+                        infRegex = { 'e': e, 'pattern': ` [(.*?)] ###`, 'text': message }
+                        retRegex = regex(infRegex);
+                        retRegex = retRegex?.res?.['1'] ? retRegex.res['1'] : 'OUTROS'
+                        infApi = {
+                            'e': e, 'method': 'POST', 'url': `https://ntfy.sh/OPSEUA_${retRegex}`,
+                            'headers': { 'Content-Type': 'application/json', 'Title': JSON.parse(message).fun[0].par.title, },
+                            'body': JSON.parse(message).fun[0].par.text,
+                        };
+                        api(infApi);
+                    }
                 } else {
-                    // ### MENSAGEM
-                    sendAwait(infSendAwait)
+                    // ERROS
+                    if (!['GET', 'POST'].includes(method)) {
+                        body = `ERRO | METODOS ACEITOS 'GET' OU 'POST'`
+                    } else if (room == '') {
+                        body = `ERRO | INFORMAR A SALA`
+                    } else if (!rooms[room]) {
+                        body = `ERRO | NÃO EXISTE '${room}'`
+                    } else if ((method == 'GET' && action == '') || (method == 'POST' && message == '')) {
+                        body = `ERRO | ACTION/MENSAGEM VAZIA '${room}'`
+                    }
                 }
-
-                // ENCAMINHAR PARA NTFY
-                if (devMaster == 'EC2' && message.includes('"title":') && message.includes('"text":')) {
-                    let infRegex, retRegex, infApi, retApi
-                    infRegex = { 'e': e, 'pattern': ` [(.*?)] ###`, 'text': message }
-                    retRegex = regex(infRegex);
-                    retRegex = retRegex?.res?.['1'] ? retRegex.res['1'] : 'OUTROS'
-                    infApi = {
-                        'e': e, 'method': 'POST', 'url': `https://ntfy.sh/OPSEUA_${retRegex}`,
-                        'headers': { 'Content-Type': 'application/json', 'Title': JSON.parse(message).fun[0].par.title, },
-                        'body': JSON.parse(message).fun[0].par.text,
-                    };
-                    api(infApi);
-                }
+            } catch (e) {
+                body = `URL INVÁLIDA!\n\nEXEMPLO:\nSALA/MENSAGEM_ou_ACAO\n?act=ACAO&roo=SALA&mes=MENSAGEM\n?roo=SALA&mes=MENSAGEM`
             }
-            // ENVIAR RETORNO HTTP
-            if (method !== 'WEBSOCKET' && !arrActions) { html({ 'e': e, 'server': server, 'body': body, 'room': room, 'infAdd': { 'type': 'text', 'title': 'Erro' } }) }
+
+            // ENVIAR RETORNO HTTP (SE NÃO FOR AÇÃO)
+            if (method !== 'WEBSOCKET' && !arrActions) { html({ 'e': e, 'server': server, 'body': body, 'room': room, 'infAdd': { 'type': 'text', 'title': 'Server' } }) }
         }
 
         ret['ret'] = true;

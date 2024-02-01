@@ -43,7 +43,7 @@ async function roomParams(inf) {
             'method': method,
             'room': room ? room : '',
             'action': action ? action : message ? message : '',
-            'message': message ? message : '',
+            'message': message ? message : action ? action : '',
         }
 
         // ### LOG FUN ###
