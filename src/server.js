@@ -24,8 +24,9 @@ setInterval(async () => {
             value.close()
         }
     };
-    // LOOP SOMENTE SE FOR NO EC2
-    if (devMaster == 'EC2') {
+    // LOOP SOMENTE SE FOR NO EC2 (07H<>23H)
+    let time = dateHour().res;
+    if (devMaster == 'EC2' && Number(time.hou) > 6 && Number(time.hou) < 24) {
         let infReceivedSendAwait, retReceivedSendAwait
         infReceivedSendAwait = { 'e': e, 'rooms': rooms, 'room': 'all', 'message': par10, 'action': par10, 'sender': null, 'server': 'res', 'method': 'WEBSOCKET' }
         received(infReceivedSendAwait)
