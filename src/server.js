@@ -17,7 +17,7 @@ async function logServer(inf) {
         googleSheets(infGoogleSheets)
     }
 }
-// LOOP: ENVIAR 'pong' PARA OS CLIENTES | AÇÃO 'loop'
+// LOOP: CHECAR ÚLTIMO PING | ACTION LOOP [SOMENTE SE FOR NO EC2 (07H<>23H)
 setInterval(async () => {
     for (let value of clients) {
         let dif = value.pingLast ? Number(dateHour().res.tim) - value.pingLast : 0; if (dif > (windowGlobal.secPing + 5)) {
@@ -28,13 +28,12 @@ setInterval(async () => {
 }, (windowGlobal.secPing * 1000));
 setInterval(async () => {
     let time = dateHour().res;
-    // LOOP SOMENTE SE FOR NO EC2 (07H<>23H)
     if (windowGlobal.devMaster == 'EC2' && Number(time.hou) > 6 && Number(time.hou) < 24) {
         let infReceivedSendAwait, retReceivedSendAwait
         infReceivedSendAwait = { 'e': e, 'rooms': rooms, 'room': 'all', 'message': windowGlobal.par10, 'action': windowGlobal.par10, 'sender': null, 'server': 'res', 'method': 'WEBSOCKET' }
         received(infReceivedSendAwait)
     }
-}, (windowGlobal.secLoop * 1000));
+}, (windowGlobal.secPing * 1000));
 
 // SERVER HTTP
 let server = _http.createServer(async (req, res) => {
@@ -81,20 +80,9 @@ wss.on('connection', async (ws, res) => {
         rooms[room].add(ws)
         logServer({ 'write': true, 'server': ws, 'msg': `[SERVER] NOVO CLIENTE` });
 
-        await new Promise(resolve => { setTimeout(resolve, 6000) })
-        let infFile, retFile // 'logFun': true, 'raw': true,         rewrite TRUE → adicionar no mesmo arquivo
-        infFile = { 'e': e, 'action': 'read', 'functionLocal': false, 'path': 'D:/IMAGE_2000KB.jpg' }
-        retFile = await file(infFile);
-        let retWsMessageSend
-        retWsMessageSend = await wsMessageSend({ 'e': e, 'room': 'OPSEUA_NODEJS', 'message': retFile.res, 'messageId': false, 'rooms': rooms, 'sender': null, 'secondsAwait': 0 })
-        console.log(`AQUI → ${JSON.stringify(retWsMessageSend)}`)
-        return
-
         // ### ON MESSAGE
         ws.on('message', async (text) => {
-            let message = data.toString('utf-8');
-            let parsedData = {}; try { parsedData = JSON.parse(message); parsedData = parsedData.message ? parsedData : { 'e': e, 'message': message, 'messageId': false, 'parts': false, } }
-            catch (e) { parsedData = { 'e': e, 'message': message, 'messageId': false, 'parts': false, } };
+            let message = text.toString('utf-8');
             if (message.length == 0) {
                 ws.send(`ERRO | MENSAGEM VAZIA '${room}'`)
             } else {
@@ -109,8 +97,7 @@ wss.on('connection', async (ws, res) => {
                     // PROCESSAR MENSAGEM RECEBIDA (SALA OU TIMEOUT)
                     let infReceivedSendAwait, retReceivedSendAwait
                     infReceivedSendAwait = { 'e': e, 'rooms': rooms, 'room': room, 'message': message, 'action': '', 'sender': ws, 'server': res, 'method': method }
-                    // received(infReceivedSendAwait)
-                    wsMessageReceived({ 'e': e, 'room': room, 'parsedData': parsedData, 'rooms': rooms, 'action': '', 'sender': ws, 'server': res, 'method': method })
+                    received(infReceivedSendAwait)
                 }
             }
         });
@@ -139,4 +126,6 @@ server.listen(windowGlobal.portLocal, async () => {
     await new Promise(resolve => { setTimeout(resolve, 2000) });
     client({ 'e': e })
 });
+
+
 
