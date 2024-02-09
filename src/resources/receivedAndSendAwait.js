@@ -1,7 +1,7 @@
 // await new Promise(resolve => { setTimeout(resolve, 2000) })
 // let infReceivedSendAwait, retReceivedSendAwait, message = {
 //     'fun': [{
-//         'securityPass': securityPass, 'retInf': 'ID_AQUI', 'name': 'commandLine', 'par': {
+//         'securityPass': windowGlobal.securityPass, 'retInf': 'ID_AQUI', 'name': 'commandLine', 'par': {
 //             'awaitFinish': true, 'command': `nircmd savescreenshot "!letter!:/ARQUIVOS/PROJETOS/WebSocket/log/screenshotNovo.png"`
 //         }
 //     }]
@@ -108,6 +108,7 @@ async function received(inf) {
         let room = inf.room
         let action = inf.action
         let message = inf.message
+        let messageId = inf.messageId
         let sender = inf.sender
         let server = inf.server
 
@@ -127,8 +128,8 @@ async function received(inf) {
                     body = `OK: '${room}'`
                     // MENSAGEM NORMAL OU AÇÃO
                     arrActions = [
-                        par1.toLowerCase(), par3.toLowerCase(), par4.toLowerCase(), par5.toLowerCase(), par8.toLowerCase(), par9.toLowerCase(),
-                        par10.toLowerCase(), par11.toLowerCase(),
+                        windowGlobal.par1.toLowerCase(), windowGlobal.par3.toLowerCase(), windowGlobal.par4.toLowerCase(), windowGlobal.par5.toLowerCase(), windowGlobal.par8.toLowerCase(), windowGlobal.par9.toLowerCase(),
+                        windowGlobal.par10.toLowerCase(), windowGlobal.par11.toLowerCase(),
                     ]; arrActions = arrActions.includes(action.toLowerCase() || message.toLowerCase())
                     infSendAwait = { 'rooms': rooms, 'room': room, 'message': message, 'server': server, 'awaitRet': false, 'action': action, 'method': method, 'sender': sender, }
                     if (arrActions) {
@@ -142,7 +143,7 @@ async function received(inf) {
                         body = `OK: '${room}' MENSAGEM '${message}'`
                     }
                     // ENCAMINHAR PARA NTFY
-                    if (devMaster == 'EC2' && message.includes('"title":') && message.includes('"text":')) {
+                    if (windowGlobal.devMaster == 'EC2' && message.includes('"title":') && message.includes('"text":')) {
                         let infRegex, retRegex, infApi, retApi
                         infRegex = { 'e': e, 'pattern': ` [(.*?)] ###`, 'text': message }
                         retRegex = regex(infRegex);

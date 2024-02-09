@@ -61,7 +61,7 @@ async function html(inf) {
                     tableHtml += `<th style="width: 65%; text-align: center;">PATH [pastas: ${qtdFolder} | arquivos: ${qtdFile} | total: ${retFile.length}]</th>`;
                     tableHtml += '</tr>';
                     for (let item of retFile) {
-                        link = `<a href="/?act=${par8}&roo=${room}&mes=${encodeURIComponent(encodeURIComponent(item.path))}">${item.path.replace(`/${item.name}`, '')}</a>`;
+                        link = `<a href="/?act=${windowGlobal.par8}&roo=${room}&mes=${encodeURIComponent(encodeURIComponent(item.path))}">${item.path.replace(`/${item.name}`, '')}</a>`;
                         tipoEstilo = item.isFolder ? 'background-color: #1bcf45; color: #ffffff;' : 'background-color: #db3434; color: #ffffff;'
                         let dataFormatada = item.edit ? setData(item.edit) : '';
                         tableHtml += `<tr>`;

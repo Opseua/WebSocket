@@ -22,51 +22,51 @@ async function actions(inf) {
         let infAdd = { 'title': 'Erro', 'type': '' }
         let body, infReceivedSendAwait, retReceivedSendAwait
 
-        if (action.toLowerCase() == par1.toLowerCase()) {
+        if (action.toLowerCase() == windowGlobal.par1.toLowerCase()) {
             // ### WSCLIENTS [SOMENTE EC2]
             let resClients = Object.keys(rooms).map(r => ({ 'sala': r, 'qtd': rooms[r].size }));
             let dH = dateHour().res; resClients.unshift({ 'hour': `${dH.hou}:${dH.min}:${dH.sec}` });
             infAdd.type = 'text'; infAdd.title = `Clients`
             body = { 'ret': true, 'res': { 'retWs': { 'ret': true, 'res': `OK | CLIENTS:\n\n${JSON.stringify(resClients)}` } } }
-        } else if (action.toLowerCase() == par3.toLowerCase()) {
+        } else if (action.toLowerCase() == windowGlobal.par3.toLowerCase()) {
             // ### RESET [PARA O CLIENTE DO URL]
             infAdd.type = 'text'; infAdd.title = `Reset (AnyDesk e Pm2)`
             message = {
                 'fun': [
                     {
-                        'securityPass': securityPass, 'retInf': 'ID_AQUI', 'name': 'commandLine', 'par': {
+                        'securityPass': windowGlobal.securityPass, 'retInf': 'ID_AQUI', 'name': 'commandLine', 'par': {
                             // 'awaitFinish': true, 'command': `taskkill /IM AnyDesk.exe /F`
                             'awaitFinish': true, 'command': `notepad`
                         }
 
                     },
                     // {
-                    //     'securityPass': securityPass, 'retInf': false, 'name': 'commandLine', 'par': {
+                    //     'securityPass': windowGlobal.securityPass, 'retInf': false, 'name': 'commandLine', 'par': {
                     //         'awaitFinish': true, 'command': `"C:/Program Files (x86)/AnyDesk/AnyDesk.exe" --restart-service`
                     //     }
                     // },
                     // {
-                    //     'securityPass': securityPass, 'retInf': false, 'name': 'commandLine', 'par': {
+                    //     'securityPass': windowGlobal.securityPass, 'retInf': false, 'name': 'commandLine', 'par': {
                     //         'awaitFinish': false, 'command': `"C:/Program Files (x86)/AnyDesk/AnyDesk.exe"`
                     //     }
                     // },
                     // {
-                    //     'securityPass': securityPass, 'retInf': false, 'name': 'log', 'par': {
+                    //     'securityPass': windowGlobal.securityPass, 'retInf': false, 'name': 'log', 'par': {
                     //         'folder': 'JavaScript', 'path': `log.txt`, 'text': 'RESET'
                     //     }
                     // },
                     // {
-                    //     'securityPass': securityPass, 'retInf': false, 'name': 'commandLine', 'par': {
+                    //     'securityPass': windowGlobal.securityPass, 'retInf': false, 'name': 'commandLine', 'par': {
                     //         'awaitFinish': false, 'command': `"!letter!:/ARQUIVOS/PROJETOS/WebSocket/src/z_OutrosWebSocket/z_RestartAll.lnk"`
                     //     }
                     // },
                 ]
             }
-        } else if (action.toLowerCase() == par4.toLowerCase()) {
+        } else if (action.toLowerCase() == windowGlobal.par4.toLowerCase()) {
             // ### CHATGPT [SOMENTE EC2]
-        } else if (action.toLowerCase() == par5.toLowerCase()) {
+        } else if (action.toLowerCase() == windowGlobal.par5.toLowerCase()) {
             // ### API [SOMENTE EC2]
-        } else if (action.toLowerCase() == par8.toLowerCase()) {
+        } else if (action.toLowerCase() == windowGlobal.par8.toLowerCase()) {
             // ### WEBFILE [PARA O CLIENTE DO URL]
             await log({ 'e': e, 'folder': 'JavaScriptNovo', 'path': `log.txt`, 'text': `actions 1` });
             let path = message.length < 3 ? `!letter!:/` : message.includes('z/w/a/b/c/d') ? `!letter!:/` : message
@@ -74,13 +74,13 @@ async function actions(inf) {
             message = {
                 'fun': [
                     {
-                        'securityPass': securityPass, 'retInf': 'ID_AQUI', 'name': 'file', 'par': {
+                        'securityPass': windowGlobal.securityPass, 'retInf': 'ID_AQUI', 'name': 'file', 'par': {
                             'action': 'isFolder', 'max': 1000, 'functionLocal': false, 'path': path, 'listRead': true
                         }
                     }
                 ]
             }
-        } else if (action.toLowerCase() == par9.toLowerCase()) {
+        } else if (action.toLowerCase() == windowGlobal.par9.toLowerCase()) {
             // ### SCREENSHOT [PARA O CLIENTE DO URL] path.match(/\.(jpg|jpeg|png|ico)$/)
             await log({ 'e': e, 'folder': 'JavaScriptNovo', 'path': `log.txt`, 'text': `actions 1` });
             infAdd.type = 'image'; infAdd.title = `screenshot`
@@ -88,29 +88,29 @@ async function actions(inf) {
             message = {
                 'fun': [
                     {
-                        'securityPass': securityPass, 'retInf': 'ID_AQUI', 'name': 'commandLine', 'par': {
+                        'securityPass': windowGlobal.securityPass, 'retInf': 'ID_AQUI', 'name': 'commandLine', 'par': {
                             'awaitFinish': true, 'command': `nircmd savescreenshot "${path}"`
                         }
                     },
                     {
-                        'securityPass': securityPass, 'retInf': 'ID_AQUI', 'name': 'file', 'par': {
+                        'securityPass': windowGlobal.securityPass, 'retInf': 'ID_AQUI', 'name': 'file', 'par': {
                             'action': 'read', 'functionLocal': false, 'path': `${path}`
                         }
                     },
                 ]
             };
-        } else if (action.toLowerCase() == par10.toLowerCase()) {
+        } else if (action.toLowerCase() == windowGlobal.par10.toLowerCase()) {
             // ### LOOP [PARA TODOS OS CLIENTE '..._NODEJS']
             let path = `!letter!:/ARQUIVOS/PROJETOS/WebSocket/log/Registros/Loop/${time1}/${time.hou}.00-${time.hou}.59`, time2 = `${time.hou}.${time.min}.${time.sec}.${time.mil}`
             message = {
                 'fun': [
                     { // CRIAR PADRÃO DE PASTA
-                        'securityPass': securityPass, 'retInf': false, 'name': 'file', 'par': {
+                        'securityPass': windowGlobal.securityPass, 'retInf': false, 'name': 'file', 'par': {
                             'action': 'write', 'functionLocal': false, 'path': `${path}/#_Z_#.txt`, 'rewrite': true, 'text': `${time2}\n`
                         }
                     },
                     { // SCREENSHOT
-                        'securityPass': securityPass, 'retInf': false, 'name': 'commandLine', 'par': {
+                        'securityPass': windowGlobal.securityPass, 'retInf': false, 'name': 'commandLine', 'par': {
                             'awaitFinish': true, 'command': `nircmd savescreenshot "${path}/${time2}_screenshot.png"`
                         }
                     },
