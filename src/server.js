@@ -7,32 +7,34 @@ let clients = new Set(), rooms = {}
 // LOG DO SERVER
 async function logServer(inf) {
     logConsole({ 'e': e, 'ee': ee, 'write': inf.write, 'msg': `${inf.msg}${inf.server ? " '" + inf.server.roomLocWeb + "'" : ''}` });
-    if (inf.server && inf.server.master && inf.server.roomLocWeb.includes('WEB') && sheetServer.devs.includes(inf.server.room) && inf.msg.includes('CONECTADO')) {
+    if (inf.server && inf.server.master && inf.server.roomLocWeb.includes('WEB') && windowGlobal.sheetServer.devs.includes(inf.server.room) && inf.msg.includes('CONECTADO')) {
         let infGoogleSheets, retGoogleSheets;
         infGoogleSheets = { // A2  | B2 | C2 
             'e': e, 'action': 'send', 'id': `1BKI7XsKTq896JcA-PLnrSIbyIK1PaakiAtoseWmML-Q`, 'tab': `SERVER`,
-            'range': `${sheetServer.cols[sheetServer.devs.indexOf(inf.server.room)]}2`,
+            'range': `${windowGlobal.sheetServer.cols[windowGlobal.sheetServer.devs.indexOf(inf.server.room)]}2`,
             'values': [[`${dateHour().res.tim} | ${inf.msg.includes('DESCONECTADO') ? 'OFF' : 'ON'}`]]
         }
         googleSheets(infGoogleSheets)
     }
 }
+// LOOP: ENVIAR 'pong' PARA OS CLIENTES | AÇÃO 'loop'
 setInterval(async () => {
     for (let value of clients) {
-        let dif = value.pingLast ? Number(dateHour().res.tim) - value.pingLast : 0; if (dif > (secPing + 5)) {
+        let dif = value.pingLast ? Number(dateHour().res.tim) - value.pingLast : 0; if (dif > (windowGlobal.secPing + 5)) {
             logServer({ 'write': true, 'server': value, 'msg': `[SERVER] CLIENTE DESCONECTADO [PING ${dif}]` });
             value.close()
         }
     };
-    // LOOP SOMENTE SE FOR NO EC2 (07H<>23H)
+}, (windowGlobal.secPing * 1000));
+setInterval(async () => {
     let time = dateHour().res;
-    if (devMaster == 'EC2' && Number(time.hou) > 6 && Number(time.hou) < 24) {
+    // LOOP SOMENTE SE FOR NO EC2 (07H<>23H)
+    if (windowGlobal.devMaster == 'EC2' && Number(time.hou) > 6 && Number(time.hou) < 24) {
         let infReceivedSendAwait, retReceivedSendAwait
-        infReceivedSendAwait = { 'e': e, 'rooms': rooms, 'room': 'all', 'message': par10, 'action': par10, 'sender': null, 'server': 'res', 'method': 'WEBSOCKET' }
+        infReceivedSendAwait = { 'e': e, 'rooms': rooms, 'room': 'all', 'message': windowGlobal.par10, 'action': windowGlobal.par10, 'sender': null, 'server': 'res', 'method': 'WEBSOCKET' }
         received(infReceivedSendAwait)
     }
-}, (secPing * 1000));
-
+}, (windowGlobal.secLoop * 1000));
 
 // SERVER HTTP
 let server = _http.createServer(async (req, res) => {
@@ -79,24 +81,36 @@ wss.on('connection', async (ws, res) => {
         rooms[room].add(ws)
         logServer({ 'write': true, 'server': ws, 'msg': `[SERVER] NOVO CLIENTE` });
 
+        await new Promise(resolve => { setTimeout(resolve, 6000) })
+        let infFile, retFile // 'logFun': true, 'raw': true,         rewrite TRUE → adicionar no mesmo arquivo
+        infFile = { 'e': e, 'action': 'read', 'functionLocal': false, 'path': 'D:/IMAGE_2000KB.jpg' }
+        retFile = await file(infFile);
+        let retWsMessageSend
+        retWsMessageSend = await wsMessageSend({ 'e': e, 'room': 'OPSEUA_NODEJS', 'message': retFile.res, 'messageId': false, 'rooms': rooms, 'sender': null, 'secondsAwait': 0 })
+        console.log(`AQUI → ${JSON.stringify(retWsMessageSend)}`)
+        return
+
         // ### ON MESSAGE
         ws.on('message', async (text) => {
-            let message = text.toString('utf-8');
+            let message = data.toString('utf-8');
+            let parsedData = {}; try { parsedData = JSON.parse(message); parsedData = parsedData.message ? parsedData : { 'e': e, 'message': message, 'messageId': false, 'parts': false, } }
+            catch (e) { parsedData = { 'e': e, 'message': message, 'messageId': false, 'parts': false, } };
             if (message.length == 0) {
                 ws.send(`ERRO | MENSAGEM VAZIA '${room}'`)
             } else {
-                if (message.toLowerCase() == par6.toLowerCase()) {
+                if (message.toLowerCase() == windowGlobal.par6.toLowerCase()) {
                     // RECEBEU: PING → ENVIAR: PONG
-                    ws.send(par7);
+                    ws.send(windowGlobal.par7);
                     ws['pingLast'] = Number(dateHour().res.tim)
-                } else if (message.toLowerCase() == par11.toLowerCase()) {
+                } else if (message.toLowerCase() == windowGlobal.par11.toLowerCase()) {
                     ws['master'] = true
                     logServer({ 'write': true, 'server': ws, 'msg': `[SERVER] MASTER CONECTADO` });
                 } else {
                     // PROCESSAR MENSAGEM RECEBIDA (SALA OU TIMEOUT)
                     let infReceivedSendAwait, retReceivedSendAwait
                     infReceivedSendAwait = { 'e': e, 'rooms': rooms, 'room': room, 'message': message, 'action': '', 'sender': ws, 'server': res, 'method': method }
-                    received(infReceivedSendAwait)
+                    // received(infReceivedSendAwait)
+                    wsMessageReceived({ 'e': e, 'room': room, 'parsedData': parsedData, 'rooms': rooms, 'action': '', 'sender': ws, 'server': res, 'method': method })
                 }
             }
         });
@@ -114,12 +128,12 @@ wss.on('connection', async (ws, res) => {
 });
 
 // INICIAR SERVIDORES
-server.listen(portLocal, async () => {
+server.listen(windowGlobal.portLocal, async () => {
     let infFile, retFile // 'logFun': true, 'raw': true,         rewrite TRUE → adicionar no mesmo arquivo
     infFile = { 'e': e, 'action': 'write', 'functionLocal': false, 'path': './log/JavaScript/MES_01_JAN/DIA_31_log.txt', 'rewrite': false, 'text': '\n' }
     await file(infFile);
 
-    logServer({ 'write': true, 'server': false, 'msg': `[WebSocket] PORTA: ${portLocal}\n` });
+    logServer({ 'write': true, 'server': false, 'msg': `[WebSocket] PORTA: ${windowGlobal.portLocal}\n` });
 
     // CLIENT (NÃO POR COMO 'await'!!!)
     await new Promise(resolve => { setTimeout(resolve, 2000) });

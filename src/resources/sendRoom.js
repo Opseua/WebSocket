@@ -22,11 +22,44 @@ function sendRoom(inf) {
             clientsInRoom.forEach((client) => {
                 if (client !== sender) {
                     client.send(message)
-                } else if (message.toLowerCase().includes(par2.toLowerCase())) {
+                } else if (message.toLowerCase().includes(windowGlobal.par2.toLowerCase())) {
                     client.send(`WEBSOCKET: OK '${room}'`);
                 }
             })
         }
+
+        // NOVO MODELO | ARRAY COM CLIENTES
+        let clientsToSend = [], i = 0;
+        if (clientsInRoom) {
+            clientsInRoom.forEach((client) => {
+                if (client !== sender) {
+                    clientsToSend.push({
+                        client: client,
+                        sameClient: false
+                    });
+                } else if (message.toLowerCase().includes(windowGlobal.par2.toLowerCase())) {
+                    clientsToSend.push({
+                        client: client,
+                        sameClient: true
+                    });
+                }
+            });
+        }
+
+        // NOVO MODELO | ENVIAR MENSAGENS
+        function sendToClients() {
+            let clientCurrent = clientsToSend[i]
+            clientCurrent.client.send(clientCurrent.sameClient ? `WEBSOCKET: OK '${room}'` : message)
+            i++; if (i < clientsToSend.length) {
+                setTimeout(() => {
+                    sendToClients();
+                }, 10);
+            }
+        }
+        if (clientsToSend.length > 0) {
+            sendToClients();
+        }
+
         if (inf.res) {
             let res = inf.res
             let bodyHtml = inf.bodyHtml
