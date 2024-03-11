@@ -1,7 +1,8 @@
-// http://127.0.0.1:8888/?act=PasswordAqui=screenshot&roo=OPSEUA&mes=MensagemAqui
+// http://127.0.0.1:1234/?act=PasswordAqui-screenshot&roo=SalaAqui&mes=MensagemAqui
 
 // let infRoomParams, retRoomParams
-// retRoomParams = await roomParams({'e': e, 'method': 'HTTP/WEBSOCKET', 'server': req})
+// infRoomParams = { 'e': e, 'wsClients': wsClients, 'resWs': res, 'server': req, }
+// retRoomParams = await roomParams(infRoomParams)
 // console.log(retRoomParams)
 
 let e = import.meta.url, ee = e
@@ -13,37 +14,60 @@ async function roomParams(inf) {
         else { process.on('uncaughtException', (errC) => errs(errC, ret)); process.on('unhandledRejection', (errC) => errs(errC, ret)) }
     }
     try {
-        let url = decodeURIComponent(inf.server.url)
+        let { server, resWs, wsClients } = inf
+        let rooms = wsClients.rooms
+        let url = decodeURIComponent(server.url)
         let { query } = _parse(url, true);
         let urlParams = Object.keys(query).length === 0 ? false : query
-        let room, action, message
-        let method = inf.method == 'WEBSOCKET' ? 'WEBSOCKET' : inf.server.method
-        let urlParts = url.split('/')
+        let room, action, message, method = server.upgrade ? 'WEBSOCKET' : server.method
+        let host = server.headers.host
+        let locWeb = host.includes('127.0.0') ? `[LOC]` : `[WEB]`, urlParts = url.split('/')
 
-        if (!urlParams && urlParts.length < 3 && urlParts['1'] == '') {
+        if (!urlParams) {
             room = false
         } else {
-            room = urlParams.roo ? urlParams.roo : urlParts[1];
             action = urlParams.act ? urlParams.act : false;
+            room = action && action.toLowerCase() == globalWindow.par1.toLowerCase() ? 'x' : urlParams.roo ? urlParams.roo : false;
             if (method == 'GET' || method == 'POST') {
-                message = '';
                 if (method == 'GET') {
                     message = urlParams.mes ? urlParams.mes : urlParts.slice(2).join('/')
                 } else {
-                    await new Promise((resolve) => {
-                        inf.server.on('data', (chunk) => { message += chunk.toString() });
-                        inf.server.on('end', () => { resolve(message) })
-                    })
+                    server.on('data', (chunk) => { message = chunk.toString() });
                 }
             }
         }
-        ret['ret'] = true;
-        ret['msg'] = `ROOM PARAMS: OK`;
-        ret['res'] = {
-            'method': method,
-            'room': room ? room : '',
-            'action': action ? action : message ? message : '',
-            'message': message ? message : action ? action : '',
+
+        // ERROS
+        let body
+        if (!room) {
+            body = `ERRO | INFORMAR A SALA\n\n→ ws|http://127.0.0.1:1234/?roo=SALA_AQUI`
+        } else if ((method == 'GET' && !action && !message) || (method == 'POST' && !message)) {
+            body = `ERRO | ACTION/MENSAGEM VAZIA '${room}'`
+        } else if (method !== 'WEBSOCKET' && !['GET', 'POST'].includes(method)) {
+            body = `ERRO | METODOS ACEITOS 'GET' OU 'POST'`
+        } else if (method !== 'WEBSOCKET' && !rooms[`${host}/${room}`] && room !== 'x') {
+            body = `ERRO | NÃO EXISTE '${room}'`
+        }
+        // DEU ALGUM ERRO
+        if (body) {
+            if (method == 'WEBSOCKET') {
+                // ### WEBSOCKET
+                resWs.send(body); resWs.terminate()
+            } else {
+                // ### HTTP
+                html({ 'e': e, 'server': resWs, 'body': body, 'room': room, 'infAdd': { 'type': 'text', 'title': 'Server' } })
+            }
+        } else {
+            ret['ret'] = true;
+            ret['msg'] = `ROOM PARAMS: OK`;
+            ret['res'] = {
+                'method': method,
+                'host': host,
+                'room': room.replace('?roo=', ''),
+                'locWeb': locWeb,
+                'action': action ? action : '',
+                'message': message ? message : '',
+            }
         }
 
         // ### LOG FUN ###

@@ -2,6 +2,7 @@
 *__pycache__*
 *.vscode*
 *.z_tempCodeRunner*
+*.z_temp*
 *.z_CR*
 *.json
 !*package.json*
@@ -14,7 +15,6 @@
 *googleOAuth*
 *package-lock.json*
 *logTime.txt*
-*callOld*
 
 
 

@@ -1,5 +1,5 @@
 // let infHtml, retHtml, infAdd = { 'title': 'Erro', 'type': '' }
-// retHtml = await html({ 'e': e, 'server': server, 'body': body, 'room': room, 'infAdd': infAdd })
+// retHtml = await html({ 'e': e, 'server': resWs, 'body': body, 'room': room, 'infAdd': infAdd })
 // console.log(retHtml)
 
 let e = import.meta.url, ee = e
@@ -11,7 +11,6 @@ async function html(inf) {
         else { process.on('uncaughtException', (errC) => errs(errC, ret)); process.on('unhandledRejection', (errC) => errs(errC, ret)) }
     }
     try {
-        let rooms = inf.rooms
         let room = inf.room
         let res = inf.server
         let infAdd = inf.infAdd
@@ -23,9 +22,13 @@ async function html(inf) {
             return day + "/" + mon + "/" + yer + " " + hou + ":" + min + ":" + sec;
         }
 
+        // FAVICON E HTML
+        let infFile = { 'e': e, 'action': 'read', 'path': `!letter!:/ARQUIVOS/WINDOWS/BAT/z_ICONES/websocket.ico` }
+        let retFile = await file(infFile);
         let bodyHtml = `
         <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> 
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>WebSocket</title> </head> <body> ####REPLACE####
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>WebSocket</title> 
+        <link rel="icon" type="image/png" href="data:image/png;base64,${Buffer.from(retFile.res).toString('base64')}"></head> <body> ####REPLACE####
         <script> document.addEventListener('keydown', function(event) { if (event.key === 'Escape') {history.back();}});</script> </body></html>`;
 
         if (infAdd.type == 'text') {
@@ -61,7 +64,7 @@ async function html(inf) {
                     tableHtml += `<th style="width: 65%; text-align: center;">PATH [pastas: ${qtdFolder} | arquivos: ${qtdFile} | total: ${retFile.length}]</th>`;
                     tableHtml += '</tr>';
                     for (let item of retFile) {
-                        link = `<a href="/?act=${windowGlobal.par8}&roo=${room}&mes=${encodeURIComponent(encodeURIComponent(item.path))}">${item.path.replace(`/${item.name}`, '')}</a>`;
+                        link = `<a href="/?act=${globalWindow.par8}&roo=${room}&mes=${encodeURIComponent(encodeURIComponent(item.path))}">${item.path.replace(`/${item.name}`, '')}</a>`;
                         tipoEstilo = item.isFolder ? 'background-color: #1bcf45; color: #ffffff;' : 'background-color: #db3434; color: #ffffff;'
                         let dataFormatada = item.edit ? setData(item.edit) : '';
                         tableHtml += `<tr>`;
