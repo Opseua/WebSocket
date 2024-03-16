@@ -17,20 +17,15 @@ async function html(inf) {
         let body = inf.body
 
         function setData(inf) {
-            let day = inf.substring(8, 10), mon = inf.substring(5, 7), yer = inf.substring(0, 4);
-            let hou = inf.substring(11, 13), min = inf.substring(14, 16), sec = inf.substring(17, 19);
-            return day + "/" + mon + "/" + yer + " " + hou + ":" + min + ":" + sec;
+            let day = inf.substring(8, 10), mon = inf.substring(5, 7), yer = inf.substring(0, 4); let hou = inf.substring(11, 13)
+            let min = inf.substring(14, 16), sec = inf.substring(17, 19); return day + "/" + mon + "/" + yer + " " + hou + ":" + min + ":" + sec;
         }
 
-        // FAVICON E HTML
-        let infFile = { 'e': e, 'action': 'read', 'path': `!letter!:/ARQUIVOS/WINDOWS/BAT/z_ICONES/websocket.ico` }
-        let retFile = await file(infFile);
+        // HTML
         let bodyHtml = `
-        <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> 
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>WebSocket</title> 
-        <link rel="icon" type="image/png" href="data:image/png;base64,${Buffer.from(retFile.res).toString('base64')}"></head> <body> ####REPLACE####
-        <script> document.addEventListener('keydown', function(event) { if (event.key === 'Escape') {history.back();}});</script> </body></html>`;
-
+        <!DOCTYPE html> <html lang="en"><head><meta charset="UTF-8"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> 
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>WebSocket</title> </head> <body> ####REPLACE####
+        <script> document.addEventListener('keydown', function(event) { if (event.key === 'Escape') {history.back();}});</script> </body> </html>`;
         if (infAdd.type == 'text') {
             // ### TEXT
             res.writeHead(200, { 'Content-Type': 'text/html' });

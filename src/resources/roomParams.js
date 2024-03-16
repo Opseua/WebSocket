@@ -27,18 +27,14 @@ async function roomParams(inf) {
             room = false
         } else {
             action = urlParams.act ? urlParams.act : false;
-
             let { par1, } = globalWindow
-            let actionPar = false; for (let [index, value] of [par1].entries()) {
-                if (action && value.toLowerCase() === action.toLowerCase()) { actionPar = true; break }
-            }
-
+            let actionPar = false; for (let [index, value] of [par1].entries()) { if (action && value.toLowerCase() === action.toLowerCase()) { actionPar = true; break } }
             room = action && actionPar ? 'x' : urlParams.roo ? urlParams.roo : false;
             if (method == 'GET' || method == 'POST') {
                 if (method == 'GET') {
                     message = urlParams.mes ? urlParams.mes : urlParts.slice(2).join('/')
                 } else {
-                    server.on('data', (chunk) => { message = chunk.toString() });
+                    message = await new Promise((resolve) => { server.on('data', (chunk) => { resolve(chunk.toString()) }) });
                 }
             }
         }

@@ -153,6 +153,7 @@ async function messageAction(inf) {
             try {
                 infAdd.type = 'text'; infAdd.title = `Outro tipo de ação/mensagem`
                 message = JSON.parse(message)
+                message = message.message ? message.message : message
             } catch (e) {
                 logConsole({ 'e': e, 'ee': ee, 'write': false, 'msg': `Erro ao fazer parse da mensagem!` });
                 infAdd.type = 'text'; infAdd.title = `Erro`

@@ -3,13 +3,12 @@ let e = import.meta.url, ee = e
 let wsClients = { 'rooms': {} }, wsClientLoc
 // SERVIDOR HTTP
 let server = _http.createServer(async (req, res) => {
-    if (req.url.includes('favicon.ico')) { return }
-    // SALA E PARAMETROS
-    let retRoomParams = await roomParams({ 'e': e, 'wsClients': wsClients, 'resWs': res, 'server': req, })
-    if (!retRoomParams.ret) { return }
+    if (req.url.includes('favicon.ico')) {
+        let ico = await _fs.promises.readFile(`${letter}:/ARQUIVOS/WINDOWS/BAT/z_ICONES/websocket.ico`); res.writeHead(200, { 'Content-Type': 'image/x-icon' }).end(ico); return;
+    }
+    // SALA E PARAMETROS | PROCESSAR AÇÃO/MENSAGEM RECEBIDA
+    let retRoomParams = await roomParams({ 'e': e, 'wsClients': wsClients, 'resWs': res, 'server': req, }); if (!retRoomParams.ret) { return }
     let { host, room, locWeb, action, message, method, } = retRoomParams.res; res['host'] = host; res['room'] = room; res['locWeb'] = locWeb; res['method'] = method;
-
-    // PROCESSAR AÇÃO/MENSAGEM RECEBIDA
     messageAction({ 'host': host, 'room': room, 'action': action, 'message': message, 'resWs': res, 'wsClients': wsClients, 'wsClientLoc': wsClientLoc })
 });
 
@@ -22,25 +21,11 @@ wss.on('connection', async (ws, res) => {
     let hostRoom = `${host}/${room}`; if (!wsClients.rooms[hostRoom]) { wsClients.rooms[hostRoom] = new Set(); }; wsClients.rooms[hostRoom].add(ws);
     logServer({ 'write': true, 'room': room, 'msg': `NOVO ${locWeb} '${room}'` });
 
-    async function teste() {
-        await new Promise(resolve => { setTimeout(resolve, 1000) }); // console.log('INICIO'); let data
-        async function sendTest(data) {
-            let retMessageSend = await messageSend({ 'destination': '127.0.0.1:8889/CLIENTE_2', 'message': data, 'resWs': ws, 'secondsAwait': 0, });
-            logConsole({ 'e': e, 'ee': ee, 'write': false, 'msg': `RESPOSTA SENDO ESPERADA:\n${JSON.stringify(retMessageSend)}` });
-        }
-        // _fs.readFile('D:/1_IMAGE_2000KB.jpg', async (err, data) => {
-        //     // data = { "fun": [{ "securityPass": "passwordAqui", "retInf": true, "name": "commandLine", "par": { "command": "notepad", "awaitFinish": true } }] }
-        //     sendTest(data)
-        // });
-        let retFile = await file({ 'e': e, 'action': 'read', 'functionLocal': false, 'path': 'D:/1_ZIP_25MB.zip' }); await sendTest(retFile.res)
-    }; // if (eng) { teste() }
-
     // ### ON MESSAGE
     ws.on('message', async (data) => {
         let message = data.toString('utf-8')
-        if (message.length == 0) {
-            ws.send(`ERRO | MENSAGEM VAZIA ${locWeb} '${room}'`)
-        } else {
+        if (message.length == 0) { ws.send(`ERRO | MENSAGEM VAZIA ${locWeb} '${room}'`) }
+        else {
             let pingPong = message == `${globalWindow.par6}` ? 1 : message == `${globalWindow.par7}` ? 2 : 0
             // ÚLTIMA MENSAGEM RECEBIDA
             ws['lastMessage'] = ws.lastMessage || pingPong > 0 ? Number(dateHour().res.tim) : false
@@ -48,14 +33,12 @@ wss.on('connection', async (ws, res) => {
             if (pingPong > 0) {
                 if (pingPong == 2) { return }
                 // RECEBIDO: 'PING' ENVIAR 'PONG'
-                // logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `RECEBEU PING ${locWeb} '${room}'` });
-                ws.send('pong')
+                ws.send('pong'); // logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `RECEBEU PING ${locWeb} '${room}'` });
             } else {
                 try { message = JSON.parse(message); } catch (e) { message = { 'message': message }; console.log('ERRO M1') };
                 if (!message.message) { message = { 'message': message }; console.log('ERRO M2') }
                 // PROCESSAR MENSAGEM RECEBIDA
-                ws.send(`pong`)
-                messageReceived({ ...message, 'host': host, 'room': room, 'resWs': ws, 'wsClients': wsClients, });
+                if (ws.lastMessage) { ws.send(`pong`) }; messageReceived({ ...message, 'host': host, 'room': room, 'resWs': ws, 'wsClients': wsClients, });
             }
         }
     });
@@ -104,10 +87,8 @@ server.listen(globalWindow.portLocal, async () => {
     let locWeb = host.includes('127.0.0') ? `[LOC]` : `[WEB]`; ws['host'] = host; ws['room'] = room; ws['locWeb'] = locWeb; ws['method'] = 'WEBSOCKET';
     wsClientLoc = ws; ws.onerror = (data) => { logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `ERRO [CLIENT LOC]:\n${JSON.stringify(data)}` }) };
     ws.onmessage = async (data) => {
-        let message = data.data.toString('utf-8');
-        let pingPong = message == `${globalWindow.par6}` ? 1 : message == `${globalWindow.par7}` ? 2 : 0
-        if (pingPong > 0) { return }
-        try { message = JSON.parse(message) } catch (e) { message = { 'message': message } }; if (!message.message) { message = { 'message': message } }
+        let message = data.data.toString('utf-8'); let pingPong = message == `${globalWindow.par6}` ? 1 : message == `${globalWindow.par7}` ? 2 : 0
+        if (pingPong > 0) { return }; try { message = JSON.parse(message) } catch (e) { message = { 'message': message } }; if (!message.message) { message = { 'message': message } }
         // PROCESSAR MENSAGEM RECEBIDA
         messageReceived({ ...message, 'host': host, 'room': room, 'resWs': ws, });
     }
@@ -122,16 +103,37 @@ server.listen(globalWindow.portLocal, async () => {
     // AGUARDAR [CLIENT LOC] INICIAR
     await new Promise(resolve => { setTimeout(resolve, 1000) })
 
-    // ACTION LOOP [SOMENTE SE FOR NO EC2 (06H<>23H)
+    // ACTION LOOP [SOMENTE SE FOR NO EC2 (07H<>23H)
     setInterval(() => {
-        let time = dateHour().res; if (globalWindow.devMaster == 'OPSEUA' && Number(time.hou) > 5 && Number(time.hou) < 24) {
+        let time = dateHour().res; if (globalWindow.devMaster == 'AWS' && Number(time.hou) > 6 && Number(time.hou) < 24) {
             // logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `ACTION: LOOP` });
-            // messageAction({ 'host': host, 'room': '*_NODEJS*', 'action': globalWindow.par10, 'message': '', 'resWs': false, 'wsClients': wsClients, 'wsClientLoc': wsClientLoc })
-            // messageAction({ 'host': host, 'room': '*OPSEUA*', 'action': globalWindow.par10, 'message': '', 'resWs': false, 'wsClients': wsClients, 'wsClientLoc': wsClientLoc })
-            // messageAction({ 'host': host, 'room': '*TESTE*', 'action': globalWindow.par10, 'message': '', 'resWs': false, 'wsClients': wsClients, 'wsClientLoc': wsClientLoc })
+            messageAction({ 'host': host, 'room': '*_NODEJS*', 'action': globalWindow.par10, 'message': '', 'resWs': false, 'wsClients': wsClients, 'wsClientLoc': wsClientLoc })
         }
     }, (globalWindow.secLoop * 1000));
 });
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+// async function teste() {
+//     await new Promise(resolve => { setTimeout(resolve, 1000) }); // console.log('INICIO'); let data
+//     async function sendTest(data) {
+//         let retMessageSend = await messageSend({ 'destination': '127.0.0.1:8889/CLIENTE_2', 'message': data, 'resWs': ws, 'secondsAwait': 0, });
+//         logConsole({ 'e': e, 'ee': ee, 'write': false, 'msg': `RESPOSTA SENDO ESPERADA:\n${JSON.stringify(retMessageSend)}` });
+//     }
+//     // _fs.readFile('D:/1_IMAGE_2000KB.jpg', async (err, data) => {
+//     //     // data = { "fun": [{ "securityPass": "passwordAqui", "retInf": true, "name": "commandLine", "par": { "command": "notepad", "awaitFinish": true } }] }
+//     //     sendTest(data)
+//     // });
+//     let retFile = await file({ 'e': e, 'action': 'read', 'functionLocal': false, 'path': 'D:/1_ZIP_25MB.zip' }); await sendTest(retFile.res)
+// }; // if (eng) { teste() }
