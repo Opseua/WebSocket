@@ -21,7 +21,7 @@ async function messageAction(inf) {
             let resClients = Object.keys(wsClients.rooms)
                 .filter(sala => sala.includes(host)).map(sala => ({ 'sala': sala, 'qtd': wsClients.rooms[sala].size }));
             let dH = dateHour().res; resClients.unshift({ 'hour': `${dH.hou}:${dH.min}:${dH.sec}` }); infAdd.type = 'text'; infAdd.title = `Clients`
-            body = { 'ret': true, 'res': `OK | CLIENTS:\n\n${JSON.stringify(resClients)}` }
+            body = { 'ret': true, 'res': `OK | CLIENTS:\n\n${JSON.stringify(resClients, null, 2)}` }
         } else if (action.toLowerCase() == globalWindow.par3.toLowerCase()) {
             // ### RESET [→ TODA A SALA] (ACTION)
             infAdd.type = 'text'; infAdd.title = `Reset (AnyDesk e Pm2)`
@@ -67,15 +67,15 @@ async function messageAction(inf) {
             if (!(message !== '')) {
                 let errBody = `Informar os parametros!`
                 body = `${errBody}\n\n→ &mes={"provider":"globalgpt","input":"Qual a idade de Marte?"}\n\n→ &mes={"provider":"open.ai","input":"Qual a idade de Marte?"}`
-                logConsole({ 'e': e, 'ee': ee, 'write': false, 'msg': `${errBody}` });
+                logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `${errBody}` });
             } else {
                 try {
                     infAdd.title = `Chat`; message = JSON.parse(message);
                     let retChat = await chat({ 'e': e, ...message });
                     body = retChat
-                } catch (e) {
+                } catch (err) {
                     let errBody = `Erro ao fazer parse dos parametros!\n\n${message}`
-                    logConsole({ 'e': e, 'ee': ee, 'write': false, 'msg': `${errBody}` });
+                    logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `${errBody}` });
                     body = `${errBody}`
                 }
             }
@@ -86,16 +86,16 @@ async function messageAction(inf) {
             if (!(message !== '')) {
                 let errBody = `Informar os parametros!`
                 body = `${errBody}\n\n→ &mes={"method":"POST","url":"https://ntfy.sh/AAAAAAAAAAA","headers":{"Content-Type":"application/json"},"body":{"aaa":"bbbb"},"max":10}`
-                logConsole({ 'e': e, 'ee': ee, 'write': false, 'msg': `${errBody}` });
+                logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `${errBody}` });
             } else {
                 try {
                     infAdd.title = `API`; message = JSON.parse(message);
                     let retApi = await api({ 'e': e, ...message });
-                    if (retApi.res) { retApi['res'] = JSON.stringify(retApi.res) }
+                    if (retApi.res) { retApi['res'] = JSON.stringify(retApi.res, null, 2) }
                     body = retApi
-                } catch (e) {
+                } catch (err) {
                     let errBody = `Erro ao fazer parse dos parametros!\n\n${message}`
-                    logConsole({ 'e': e, 'ee': ee, 'write': false, 'msg': `${errBody}` });
+                    logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `${errBody}` });
                     body = `${errBody}`
                 }
             }
@@ -154,26 +154,28 @@ async function messageAction(inf) {
                 infAdd.type = 'text'; infAdd.title = `Outro tipo de ação/mensagem`
                 message = JSON.parse(message)
                 message = message.message ? message.message : message
-            } catch (e) {
-                logConsole({ 'e': e, 'ee': ee, 'write': false, 'msg': `Erro ao fazer parse da mensagem!` });
+            } catch (err) {
                 infAdd.type = 'text'; infAdd.title = `Erro`
-                body = `Erro ao fazer parse da mensagem!\n\n${message}`
+                let errBody = `Erro ao fazer parse da mensagem!\n\n${message}`
+                logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `${errBody}` });
                 message = ''
             }
         }
 
         // ENVIAR COMANDO(s)
         if (typeof message === 'object' || message !== '') {
-            retMessageSend = await messageSend({ 'destination': destination, 'message': message, 'resWs': wsClientLoc, 'secondsAwait': 0, });
+            retMessageSend = await messageSend({ 'destination': destination, 'messageId': true, 'message': message, 'resWs': wsClientLoc, 'secondsAwait': 0, });
             // logConsole({ 'e': e, 'ee': ee, 'write': false, 'msg': `RESPOSTA SENDO ESPERADA:\n${JSON.stringify(retMessageSend)}` });
-            body = !retMessageSend.res ? retMessageSend : { 'ret': retMessageSend.ret, 'msg': retMessageSend.msg, 'res': retMessageSend.res }
+            let bodyRes = infAdd.title.includes(`Outro tipo de ação/mensagem`) ? JSON.stringify(retMessageSend.res, null, 2) : retMessageSend.res
+            body = !retMessageSend.res ? retMessageSend : { 'ret': retMessageSend.ret, 'msg': retMessageSend.msg, 'res': bodyRes }
         }
 
         // ENVIAR RETORNO HTTP (SE NECESSÁRIO)
         if (resWs) {
             infAdd.type = body?.res ? infAdd.type : 'text'
-            let bodyBrowser = typeof body === 'object' ? JSON.stringify(body) : body
+            let bodyBrowser = typeof body === 'object' ? JSON.stringify(body, null, 2) : body
             body = body.ret && body.res ? body.res : body.ret ? `AÇÃO EXECUTADA COM SUCESSO\n\n${bodyBrowser}` : `ERRO AO EXECUTAR AÇÃO!\n\n${bodyBrowser}`
+
             await html({ 'e': e, 'server': resWs, 'body': body, 'room': room, 'infAdd': infAdd })
         }
 
@@ -185,8 +187,8 @@ async function messageAction(inf) {
             let infFile = { 'e': e, 'action': 'write', 'functionLocal': false, 'logFun': new Error().stack, 'path': 'AUTO', }
             infFile['rewrite'] = false; infFile['text'] = { 'inf': inf, 'ret': ret }; file(infFile);
         }
-    } catch (e) {
-        let retRegexE = await regexE({ 'inf': inf, 'e': e, 'catchGlobal': false });
+    } catch (err) {
+        let retRegexE = await regexE({ 'inf': inf, 'e': err, 'catchGlobal': false });
         ret['msg'] = retRegexE.res
     };
     return {

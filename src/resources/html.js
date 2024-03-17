@@ -25,7 +25,7 @@ async function html(inf) {
         let bodyHtml = `
         <!DOCTYPE html> <html lang="en"><head><meta charset="UTF-8"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> 
         <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>WebSocket</title> </head> <body> ####REPLACE####
-        <script> document.addEventListener('keydown', function(event) { if (event.key === 'Escape') {history.back();}});</script> </body> </html>`;
+        <script> document.addEventListener('keydown',function(event){if(event.key === 'Escape'){history.back()}}) </script> </body> </html>`;
         if (infAdd.type == 'text') {
             // ### TEXT
             res.writeHead(200, { 'Content-Type': 'text/html' });
@@ -108,8 +108,8 @@ async function html(inf) {
             let infFile = { 'e': e, 'action': 'write', 'functionLocal': false, 'logFun': new Error().stack, 'path': 'AUTO', }
             infFile['rewrite'] = false; infFile['text'] = { 'inf': inf, 'ret': ret }; file(infFile);
         }
-    } catch (e) {
-        let retRegexE = await regexE({ 'inf': inf, 'e': e, 'catchGlobal': false });
+    } catch (err) {
+        let retRegexE = await regexE({ 'inf': inf, 'e': err, 'catchGlobal': false });
         ret['msg'] = retRegexE.res
     };
     return {
