@@ -35,7 +35,7 @@ wss.on('connection', async (ws, res) => {
                 // RECEBIDO: 'PING' ENVIAR 'PONG'
                 ws.send('pong'); // logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `RECEBEU PING ${locWeb} '${room}'` });
             } else {
-                try { message = JSON.parse(message); } catch (err) { message = { 'message': message }; logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `ERRO M1` }) };
+                try { message = JSON.parse(message); } catch (catchErr) { message = { 'message': message }; logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `ERRO M1` }) };
                 if (!message.message) { message = { 'message': message }; logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `ERRO M2` }) }
                 // PROCESSAR MENSAGEM RECEBIDA
                 if (ws.lastMessage) { ws.send(`pong`) }; messageReceived({ ...message, 'host': host, 'room': room, 'resWs': ws, 'wsClients': wsClients, });
@@ -88,7 +88,7 @@ server.listen(globalWindow.portLocal, async () => {
     wsClientLoc = ws; ws.onerror = (data) => { logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `ERRO [CLIENT LOC]:\n${JSON.stringify(data)}` }) };
     ws.onmessage = async (data) => {
         let message = data.data.toString('utf-8'); let pingPong = message == `${globalWindow.par6}` ? 1 : message == `${globalWindow.par7}` ? 2 : 0
-        if (pingPong > 0) { return }; try { message = JSON.parse(message) } catch (err) { message = { 'message': message } }; if (!message.message) { message = { 'message': message } }
+        if (pingPong > 0) { return }; try { message = JSON.parse(message) } catch (catchErr) { message = { 'message': message } }; if (!message.message) { message = { 'message': message } }
         // PROCESSAR MENSAGEM RECEBIDA
         messageReceived({ ...message, 'host': host, 'room': room, 'resWs': ws, });
     }

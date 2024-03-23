@@ -73,7 +73,7 @@ async function messageAction(inf) {
                     infAdd.title = `Chat`; message = JSON.parse(message);
                     let retChat = await chat({ 'e': e, ...message });
                     body = retChat
-                } catch (err) {
+                } catch (catchErr) {
                     let errBody = `Erro ao fazer parse dos parametros!\n\n${message}`
                     logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `${errBody}` });
                     body = `${errBody}`
@@ -93,7 +93,7 @@ async function messageAction(inf) {
                     let retApi = await api({ 'e': e, ...message });
                     if (retApi.res) { retApi['res'] = JSON.stringify(retApi.res, null, 2) }
                     body = retApi
-                } catch (err) {
+                } catch (catchErr) {
                     let errBody = `Erro ao fazer parse dos parametros!\n\n${message}`
                     logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `${errBody}` });
                     body = `${errBody}`
@@ -154,7 +154,7 @@ async function messageAction(inf) {
                 infAdd.type = 'text'; infAdd.title = `Outro tipo de ação/mensagem`
                 message = JSON.parse(message)
                 message = message.message ? message.message : message
-            } catch (err) {
+            } catch (catchErr) {
                 infAdd.type = 'text'; infAdd.title = `Erro`
                 let errBody = `Erro ao fazer parse da mensagem!\n\n${message}`
                 logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `${errBody}` });
@@ -187,8 +187,8 @@ async function messageAction(inf) {
             let infFile = { 'e': e, 'action': 'write', 'functionLocal': false, 'logFun': new Error().stack, 'path': 'AUTO', }
             infFile['rewrite'] = false; infFile['text'] = { 'inf': inf, 'ret': ret }; file(infFile);
         }
-    } catch (err) {
-        let retRegexE = await regexE({ 'inf': inf, 'e': err, 'catchGlobal': false });
+    } catch (catchErr) {
+        let retRegexE = await regexE({ 'inf': inf, 'e': catchErr, 'catchGlobal': false });
         ret['msg'] = retRegexE.res
     };
     return {
