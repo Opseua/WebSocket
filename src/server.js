@@ -35,8 +35,8 @@ wss.on('connection', async (ws, res) => {
                 // RECEBIDO: 'PING' ENVIAR 'PONG'
                 ws.send('pong'); // logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `RECEBEU PING ${locWeb} '${room}'` });
             } else {
-                try { message = JSON.parse(message); } catch (err) { message = { 'message': message }; console.log('ERRO M1') };
-                if (!message.message) { message = { 'message': message }; console.log('ERRO M2') }
+                try { message = JSON.parse(message); } catch (err) { message = { 'message': message }; logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `ERRO M1` }) };
+                if (!message.message) { message = { 'message': message }; logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `ERRO M2` }) }
                 // PROCESSAR MENSAGEM RECEBIDA
                 if (ws.lastMessage) { ws.send(`pong`) }; messageReceived({ ...message, 'host': host, 'room': room, 'resWs': ws, 'wsClients': wsClients, });
             }
@@ -114,7 +114,7 @@ server.listen(globalWindow.portLocal, async () => {
 
 
 // async function teste() {
-//     await new Promise(resolve => { setTimeout(resolve, 1000) }); // console.log('INICIO'); let data
+//     await new Promise(resolve => { setTimeout(resolve, 1000) }); //  logConsole({ 'e': e, 'ee': ee, 'write': false, 'msg': `INICIO` }) ; let data
 //     async function sendTest(data) {
 //         let retMessageSend = await messageSend({ 'destination': '127.0.0.1:8889/CLIENTE_2', 'messageId': true, 'message': data, 'resWs': ws, 'secondsAwait': 0, });
 //         logConsole({ 'e': e, 'ee': ee, 'write': false, 'msg': `RESPOSTA SENDO ESPERADA:\n${JSON.stringify(retMessageSend)}` });
