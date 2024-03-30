@@ -121,7 +121,7 @@ async function messageAction(inf) {
                 'fun': [
                     {
                         'securityPass': globalWindow.securityPass, 'retInf': false, 'name': 'commandLine', 'par': {
-                            'awaitFinish': true, 'command': `nircmd savescreenshot "${path}"`
+                            'awaitFinish': true, 'command': `%nircmd% savescreenshot "${path}"`
                         }
                     },
                     {
@@ -144,7 +144,7 @@ async function messageAction(inf) {
                     },
                     { // SCREENSHOT (MANTER awaitFinish 'true' DO CONTRÁRIO O NIRCMD ABRE O POPUP)
                         'securityPass': globalWindow.securityPass, 'retInf': false, 'name': 'commandLine', 'par': {
-                            'awaitFinish': true, 'command': `nircmd savescreenshot "${path}/${time2}_screenshot.png"`
+                            'awaitFinish': true, 'command': `%nircmd% savescreenshot "${path}/${time2}_screenshot.png"`
                         }
                     },
                 ]
