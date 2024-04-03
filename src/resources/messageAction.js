@@ -21,7 +21,7 @@ async function messageAction(inf) {
             let resClients = Object.keys(wsClients.rooms)
                 .filter(sala => sala.includes(host)).map(sala => ({ 'sala': sala, 'qtd': wsClients.rooms[sala].size }));
             let dH = dateHour().res; resClients.unshift({ 'hour': `${dH.hou}:${dH.min}:${dH.sec}` }); infAdd.type = 'text'; infAdd.title = `Clients`
-            body = { 'ret': true, 'res': `OK | CLIENTS:\n\n${JSON.stringify(resClients, null, 2)}` }
+            body = { 'ret': true, 'res': `${resWs.method} - OK | CLIENTS:\n\n${JSON.stringify(resClients, null, 2)}` }
         } else if (action.toLowerCase() == globalWindow.par3.toLowerCase()) {
             // ### RESET [→ TODA A SALA] (ACTION)
             infAdd.type = 'text'; infAdd.title = `Reset (AnyDesk e Pm2)`
