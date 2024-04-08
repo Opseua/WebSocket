@@ -80,9 +80,9 @@ let secPing = globalWindow.secPing; function lastMessageReceived() {
 }; setInterval(() => { lastMessageReceived() }, (secPing * 2) * 1000);
 
 // SERVIDOR: INICIAR
-server.listen(globalWindow.portLocal, async () => {
+server.listen(globalWindow.portLoc, async () => {
     // WEBSOCKET [CLIENT LOC] ------------------------------------------------------------------------------------------
-    let ws = new _WebSocket(`ws://${letter == 'D' ? '127.0.0.1' : globalWindow.serverWeb}:${globalWindow.portLocal}/?roo=${globalWindow.par2}`)
+    let ws = new _WebSocket(`ws://${letter == 'D' ? '127.0.0.1' : globalWindow.serverWeb}:${globalWindow.portLoc}/?roo=${globalWindow.par2}`)
     let url = ws._url ? ws._url : ws.url; let host = url.replace('ws://', '').split('/')[0]; let room = url.split(`${host}/`)[1].replace('?roo=', '')
     let locWeb = host.includes('127.0.0') ? `[LOC]` : `[WEB]`; ws['host'] = host; ws['room'] = room; ws['locWeb'] = locWeb; ws['method'] = 'WEBSOCKET';
     wsClientLoc = ws; ws.onerror = (data) => { logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `ERRO [CLIENT LOC]:\n${JSON.stringify(data)}` }) };
@@ -94,7 +94,7 @@ server.listen(globalWindow.portLocal, async () => {
     }
     // -------------------------------------------------------------------------------------------------------------
     // AGUARDAR SERVIDOR INICIAR
-    logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `RODANDO NA PORTA: ${globalWindow.portLocal}` });
+    logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `RODANDO NA PORTA: ${globalWindow.portLoc}` });
     await new Promise(resolve => { setTimeout(resolve, 1000) })
 
     // CLIENT (NÃO POR COMO 'await'!!!)
