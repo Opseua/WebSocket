@@ -112,16 +112,3 @@ server.listen(globalWindow.portLoc, async () => {
     }, (globalWindow.secLoop * 1000));
 });
 
-
-// async function teste() {
-//     await new Promise(resolve => { setTimeout(resolve, 1000) }); //  logConsole({ 'e': e, 'ee': ee, 'write': false, 'msg': `INICIO` }) ; let data
-//     async function sendTest(data) {
-//         let retMessageSend = await messageSend({ 'destination': '127.0.0.1:8889/CLIENTE_2', 'messageId': true, 'message': data, 'resWs': ws, 'secondsAwait': 0, });
-//         logConsole({ 'e': e, 'ee': ee, 'write': false, 'msg': `RESPOSTA SENDO ESPERADA:\n${JSON.stringify(retMessageSend)}` });
-//     }
-//     // _fs.readFile('D:/1_IMAGE_2000KB.jpg', async (err, data) => {
-//     //     // data = { "fun": [{ "securityPass": "passwordAqui", "retInf": true, "name": "commandLine", "par": { "command": "notepad", "awaitFinish": true } }] }
-//     //     sendTest(data)
-//     // });
-//     let retFile = await file({ 'e': e, 'action': 'read', 'functionLocal': false, 'path': 'D:/1_ZIP_25MB.zip' }); await sendTest(retFile.res)
-// }; // if (eng) { teste() }
