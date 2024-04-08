@@ -50,7 +50,7 @@ wss.on('connection', async (ws, res) => {
 
 // LOG DO SERVER
 async function logServer(inf) {
-    let { write, msg, room } = inf; // logConsole({ 'e': e, 'ee': ee, 'write': write, 'msg': msg });
+    let { write, msg, room } = inf; logConsole({ 'e': e, 'ee': ee, 'write': write, 'msg': msg });
     // if (globalWindow.devMaster == 'OPSEUA' && room && globalWindow.sheetServer.devs.includes(room)) { // 'OPSEUA' → 'EC2'
     //     let infGoogleSheets = { // A2  | B2 | C2 
     //         'e': e, 'action': 'send', 'id': `1BKI7XsKTq896JcA-PLnrSIbyIK1PaakiAtoseWmML-Q`, 'tab': `SERVER`,
@@ -94,8 +94,8 @@ server.listen(globalWindow.portLocal, async () => {
     }
     // -------------------------------------------------------------------------------------------------------------
     // AGUARDAR SERVIDOR INICIAR
-    await new Promise(resolve => { setTimeout(resolve, 1000) })
     logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `RODANDO NA PORTA: ${globalWindow.portLocal}` });
+    await new Promise(resolve => { setTimeout(resolve, 1000) })
 
     // CLIENT (NÃO POR COMO 'await'!!!)
     client({ 'e': e })
@@ -103,7 +103,7 @@ server.listen(globalWindow.portLocal, async () => {
     // AGUARDAR [CLIENT LOC] INICIAR
     await new Promise(resolve => { setTimeout(resolve, 1000) })
 
-    // ACTION LOOP [SOMENTE SE FOR NO EC2 (07H<>23H)
+    // ACTION LOOP [SOMENTE SE FOR NO AWS (07H<>23H)
     setInterval(() => {
         let time = dateHour().res; if (globalWindow.devMaster == 'AWS' && Number(time.hou) > 6 && Number(time.hou) < 24) {
             // logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `ACTION: LOOP` });
