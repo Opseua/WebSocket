@@ -50,13 +50,8 @@ async function messageAction(inf) {
                     //     }
                     // },
                     // {
-                    //     'securityPass': globalWindow.securityPass, 'retInf': false, 'name': 'log', 'par': {
-                    //         'folder': 'JavaScript', 'path': `log.txt`, 'text': 'RESET'
-                    //     }
-                    // },
-                    // {
                     //     'securityPass': globalWindow.securityPass, 'retInf': false, 'name': 'commandLine', 'par': {
-                    //         'awaitFinish': false, 'command': `"!letter!:/ARQUIVOS/PROJETOS/WebSocket/src/z_OutrosWebSocket/z_RestartAll.lnk"`
+                    //         'awaitFinish': false, 'command': `"!letter!:/ARQUIVOS/PROJETOS/Chrome_Extension/src/scripts/BAT/z_RestartAll.lnk"`
                     //     }
                     // },
                 ]
@@ -70,16 +65,11 @@ async function messageAction(inf) {
                 logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `${errBody}` });
             } else {
                 try {
-                    infAdd.title = `Chat`; message = JSON.parse(message);
-                    let retChat = await chat({ 'e': e, ...message });
-                    body = retChat
+                    infAdd.title = `Chat`; message = JSON.parse(message); let retChat = await chat({ 'e': e, ...message }); body = retChat
                 } catch (catchErr) {
-                    let errBody = `Erro ao fazer parse dos parametros!\n\n${message}`
-                    logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `${errBody}` });
-                    body = `${errBody}`
+                    let errBody = `Erro ao fazer parse dos parametros!\n\n${message}`; logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `${errBody}` }); body = `${errBody}`
                 }
-            }
-            message = '';
+            }; message = '';
         } else if (action.toLowerCase() == globalWindow.par5.toLowerCase()) {
             // ### API [SOMENTE EC2] (ACTION)
             infAdd.type = 'text'; infAdd.title = `Erro | API`;
@@ -89,17 +79,12 @@ async function messageAction(inf) {
                 logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `${errBody}` });
             } else {
                 try {
-                    infAdd.title = `API`; message = JSON.parse(message);
-                    let retApi = await api({ 'e': e, ...message });
-                    if (retApi.res) { retApi['res'] = JSON.stringify(retApi.res, null, 2) }
-                    body = retApi
+                    infAdd.title = `API`; message = JSON.parse(message); let retApi = await api({ 'e': e, ...message });
+                    if (retApi.res) { retApi['res'] = JSON.stringify(retApi.res, null, 2) }; body = retApi
                 } catch (catchErr) {
-                    let errBody = `Erro ao fazer parse dos parametros!\n\n${message}`
-                    logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `${errBody}` });
-                    body = `${errBody}`
+                    let errBody = `Erro ao fazer parse dos parametros!\n\n${message}`; logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `${errBody}` }); body = `${errBody}`
                 }
-            }
-            message = '';
+            }; message = '';
         } else if (action.toLowerCase() == globalWindow.par8.toLowerCase()) {
             // ### WEBFILE [→ TODA A SALA] (ACTION)
             let path = message.length < 3 ? `!letter!:/` : message.includes('z/w/a/b/c/d') ? `!letter!:/` : message
@@ -151,14 +136,10 @@ async function messageAction(inf) {
             }
         } else {
             try {
-                infAdd.type = 'text'; infAdd.title = `Outro tipo de ação/mensagem`
-                message = JSON.parse(message)
-                message = message.message ? message.message : message
+                infAdd.type = 'text'; infAdd.title = `Outro tipo de ação/mensagem`; message = JSON.parse(message); message = message.message ? message.message : message
             } catch (catchErr) {
-                infAdd.type = 'text'; infAdd.title = `Erro`
-                let errBody = `Erro ao fazer parse da mensagem!\n\n${message}`
-                logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `${errBody}` });
-                message = ''
+                infAdd.type = 'text'; infAdd.title = `Erro`; let errBody = `Erro ao fazer parse da mensagem!\n\n${message}`
+                logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `${errBody}` }); message = ''
             }
         }
 
@@ -175,7 +156,6 @@ async function messageAction(inf) {
             infAdd.type = body?.res ? infAdd.type : 'text'
             let bodyBrowser = typeof body === 'object' ? JSON.stringify(body, null, 2) : body
             body = body.ret && body.res ? body.res : body.ret ? `AÇÃO EXECUTADA COM SUCESSO\n\n${bodyBrowser}` : `ERRO AO EXECUTAR AÇÃO!\n\n${bodyBrowser}`
-
             await html({ 'e': e, 'server': resWs, 'body': body, 'room': room, 'infAdd': infAdd })
         }
 
