@@ -12,14 +12,12 @@ async function messageAction(inf) {
         else { process.on('uncaughtException', (errC) => errs(errC, ret)); process.on('unhandledRejection', (errC) => errs(errC, ret)) }
     }
     try {
-        let time = dateHour().res, time1 = `MES_${time.mon}_${time.monNam}/DIA_${time.day}`
-        let { host, room, action, message, resWs, wsClients, wsClientLoc, } = inf
+        let time = dateHour().res, time1 = `MES_${time.mon}_${time.monNam}/DIA_${time.day}`; let { host, room, action, message, resWs, wsClients, wsClientLoc, } = inf
         let body = {}, retMessageSend, destination = `${host}/${room}`, infAdd = { 'title': 'Erro', 'type': '' }
 
         if (action.toLowerCase() == globalWindow.par1.toLowerCase()) {
             // ### WSCLIENTS [→ EC2] (ACTION)
-            let resClients = Object.keys(wsClients.rooms)
-                .filter(sala => sala.includes(host)).map(sala => ({ 'sala': sala, 'qtd': wsClients.rooms[sala].size }));
+            let resClients = Object.keys(wsClients.rooms).filter(sala => sala.includes(host)).map(sala => ({ 'sala': sala, 'qtd': wsClients.rooms[sala].size }));
             let dH = dateHour().res; resClients.unshift({ 'hour': `${dH.hou}:${dH.min}:${dH.sec}` }); infAdd.type = 'text'; infAdd.title = `Clients`
             body = { 'ret': true, 'res': `${resWs.method} - OK | CLIENTS:\n\n${JSON.stringify(resClients, null, 2)}` }
         } else if (action.toLowerCase() == globalWindow.par3.toLowerCase()) {
@@ -29,31 +27,25 @@ async function messageAction(inf) {
                 'fun': [
                     {
                         'securityPass': globalWindow.securityPass, 'retInf': false, 'name': 'commandLine', 'par': {
-                            'awaitFinish': false, 'command': `notepad`
+                            'awaitFinish': true, 'command': `taskkill /IM AnyDesk.exe /F`
                         }
 
                     },
-                    // {
-                    //     'securityPass': globalWindow.securityPass, 'retInf': false, 'name': 'commandLine', 'par': {
-                    //         'awaitFinish': true, 'command': `taskkill /IM AnyDesk.exe /F`
-                    //     }
-
-                    // },
-                    // {
-                    //     'securityPass': globalWindow.securityPass, 'retInf': true, 'name': 'commandLine', 'par': {
-                    //         'awaitFinish': true, 'command': `"C:/Program Files (x86)/AnyDesk/AnyDesk.exe" --restart-service`
-                    //     }
-                    // },
-                    // {
-                    //     'securityPass': globalWindow.securityPass, 'retInf': false, 'name': 'commandLine', 'par': {
-                    //         'awaitFinish': false, 'command': `"C:/Program Files (x86)/AnyDesk/AnyDesk.exe"`
-                    //     }
-                    // },
-                    // {
-                    //     'securityPass': globalWindow.securityPass, 'retInf': false, 'name': 'commandLine', 'par': {
-                    //         'awaitFinish': false, 'command': `"!letter!:/ARQUIVOS/PROJETOS/Chrome_Extension/src/scripts/BAT/z_RestartAll.lnk"`
-                    //     }
-                    // },
+                    {
+                        'securityPass': globalWindow.securityPass, 'retInf': true, 'name': 'commandLine', 'par': {
+                            'awaitFinish': true, 'command': `"C:/Program Files (x86)/AnyDesk/AnyDesk.exe" --restart-service`
+                        }
+                    },
+                    {
+                        'securityPass': globalWindow.securityPass, 'retInf': false, 'name': 'commandLine', 'par': {
+                            'awaitFinish': false, 'command': `"C:/Program Files (x86)/AnyDesk/AnyDesk.exe"`
+                        }
+                    },
+                    {
+                        'securityPass': globalWindow.securityPass, 'retInf': false, 'name': 'commandLine', 'par': {
+                            'awaitFinish': false, 'command': `"!letter!:/ARQUIVOS/PROJETOS/Chrome_Extension/src/scripts/BAT/z_RestartAll.lnk"`
+                        }
+                    },
                 ]
             }
         } else if (action.toLowerCase() == globalWindow.par4.toLowerCase()) {
@@ -100,8 +92,7 @@ async function messageAction(inf) {
             }
         } else if (action.toLowerCase() == globalWindow.par9.toLowerCase()) {
             // ### SCREENSHOT [→ TODA A SALA] path.match(/\.(jpg|jpeg|png|ico)$/) (ACTION)
-            infAdd.type = 'image'; infAdd.title = `screenshot`
-            let path = `!letter!:/ARQUIVOS/PROJETOS/WebSocket/log/screenshot.png`
+            infAdd.type = 'image'; infAdd.title = `screenshot`; let path = `!letter!:/ARQUIVOS/PROJETOS/WebSocket/log/screenshot.png`
             message = {
                 'fun': [
                     {
@@ -153,8 +144,7 @@ async function messageAction(inf) {
 
         // ENVIAR RETORNO HTTP (SE NECESSÁRIO)
         if (resWs) {
-            infAdd.type = body?.res ? infAdd.type : 'text'
-            let bodyBrowser = typeof body === 'object' ? JSON.stringify(body, null, 2) : body
+            infAdd.type = body?.res ? infAdd.type : 'text'; let bodyBrowser = typeof body === 'object' ? JSON.stringify(body, null, 2) : body
             body = body.ret && body.res ? body.res : body.ret ? `AÇÃO EXECUTADA COM SUCESSO\n\n${bodyBrowser}` : `ERRO AO EXECUTAR AÇÃO!\n\n${bodyBrowser}`
             await html({ 'e': e, 'server': resWs, 'body': body, 'room': room, 'infAdd': infAdd })
         }
