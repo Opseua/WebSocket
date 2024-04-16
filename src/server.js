@@ -1,5 +1,6 @@
 await import('./resources/@export.js');
 let e = import.meta.url, ee = e
+
 let wsClients = { 'rooms': {} }, wsClientLoc
 // SERVIDOR HTTP
 let server = _http.createServer(async (req, res) => {
@@ -52,7 +53,7 @@ wss.on('connection', async (ws, res) => {
 async function logServer(inf) {
     let { write, msg, room } = inf; logConsole({ 'e': e, 'ee': ee, 'write': write, 'msg': msg });
     // if (globalWindow.devMaster == 'OPSEUA' && room && globalWindow.sheetServer.devs.includes(room)) { // 'OPSEUA' → 'EC2'
-    //     let infGoogleSheets = { // A2  | B2 | C2 
+    //     let infGoogleSheets = { // A2  | B2 | C2
     //         'e': e, 'action': 'send', 'id': `1BKI7XsKTq896JcA-PLnrSIbyIK1PaakiAtoseWmML-Q`, 'tab': `SERVER`,
     //         'range': `${globalWindow.sheetServer.cols[globalWindow.sheetServer.devs.indexOf(room)]}2`,
     //         'values': [[`${dateHour().res.tim} | ${inf.msg.includes('NOVO') ? 'ON' : 'OFF'}`]]
