@@ -104,11 +104,11 @@ server.listen(globalWindow.portLoc, async () => {
     // AGUARDAR [CLIENT LOC] INICIAR
     await new Promise(resolve => { setTimeout(resolve, 1000) })
 
-    // ACTION LOOP [SOMENTE SE FOR NO AWS (07H<>23H)
+    // ACTION LOOP [SOMENTE SE FOR NO AWS (08H<>23H)]
     setInterval(() => {
-        let time = dateHour().res; if (globalWindow.devMaster == 'AWS' && Number(time.hou) > 6 && Number(time.hou) < 24) {
+        let time = dateHour().res; if (globalWindow.devMaster == 'AWS' && Number(time.hou) > 7 && Number(time.hou) < 24) {
             // logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `ACTION: LOOP` });
-            messageAction({ 'host': host, 'room': '*_NODEJS*', 'action': globalWindow.par10, 'message': '', 'resWs': false, 'wsClients': wsClients, 'wsClientLoc': wsClientLoc })
+            messageAction({ 'host': host, 'room': '*-NODEJS-*', 'action': globalWindow.par10, 'message': '', 'resWs': false, 'wsClients': wsClients, 'wsClientLoc': wsClientLoc })
         }
     }, (globalWindow.secLoop * 1000));
 });

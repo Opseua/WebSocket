@@ -108,7 +108,7 @@ async function messageAction(inf) {
                 ]
             };
         } else if (action.toLowerCase() == globalWindow.par10.toLowerCase()) {
-            // ### LOOP [→ TODA A SALA '..._NODEJS'] (ACTION)
+            // ### LOOP [→ TODA A SALA '...-NODEJS-...'] (ACTION)
             infAdd.type = 'text'; infAdd.title = `Loop`
             let path = `!letter!:/ARQUIVOS/PROJETOS/WebSocket/log/Registros/Loop/${time1}/${time.hou}.00-${time.hou}.59`, time2 = `${time.hou}.${time.min}.${time.sec}.${time.mil}`
             message = {
