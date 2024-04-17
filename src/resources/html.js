@@ -2,7 +2,7 @@
 // retHtml = await html({ 'e': e, 'server': resWs, 'body': body, 'room': room, 'infAdd': infAdd })
 // console.log(retHtml)
 
-let e = import.meta.url, ee = e
+let e = import.meta.url, ee = e;
 async function html(inf) {
     let ret = { 'ret': false }; e = inf && inf.e ? inf.e : e;
     if (catchGlobal) {

@@ -3,7 +3,7 @@
 // retMessageAction = await messageAction(infMessageAction)
 // console.log(retMessageAction)
 
-let e = import.meta.url, ee = e
+let e = import.meta.url, ee = e;
 async function messageAction(inf) {
     let ret = { 'ret': false }; e = inf && inf.e ? inf.e : e;
     if (catchGlobal) {
@@ -67,7 +67,7 @@ async function messageAction(inf) {
             infAdd.type = 'text'; infAdd.title = `Erro | API`;
             if (!(message !== '')) {
                 let errBody = `Informar os parametros!`
-                body = `${errBody}\n\n→ &mes={"method":"POST","url":"https://ntfy.sh/AAAAAAAAAAA","headers":{"Content-Type":"application/json"},"body":{"aaa":"bbbb"},"max":10}`
+                body = `${errBody}\n\n→ &mes={"method":"POST","url":"https://ntfy.sh/AAAAAAAAAAA","headers":{"Content-Type":"application/json"},"body":{"aaa":"bbb"},"max":10}`
                 logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `${errBody}` });
             } else {
                 try {
