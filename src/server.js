@@ -93,7 +93,7 @@ async function serverRun(inf) {
         // SERVIDOR: INICIAR
         server.listen(globalWindow.portLoc, async () => {
             // WEBSOCKET [CLIENT LOC] ------------------------------------------------------------------------------------------
-            let ws = new _WebSocket(`ws://${letter == 'D' ? '127.0.0.1' : globalWindow.serverWeb}:${globalWindow.portLoc}/?roo=${globalWindow.par2}`)
+            let ws = new _WebSocket(`ws://${letter == 'D' ? '127.0.0.1' : globalWindow.serverWeb}:${globalWindow.portLoc}/?roo=${globalWindow.devMaster}-${globalWindow.par2}`)
             let url = ws._url ? ws._url : ws.url; let host = url.replace('ws://', '').split('/')[0]; let room = url.split(`${host}/`)[1].replace('?roo=', '')
             let locWeb = host.includes('127.0.0') ? `[LOC]` : `[WEB]`; ws['host'] = host; ws['room'] = room; ws['locWeb'] = locWeb; ws['method'] = 'WEBSOCKET';
             wsClientLoc = ws; ws.onerror = (data) => { logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `ERRO [CLIENT LOC]:\n${JSON.stringify(data)}` }) };
@@ -114,7 +114,7 @@ async function serverRun(inf) {
             // AGUARDAR [CLIENT LOC] INICIAR
             await new Promise(resolve => { setTimeout(resolve, 1000) })
 
-            // ACTION LOOP [SOMENTE SE FOR NO AWS (08H<>23H)]
+            // ACTION LOOP [SOMENTE SE FOR NO AWS (08H<>23H)] PARA TODOS OS '*-NODEJS-*'
             setInterval(() => {
                 let time = dateHour().res; if (globalWindow.devMaster == 'AWS' && Number(time.hou) > 7 && Number(time.hou) < 24) {
                     // logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `ACTION: LOOP` });
@@ -122,6 +122,10 @@ async function serverRun(inf) {
                 }
             }, (globalWindow.secLoop * 1000));
         });
+
+        // APAGAR LOGS ANTIGOS → EXECUTAR NA INICIALIZAÇÃO E A CADA 25 HORAS
+        await new Promise(resolve => { setTimeout(resolve, 30000) })
+        delOldLogs(); setInterval(() => { delOldLogs(); }, 90000 * 1000);
 
         ret['ret'] = true;
         ret['msg'] = `SERVER: OK`;
@@ -142,7 +146,7 @@ async function serverRun(inf) {
         ...(ret.res && { res: ret.res }),
     };
 }
-// TODAS AS FUNÇÕES PRIMÁRIAS DO 'server.js' / 'serverC6.js' / 'serverJsf.js' DEVEM ser 'serverRun'!!!
+// TODAS AS FUNÇÕES PRIMÁRIAS DO 'server.js' / 'serverC6.js' / 'serverJsf.js' DEVEM SE CHAMAR 'serverRun'!!!
 serverRun()
 
 
