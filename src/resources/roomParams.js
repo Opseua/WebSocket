@@ -39,13 +39,15 @@ async function roomParams(inf) {
             }
         }
 
+        let hostRoom = `${host}/?roo=${room}`
+
         // ERROS
         let body
         if (!room || (method == 'GET' && !action && !message) || (method == 'POST' && !message)) {
             body = `ERRO | INFORMAR A SALA|ACTION/MENSAGEM\n\n→ ws|http://127.0.0.1:1234/?act=ACTION_AQUI&roo=SALA_AQUI&mes=MENSAGEM_AQUI`
         } else if (method !== 'WEBSOCKET' && !['GET', 'POST'].includes(method)) {
             body = `ERRO | METODOS ACEITOS 'GET' OU 'POST'`
-        } else if (method !== 'WEBSOCKET' && !rooms[`${host}/${room}`] && room !== 'x') {
+        } else if (method !== 'WEBSOCKET' && !rooms[`${hostRoom}`] && room !== 'x') {
             body = `ERRO | NÃO EXISTE '${room}'`
         }
         // DEU ALGUM ERRO
@@ -63,7 +65,8 @@ async function roomParams(inf) {
             ret['res'] = {
                 'method': method,
                 'host': host,
-                'room': room.replace('?roo=', ''),
+                'room': room,
+                'hostRoom': hostRoom,
                 'locWeb': locWeb,
                 'action': action ? action : '',
                 'message': message ? message : '',

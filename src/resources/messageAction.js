@@ -12,8 +12,8 @@ async function messageAction(inf) {
         else { process.on('uncaughtException', (errC) => errs(errC, ret)); process.on('unhandledRejection', (errC) => errs(errC, ret)) }
     }
     try {
-        let time = dateHour().res, time1 = `MES_${time.mon}_${time.monNam}/DIA_${time.day}`; let { host, room, action, message, resWs, wsClients, wsClientLoc, } = inf
-        let body = {}, retMessageSend, destination = `${host}/${room}`, infAdd = { 'title': 'Erro', 'type': '' }
+        let time = dateHour().res, time1 = `MES_${time.mon}_${time.monNam}/DIA_${time.day}`; let { host, room, hostRoom, action, message, resWs, wsClients, wsClientLoc, } = inf
+        let body = {}, retMessageSend, destination = `${hostRoom}`, infAdd = { 'title': 'Erro', 'type': '' }
 
         if (action.toLowerCase() == globalWindow.par1.toLowerCase()) {
             // ### WSCLIENTS [→ EC2] (ACTION)

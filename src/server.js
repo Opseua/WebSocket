@@ -19,8 +19,8 @@ async function serverRun(inf) {
             }
             // SALA E PARAMETROS | PROCESSAR AÇÃO/MENSAGEM RECEBIDA
             let retRoomParams = await roomParams({ 'e': e, 'wsClients': wsClients, 'resWs': res, 'server': req, }); if (!retRoomParams.ret) { return }
-            let { host, room, locWeb, action, message, method, } = retRoomParams.res; res['host'] = host; res['room'] = room; res['locWeb'] = locWeb; res['method'] = method;
-            messageAction({ 'host': host, 'room': room, 'action': action, 'message': message, 'resWs': res, 'wsClients': wsClients, 'wsClientLoc': wsClientLoc })
+            let { host, room, hostRoom, locWeb, action, message, method, } = retRoomParams.res; res['host'] = host; res['room'] = room; res['hostRoom'] = hostRoom; res['locWeb'] = locWeb; res['method'] = method;
+            messageAction({ 'host': host, 'room': room, 'hostRoom': hostRoom, 'action': action, 'message': message, 'resWs': res, 'wsClients': wsClients, 'wsClientLoc': wsClientLoc })
         });
 
         // SERVIDOR WEBSOCKET | ### ON CONNECTION
@@ -28,8 +28,8 @@ async function serverRun(inf) {
         wss.on('connection', async (ws, res) => {
             // SALA PARAMETROS E [ADICIONAR] | ENVIAR PING DE INÍCIO DE CONEXÃO
             let retRoomParams = await roomParams({ 'e': e, 'wsClients': wsClients, 'resWs': ws, 'server': res, }); if (!retRoomParams.ret) { return }
-            let { host, room, locWeb, method, } = retRoomParams.res; ws['host'] = host; ws['room'] = room; ws['locWeb'] = locWeb; ws['method'] = method;
-            let hostRoom = `${host}/${room}`; if (!wsClients.rooms[hostRoom]) { wsClients.rooms[hostRoom] = new Set(); }; wsClients.rooms[hostRoom].add(ws);
+            let { host, room, hostRoom, locWeb, method, } = retRoomParams.res; ws['host'] = host; ws['room'] = room; ws['hostRoom'] = hostRoom; ws['locWeb'] = locWeb; ws['method'] = method;
+            if (!wsClients.rooms[hostRoom]) { wsClients.rooms[hostRoom] = new Set(); }; wsClients.rooms[hostRoom].add(ws);
             logServer({ 'write': true, 'room': room, 'msg': `NOVO ${locWeb} '${room}'` });
 
             // ### ON MESSAGE
@@ -49,14 +49,14 @@ async function serverRun(inf) {
                         try { message = JSON.parse(message); } catch (catchErr) { message = { 'message': message }; logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `ERRO M1` }) };
                         if (!message.message) { message = { 'message': message }; logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `ERRO M2` }) }
                         // PROCESSAR MENSAGEM RECEBIDA
-                        if (ws.lastMessage) { ws.send(`pong`) }; messageReceived({ ...message, 'host': host, 'room': room, 'resWs': ws, 'wsClients': wsClients, });
+                        if (ws.lastMessage) { ws.send(`pong`) }; messageReceived({ ...message, 'host': host, 'room': room, 'hostRoom': hostRoom, 'resWs': ws, 'wsClients': wsClients, });
                     }
                 }
             });
 
             // ### ON ERROR/CLOSE
-            ws.on('error', (error) => { removeSerCli({ 'resWs': ws, 'host': host, 'room': room, 'write': true, 'msg': `CLIENTE ERRO ${locWeb} '${room}'\n${error}`, }) });
-            ws.on('close', () => { removeSerCli({ 'resWs': ws, 'host': host, 'room': room, 'write': true, 'msg': `CLIENTE DESCONECTADO ${locWeb} '${room}'`, }) });
+            ws.on('error', (error) => { removeSerCli({ 'resWs': ws, 'host': host, 'room': room, 'hostRoom': hostRoom, 'write': true, 'msg': `CLIENTE ERRO ${locWeb} '${room}'\n${error}`, }) });
+            ws.on('close', () => { removeSerCli({ 'resWs': ws, 'host': host, 'room': room, 'hostRoom': hostRoom, 'write': true, 'msg': `CLIENTE DESCONECTADO ${locWeb} '${room}'`, }) });
         });
 
         // LOG DO SERVER
@@ -73,7 +73,7 @@ async function serverRun(inf) {
 
         // REMOVER CLIENTE
         function removeSerCli(inf) {
-            let { resWs, write, msg, host, room } = inf; let hostRoom = `${host}/${room}`; logServer({ 'write': write, 'room': room, 'msg': msg, }); if (wsClients.rooms[hostRoom]) {
+            let { resWs, write, msg, host, room, hostRoom } = inf; logServer({ 'write': write, 'room': room, 'msg': msg, }); if (wsClients.rooms[hostRoom]) {
                 wsClients.rooms[hostRoom].delete(resWs); if (wsClients.rooms[hostRoom].size == 0) { delete wsClients.rooms[hostRoom] }
             }
         }
