@@ -43,7 +43,7 @@ async function messageAction(inf) {
                     },
                     {
                         'securityPass': globalWindow.securityPass, 'retInf': false, 'name': 'commandLine', 'par': {
-                            'awaitFinish': false, 'command': `"!letter!:/ARQUIVOS/PROJETOS/Chrome_Extension/src/scripts/BAT/z_RestartAll.lnk"`
+                            'awaitFinish': false, 'command': `"!letter!:/ARQUIVOS/PROJETOS/Chrome_Extension/src/scripts/BAT/z_AllRestart.lnk"`
                         }
                     },
                 ]
