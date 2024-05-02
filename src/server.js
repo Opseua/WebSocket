@@ -20,7 +20,7 @@ async function serverRun(inf) {
             // SALA E PARAMETROS | PROCESSAR AÇÃO/MENSAGEM RECEBIDA
             let retRoomParams = await roomParams({ 'e': e, 'wsClients': wsClients, 'resWs': res, 'server': req, }); if (!retRoomParams.ret) { return }
             let { host, room, hostRoom, locWeb, action, message, method, } = retRoomParams.res; res['host'] = host; res['room'] = room; res['hostRoom'] = hostRoom; res['locWeb'] = locWeb; res['method'] = method;
-            messageAction({ 'host': host, 'room': room, 'hostRoom': hostRoom, 'action': action, 'message': message, 'resWs': res, 'wsClients': wsClients, 'wsClientLoc': wsClientLoc })
+            messageAction({ 'host': host, 'room': room, 'action': action, 'message': message, 'resWs': res, 'wsClients': wsClients, 'wsClientLoc': wsClientLoc })
         });
 
         // SERVIDOR WEBSOCKET | ### ON CONNECTION
@@ -49,7 +49,7 @@ async function serverRun(inf) {
                         try { message = JSON.parse(message); } catch (catchErr) { message = { 'message': message }; logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `ERRO M1` }) };
                         if (!message.message) { message = { 'message': message }; logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `ERRO M2` }) }
                         // PROCESSAR MENSAGEM RECEBIDA
-                        if (ws.lastMessage) { ws.send(`pong`) }; messageReceived({ ...message, 'host': host, 'room': room, 'hostRoom': hostRoom, 'resWs': ws, 'wsClients': wsClients, });
+                        if (ws.lastMessage) { ws.send(`pong`) }; messageReceived({ ...message, 'host': host, 'room': room, 'resWs': ws, 'wsClients': wsClients, });
                     }
                 }
             });
@@ -94,8 +94,8 @@ async function serverRun(inf) {
         server.listen(globalWindow.portLoc, async () => {
             // WEBSOCKET [CLIENT LOC] ------------------------------------------------------------------------------------------
             let ws = new _WebSocket(`ws://${letter == 'D' ? '127.0.0.1' : globalWindow.serverWeb}:${globalWindow.portLoc}/?roo=${globalWindow.devMaster}-${globalWindow.par2}`)
-            let url = ws._url ? ws._url : ws.url; let host = url.replace('ws://', '').split('/')[0]; let room = url.split(`${host}/`)[1].replace('?roo=', '')
-            let locWeb = host.includes('127.0.0') ? `[LOC]` : `[WEB]`; ws['host'] = host; ws['room'] = room; ws['locWeb'] = locWeb; ws['method'] = 'WEBSOCKET';
+            let url = ws._url ? ws._url : ws.url; let host = url.replace('ws://', '').split('/')[0]; let room = url.split(`${host}/`)[1].replace('?roo=', ''); let hostRoom = url.replace('ws://', '')
+            let locWeb = host.includes('127.0.0') ? `[LOC]` : `[WEB]`; ws['host'] = host; ws['room'] = room; ws['hostRoom'] = hostRoom; ws['locWeb'] = locWeb; ws['method'] = 'WEBSOCKET';
             wsClientLoc = ws; ws.onerror = (data) => { logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `ERRO [CLIENT LOC]:\n${JSON.stringify(data)}` }) };
             ws.onmessage = async (data) => {
                 let message = data.data.toString('utf-8'); let pingPong = message == `${globalWindow.par6}` ? 1 : message == `${globalWindow.par7}` ? 2 : 0
@@ -115,13 +115,22 @@ async function serverRun(inf) {
             await new Promise(resolve => { setTimeout(resolve, 1000) })
 
             // ACTION LOOP [SOMENTE SE FOR NO AWS (08H<>23H)] PARA TODOS OS '*-NODEJS-*'
-            setInterval(() => {
+            setInterval(async () => {
                 let time = dateHour().res; if (globalWindow.devMaster == 'AWS' && Number(time.hou) > 7 && Number(time.hou) < 24) {
-                    // logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `ACTION: LOOP` });
-                    messageAction({ 'host': host, 'room': '*-NODEJS-*', 'action': globalWindow.par10, 'message': '', 'resWs': false, 'wsClients': wsClients, 'wsClientLoc': wsClientLoc })
+                    logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `ACTION: LOOP` });
+                    let retMessageAction = await messageAction({ 'host': host, 'room': '*-NODEJS-*', 'destination': '*-NODEJS-*', 'action': globalWindow.par10, 'message': '', 'resWs': false, 'wsClients': wsClients, 'wsClientLoc': wsClientLoc })
                 }
             }, (globalWindow.secLoop * 1000));
         });
+
+        await new Promise(resolve => { setTimeout(resolve, 15000) })
+        let infNotification, retNotification // 'logFun': true,
+        infNotification = {
+            'e': e, 'duration': 2, 'icon': './src/scripts/media/icon_4.png', 'retInf': false,
+            'title': `TITULO`, 'text': `TEXTO`,
+        };
+        retNotification = await notification(infNotification);
+        console.log(retNotification)
 
         // APAGAR LOGS ANTIGOS → EXECUTAR NA INICIALIZAÇÃO E A CADA 25 HORAS
         await new Promise(resolve => { setTimeout(resolve, 30000) })
@@ -130,11 +139,6 @@ async function serverRun(inf) {
         ret['ret'] = true;
         ret['msg'] = `SERVER: OK`;
 
-        // ### LOG FUN ###
-        if (inf && inf.logFun) {
-            let infFile = { 'e': e, 'action': 'write', 'functionLocal': false, 'logFun': new Error().stack, 'path': 'AUTO', }
-            infFile['rewrite'] = false; infFile['text'] = { 'inf': inf, 'ret': ret }; file(infFile);
-        }
     } catch (catchErr) {
         console.log(catchErr)
         let retRegexE = await regexE({ 'inf': inf, 'e': catchErr, 'catchGlobal': false });

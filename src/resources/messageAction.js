@@ -12,8 +12,8 @@ async function messageAction(inf) {
         else { process.on('uncaughtException', (errC) => errs(errC, ret)); process.on('unhandledRejection', (errC) => errs(errC, ret)) }
     }
     try {
-        let time = dateHour().res, time1 = `MES_${time.mon}_${time.monNam}/DIA_${time.day}`; let { host, room, hostRoom, action, message, resWs, wsClients, wsClientLoc, } = inf
-        let body = {}, retMessageSend, destination = `${hostRoom}`, infAdd = { 'title': 'Erro', 'type': '' }
+        let time = dateHour().res, time1 = `MES_${time.mon}_${time.monNam}/DIA_${time.day}`; let { host, room, action, message, resWs, wsClients, wsClientLoc, } = inf
+        let body = {}, retMessageSend, infAdd = { 'title': 'Erro', 'type': '' }, destination = inf.destination ? inf.destination : `${host}/?roo=${room}`
 
         if (action.toLowerCase() == globalWindow.par1.toLowerCase()) {
             // ### WSCLIENTS [→ EC2] (ACTION)
@@ -152,11 +152,6 @@ async function messageAction(inf) {
         ret['ret'] = true;
         ret['msg'] = `ACTIONS: OK`
 
-        // ### LOG FUN ###
-        if (inf && inf.logFun) {
-            let infFile = { 'e': e, 'action': 'write', 'functionLocal': false, 'logFun': new Error().stack, 'path': 'AUTO', }
-            infFile['rewrite'] = false; infFile['text'] = { 'inf': inf, 'ret': ret }; file(infFile);
-        }
     } catch (catchErr) {
         let retRegexE = await regexE({ 'inf': inf, 'e': catchErr, 'catchGlobal': false });
         ret['msg'] = retRegexE.res
