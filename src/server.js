@@ -88,7 +88,7 @@ async function serverRun(inf) {
         // SERVIDOR: INICIAR
         server.listen(globalWindow.portLoc, async () => {
             // WEBSOCKET [CLIENT LOC] ------------------------------------------------------------------------------------------
-            let ws = new _WebSocket(`ws://${letter == 'D' ? '127.0.0.1' : globalWindow.serverWeb}:${globalWindow.portLoc}/?roo=${globalWindow.devMaster}-${globalWindow.par2}`)
+            let ws = new _WebSocket(`ws://${globalWindow.devMaster == 'AWS' ? globalWindow.serverWeb : '127.0.0.1'}:${globalWindow.portLoc}/?roo=${globalWindow.devMaster}-${globalWindow.par2}`)
             let url = ws._url ? ws._url : ws.url; let host = url.replace('ws://', '').split('/')[0]; let room = url.split(`${host}/`)[1].replace('?roo=', ''); let hostRoom = url.replace('ws://', '')
             let locWeb = host.includes('127.0.0') ? `[LOC]` : `[WEB]`; ws['host'] = host; ws['room'] = room; ws['hostRoom'] = hostRoom; ws['locWeb'] = locWeb; ws['method'] = 'WEBSOCKET';
             wsClientLoc = ws; ws.onerror = (data) => { logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `ERRO [CLIENT LOC]:\n${JSON.stringify(data)}` }) };
