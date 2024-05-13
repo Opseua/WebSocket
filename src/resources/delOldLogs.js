@@ -1,4 +1,4 @@
-// let infDelOldLogs, retDelOldLogs // 'logFun': true,
+// let infDelOldLogs, retDelOldLogs
 // retDelOldLogs = await delOldLogs()
 // console.log(retDelOldLogs)
 
