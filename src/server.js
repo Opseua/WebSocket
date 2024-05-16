@@ -120,7 +120,7 @@ async function serverRun(inf) {
 
         // APAGAR LOGS ANTIGOS → EXECUTAR NA INICIALIZAÇÃO E A CADA 25 HORAS
         await new Promise(resolve => { setTimeout(resolve, 30000) })
-        delOldLogs(); setInterval(() => { delOldLogs(); }, 90000 * 1000);
+        logsDelOld(); setInterval(() => { logsDelOld(); }, 90000 * 1000);
 
         ret['ret'] = true;
         ret['msg'] = `SERVER: OK`;
