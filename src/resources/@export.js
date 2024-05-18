@@ -22,7 +22,6 @@ let retGetPath = await getPath({ 'e': new Error(), 'devChildren': devChildren })
 // console.log('project:', globalWindow.project)
 
 // FUNÇÕES DESSE PROJETO
-await import('./logsDelOld.js')
 await import('./html.js');
 await import('./messageAction.js');
 await import('./roomParams.js');
