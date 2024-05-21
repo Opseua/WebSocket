@@ -2,8 +2,7 @@
 
 // let infRoomParams, retRoomParams
 // infRoomParams = { 'e': e, 'wsClients': wsClients, 'resWs': res, 'server': req, }
-// retRoomParams = await roomParams(infRoomParams)
-// console.log(retRoomParams)
+// retRoomParams = await roomParams(infRoomParams); console.log(retRoomParams)
 
 let e = import.meta.url, ee = e;
 async function roomParams(inf) {

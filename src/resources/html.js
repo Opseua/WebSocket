@@ -1,6 +1,5 @@
 // let infHtml, retHtml, infAdd = { 'title': 'Erro', 'type': '' }
-// retHtml = await html({ 'e': e, 'server': resWs, 'body': body, 'room': room, 'infAdd': infAdd })
-// console.log(retHtml)
+// retHtml = await html({ 'e': e, 'server': resWs, 'body': body, 'room': room, 'infAdd': infAdd }); console.log(retHtml)
 
 let e = import.meta.url, ee = e;
 async function html(inf) {

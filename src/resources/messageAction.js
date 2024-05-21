@@ -1,7 +1,6 @@
 // let infMessageAction, retMessageAction
 // infMessageAction = { 'host': host, 'room': room, 'action': action, 'message': message, 'resWs': res, 'wsClients': wsClients, 'wsClientLoc': wsClientLoc }
-// retMessageAction = await messageAction(infMessageAction)
-// console.log(retMessageAction)
+// retMessageAction = await messageAction(infMessageAction); console.log(retMessageAction)
 
 let e = import.meta.url, ee = e;
 async function messageAction(inf) {
