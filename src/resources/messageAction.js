@@ -140,7 +140,7 @@ async function messageAction(inf) {
         if (resWs) {
             infAdd.type = body?.res ? infAdd.type : 'text'; let bodyBrowser = typeof body === 'object' ? JSON.stringify(body, null, 2) : body
             body = body.ret && body.res ? body.res : body.ret ? `AÇÃO EXECUTADA COM SUCESSO\n\n${bodyBrowser}` : `ERRO AO EXECUTAR AÇÃO!\n\n${bodyBrowser}`
-            await html({ 'e': e, 'server': resWs, 'body': body, 'room': room, 'infAdd': infAdd })
+            await html({ 'e': e, 'server': resWs, 'body': body, 'room': room, 'infAdd': infAdd, 'method': resWs.method })
         }
 
         ret['ret'] = true;

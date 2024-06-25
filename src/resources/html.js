@@ -5,10 +5,8 @@ let e = import.meta.url, ee = e;
 async function html(inf) {
     let ret = { 'ret': false }; e = inf && inf.e ? inf.e : e;
     try {
-        let room = inf.room
-        let res = inf.server
-        let infAdd = inf.infAdd
-        let body = inf.body
+
+        let res = inf.server; let { room, infAdd, body, method } = inf
 
         function setData(inf) {
             let day = inf.substring(8, 10), mon = inf.substring(5, 7), yer = inf.substring(0, 4); let hou = inf.substring(11, 13)
@@ -23,7 +21,7 @@ async function html(inf) {
         if (infAdd.type == 'text') {
             // ### TEXT
             res.writeHead(200, { 'Content-Type': 'text/html' });
-            res.end(bodyHtml.replace('####REPLACE####', `<pre>${body}</pre>`).replace('WebSocket', `${infAdd.title}`));
+            res.end(method == 'POST' ? body : bodyHtml.replace('####REPLACE####', `<pre>${body}</pre>`).replace('WebSocket', `${infAdd.title}`));
         } else if (infAdd.type == 'image') {
             // ### IMAGE
             let imagemBase64 = Buffer.from({ type: 'Buffer', data: body.data }).toString('base64');
