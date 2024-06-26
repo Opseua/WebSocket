@@ -31,11 +31,11 @@ async function html(inf) {
             }
         } else if (infAdd.type == 'text') {
             // ### TEXT
-            res.writeHead(200, { 'Content-Type': 'text/html' }); res.end(method == 'GET' ? bodyHtml.replace('####REPLACE####', `<pre>${body}</pre>`).replace('WebSocket', `${infAdd.title}`) : body);
+            res.writeHead(200, { 'Content-Type': 'text/html' }); res.end(bodyHtml.replace('####REPLACE####', `<pre>${body}</pre>`).replace('WebSocket', `${infAdd.title}`));
         } else if (infAdd.type == 'image') {
             // ### IMAGE
             let imagemBase64 = Buffer.from({ type: 'Buffer', data: body.data }).toString('base64');
-            res.end(method == 'GET' ? body : bodyHtml.replace('####REPLACE####', `<img src="data:image/png;base64,${imagemBase64}" alt="Imagem">`).replace('WebSocket', `${infAdd.title}`));
+            res.end(bodyHtml.replace('####REPLACE####', `<img src="data:image/png;base64,${imagemBase64}" alt="Imagem">`).replace('WebSocket', `${infAdd.title}`));
         } else if (infAdd.type == 'array') {
             // ### ARRAY
             let retFile = body; let path = infAdd.path; let pathFile; if (path.length > 3) { pathFile = path.lastIndexOf("/"); pathFile = path.substring(pathFile + 1); } else { pathFile = path.replace('/', '') }
