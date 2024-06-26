@@ -16,6 +16,7 @@ async function roomParams(inf) {
         let room, action, message, method = server.upgrade ? 'WEBSOCKET' : server.method
         let host = server.headers.host
         let locWeb = host.includes('127.0.0') ? `[LOC]` : `[WEB]`, urlParts = url.split('/')
+        let headers = server.headers
 
         if (!urlParams) {
             room = false
@@ -51,7 +52,7 @@ async function roomParams(inf) {
                 resWs.send(body); resWs.terminate()
             } else {
                 // ### HTTP
-                html({ 'e': e, 'server': resWs, 'body': body, 'room': room, 'infAdd': { 'type': 'text', 'title': 'Server' }, 'method': method })
+                html({ 'e': e, 'server': resWs, 'body': body, 'room': room, 'infAdd': { 'type': 'text', 'title': 'Server' }, 'method': method, 'headers': headers, })
             }
         } else {
             ret['ret'] = true;
@@ -64,6 +65,7 @@ async function roomParams(inf) {
                 'locWeb': locWeb,
                 'action': action ? action : '',
                 'message': message ? message : '',
+                'headers': headers,
             }
         }
 

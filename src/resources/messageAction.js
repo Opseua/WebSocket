@@ -6,7 +6,7 @@ let e = import.meta.url, ee = e;
 async function messageAction(inf) {
     let ret = { 'ret': false }; e = inf && inf.e ? inf.e : e;
     try {
-        let time = dateHour().res, time1 = `MES_${time.mon}_${time.monNam}/DIA_${time.day}`; let { host, room, action, message, resWs, wsClients, wsClientLoc, } = inf
+        let time = dateHour().res, time1 = `MES_${time.mon}_${time.monNam}/DIA_${time.day}`; let { host, room, action, message, resWs, wsClients, wsClientLoc, headers } = inf
         let body = {}, retMessageSend, infAdd = { 'title': 'Erro', 'type': '' }, destination = inf.destination ? inf.destination : `${host}/?roo=${room}`
 
         if (action.toLowerCase() == globalWindow.par1.toLowerCase()) {
@@ -132,15 +132,15 @@ async function messageAction(inf) {
         if (typeof message === 'object' || message !== '') {
             retMessageSend = await messageSend({ 'destination': destination, 'messageId': true, 'message': message, 'resWs': wsClientLoc, 'secondsAwait': 0, });
             // logConsole({ 'e': e, 'ee': ee, 'write': false, 'msg': `RESPOSTA SENDO ESPERADA:\n${JSON.stringify(retMessageSend)}` });
-            let bodyRes = infAdd.title.includes(`Outro tipo de ação/mensagem`) ? JSON.stringify(retMessageSend.res, null, 2) : retMessageSend.res
+            let bodyRes = infAdd.title.includes(`Outro tipo de ação/mensagem`) ? headers.raw ? retMessageSend.res : JSON.stringify(retMessageSend.res, null, 2) : retMessageSend.res
             body = !retMessageSend.res ? retMessageSend : { 'ret': retMessageSend.ret, 'msg': retMessageSend.msg, 'res': bodyRes }
         }
 
         // ENVIAR RETORNO HTTP (SE NECESSÁRIO)
         if (resWs) {
             infAdd.type = body?.res ? infAdd.type : 'text'; let bodyBrowser = typeof body === 'object' ? JSON.stringify(body, null, 2) : body
-            body = body.ret && body.res ? body.res : body.ret ? `AÇÃO EXECUTADA COM SUCESSO\n\n${bodyBrowser}` : `ERRO AO EXECUTAR AÇÃO!\n\n${bodyBrowser}`
-            await html({ 'e': e, 'server': resWs, 'body': body, 'room': room, 'infAdd': infAdd, 'method': resWs.method })
+            body = body.ret && body.res ? body.res : body.ret ? headers.raw ? 'OK' : `AÇÃO EXECUTADA COM SUCESSO\n\n${bodyBrowser}` : headers.raw ? body : `ERRO AO EXECUTAR AÇÃO!\n\n${bodyBrowser}`
+            await html({ 'e': e, 'server': resWs, 'body': body, 'room': room, 'infAdd': infAdd, 'method': resWs.method, 'headers': headers, })
         }
 
         ret['ret'] = true;

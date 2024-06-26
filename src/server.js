@@ -7,45 +7,34 @@ async function serverRun(inf) {
     try {
         logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `**************** SERVER **************** [${startupFun(startup, new Date())}]` })
 
-        let wsClients = { 'rooms': {} }, wsClientLoc
         // SERVIDOR HTTP
-        let server = _http.createServer(async (req, res) => {
-            if (req.url.includes('favicon.ico')) {
-                let ico = await _fs.promises.readFile(`${letter}:/ARQUIVOS/WINDOWS/BAT/z_ICONES/websocket.ico`); res.writeHead(200, { 'Content-Type': 'image/x-icon' }).end(ico); return;
-            }
+        let wsClients = { 'rooms': {} }, wsClientLoc; let server = _http.createServer(async (req, res) => {
+            if (req.url.includes('favicon.ico')) { let ico = await _fs.promises.readFile(`${letter}:/ARQUIVOS/WINDOWS/BAT/z_ICONES/websocket.ico`); res.writeHead(200, { 'Content-Type': 'image/x-icon' }).end(ico); return; }
             // SALA E PARAMETROS | PROCESSAR AÇÃO/MENSAGEM RECEBIDA
-            let retRoomParams = await roomParams({ 'e': e, 'wsClients': wsClients, 'resWs': res, 'server': req, }); if (!retRoomParams.ret) { return }
-            let { host, room, hostRoom, locWeb, action, message, method, } = retRoomParams.res; res['host'] = host; res['room'] = room; res['hostRoom'] = hostRoom; res['locWeb'] = locWeb; res['method'] = method;
-            messageAction({ 'host': host, 'room': room, 'action': action, 'message': message, 'resWs': res, 'wsClients': wsClients, 'wsClientLoc': wsClientLoc })
+            let retRoomParams = await roomParams({ 'e': e, 'wsClients': wsClients, 'resWs': res, 'server': req, }); if (!retRoomParams.ret) { return };
+            let { host, room, hostRoom, locWeb, action, message, method, headers } = retRoomParams.res; res['host'] = host; res['room'] = room; res['hostRoom'] = hostRoom; res['locWeb'] = locWeb; res['method'] = method;
+            res['headers'] = headers; messageAction({ 'host': host, 'room': room, 'action': action, 'message': message, 'resWs': res, 'wsClients': wsClients, 'wsClientLoc': wsClientLoc, 'headers': headers })
         });
 
         // SERVIDOR WEBSOCKET | ### ON CONNECTION
-        let wss = new _WebSocketServer({ server });
-        wss.on('connection', async (ws, res) => {
+        let wss = new _WebSocketServer({ server }); wss.on('connection', async (ws, res) => {
             // SALA PARAMETROS E [ADICIONAR] | ENVIAR PING DE INÍCIO DE CONEXÃO
-            let retRoomParams = await roomParams({ 'e': e, 'wsClients': wsClients, 'resWs': ws, 'server': res, }); if (!retRoomParams.ret) { return }
+            let retRoomParams = await roomParams({ 'e': e, 'wsClients': wsClients, 'resWs': ws, 'server': res, }); if (!retRoomParams.ret) { return };
             let { host, room, hostRoom, locWeb, method, } = retRoomParams.res; ws['host'] = host; ws['room'] = room; ws['hostRoom'] = hostRoom; ws['locWeb'] = locWeb; ws['method'] = method;
             if (!wsClients.rooms[hostRoom]) { wsClients.rooms[hostRoom] = new Set(); }; wsClients.rooms[hostRoom].add(ws);
-            logServer({ 'write': true, 'room': room, 'msg': `NOVO ${locWeb} '${room}'` });
 
             // ### ON MESSAGE
             ws.on('message', async (data) => {
-                let message = data.toString('utf-8')
-                if (message.length == 0) { ws.send(`ERRO | MENSAGEM VAZIA ${locWeb} '${room}'`) }
-                else {
+                let message = data.toString('utf-8'); if (message.length == 0) { ws.send(`ERRO | MENSAGEM VAZIA ${locWeb} '${room}'`) } else {
                     let pingPong = message == `${globalWindow.par6}` ? 1 : message == `${globalWindow.par7}` ? 2 : 0
-                    // ÚLTIMA MENSAGEM RECEBIDA
-                    ws['lastMessage'] = ws.lastMessage || pingPong > 0 ? Number(dateHour().res.tim) : false
+                    ws['lastMessage'] = ws.lastMessage || pingPong > 0 ? Number(dateHour().res.tim) : false; // ÚLTIMA MENSAGEM RECEBIDA
                     // logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `← SER | ${ws.lastMessage} | ${hostRoom}` });
-                    if (pingPong > 0) {
-                        if (pingPong == 2) { return }
-                        // RECEBIDO: 'PING' ENVIAR 'PONG'
-                        ws.send('pong'); // logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `RECEBEU PING ${locWeb} '${room}'` });
+                    if (pingPong > 0) { // RECEBIDO: 'PING' ENVIAR 'PONG'
+                        if (pingPong == 2) { return }; ws.send('pong'); // logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `RECEBEU PING ${locWeb} '${room}'` });
                     } else {
                         try { message = JSON.parse(message); } catch (catchErr) { message = { 'message': message }; logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `ERRO M1` }) };
                         if (!message.message) { message = { 'message': message }; logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `ERRO M2` }) }
-                        // PROCESSAR MENSAGEM RECEBIDA
-                        if (ws.lastMessage) { ws.send(`pong`) }; messageReceived({ ...message, 'host': host, 'room': room, 'resWs': ws, 'wsClients': wsClients, });
+                        if (ws.lastMessage) { ws.send(`pong`) }; messageReceived({ ...message, 'host': host, 'room': room, 'resWs': ws, 'wsClients': wsClients, }); // PROCESSAR MENSAGEM RECEBIDA
                     }
                 }
             });
@@ -55,23 +44,9 @@ async function serverRun(inf) {
             ws.on('close', () => { removeSerCli({ 'resWs': ws, 'host': host, 'room': room, 'hostRoom': hostRoom, 'write': true, 'msg': `CLIENTE DESCONECTADO ${locWeb} '${room}'`, }) });
         });
 
-        // LOG DO SERVER
-        async function logServer(inf) {
-            let { write, msg, room } = inf; logConsole({ 'e': e, 'ee': ee, 'write': write, 'msg': msg });
-            // if (globalWindow.devMaster == 'OPSEUA' && room && globalWindow.sheetServer.devs.includes(room)) { // 'OPSEUA' → 'EC2'
-            //     let infGoogleSheets = { // A2  | B2 | C2
-            //         'e': e, 'action': 'send', 'id': `1BKI7XsKTq896JcA-PLnrSIbyIK1PaakiAtoseWmML-Q`, 'tab': `SERVER`,
-            //         'range': `${globalWindow.sheetServer.cols[globalWindow.sheetServer.devs.indexOf(room)]}2`,
-            //         'values': [[`${dateHour().res.tim} | ${inf.msg.includes('NOVO') ? 'ON' : 'OFF'}`]]
-            //     }; googleSheets(infGoogleSheets)
-            // }
-        }
-
         // REMOVER CLIENTE
         function removeSerCli(inf) {
-            let { resWs, write, msg, host, room, hostRoom } = inf; logServer({ 'write': write, 'room': room, 'msg': msg, }); if (wsClients.rooms[hostRoom]) {
-                wsClients.rooms[hostRoom].delete(resWs); if (wsClients.rooms[hostRoom].size == 0) { delete wsClients.rooms[hostRoom] }
-            }
+            let { resWs, write, msg, host, room, hostRoom } = inf; if (wsClients.rooms[hostRoom]) { wsClients.rooms[hostRoom].delete(resWs); if (wsClients.rooms[hostRoom].size == 0) { delete wsClients.rooms[hostRoom] } }
         }
 
         // LOOP: CHECAR ÚLTIMA MENSAGEM
@@ -92,29 +67,26 @@ async function serverRun(inf) {
             let ws = new _WebSocket(`ws://${globalWindow.devMaster == 'AWS' ? globalWindow.serverWeb : '127.0.0.1'}:${globalWindow.portLoc}/?roo=${globalWindow.devMaster}-${globalWindow.par2}`)
             let url = ws._url ? ws._url : ws.url; let host = url.replace('ws://', '').split('/')[0]; let room = url.split(`${host}/`)[1].replace('?roo=', ''); let hostRoom = url.replace('ws://', '')
             let locWeb = host.includes('127.0.0') ? `[LOC]` : `[WEB]`; ws['host'] = host; ws['room'] = room; ws['hostRoom'] = hostRoom; ws['locWeb'] = locWeb; ws['method'] = 'WEBSOCKET';
-            wsClientLoc = ws; ws.onerror = (data) => { logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `ERRO [CLIENT LOC]:\n${JSON.stringify(data)}` }) };
-            ws.onmessage = async (data) => {
+            wsClientLoc = ws; ws.onerror = (data) => { logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `ERRO [CLIENT LOC]:\n${JSON.stringify(data)}` }) }; ws.onmessage = async (data) => {
                 let message = data.data.toString('utf-8'); let pingPong = message == `${globalWindow.par6}` ? 1 : message == `${globalWindow.par7}` ? 2 : 0
                 if (pingPong > 0) { return }; try { message = JSON.parse(message) } catch (catchErr) { message = { 'message': message } }; if (!message.message) { message = { 'message': message } }
-                // PROCESSAR MENSAGEM RECEBIDA
-                messageReceived({ ...message, 'host': host, 'room': room, 'resWs': ws, });
+                messageReceived({ ...message, 'host': host, 'room': room, 'resWs': ws, });   // PROCESSAR MENSAGEM RECEBIDA
             }
             // -------------------------------------------------------------------------------------------------------------
-            // AGUARDAR SERVIDOR INICIAR
-            logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `RODANDO NA PORTA: ${globalWindow.portLoc}` });
-            await new Promise(resolve => { setTimeout(resolve, 1000) })
+            // AGUARDAR INÍCIO [SERVIDOR]
+            logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `RODANDO NA PORTA: ${globalWindow.portLoc}` }); await new Promise(resolve => { setTimeout(resolve, 1000) })
 
             // CLIENT (NÃO POR COMO 'await'!!!)
             client({ 'e': e })
 
-            // AGUARDAR [CLIENT LOC] INICIAR
+            // AGUARDAR INÍCIO [CLIENTE]
             await new Promise(resolve => { setTimeout(resolve, 1000) })
 
             // ACTION LOOP [SOMENTE SE FOR NO AWS (08H<>23H)] PARA TODOS OS '*-NODEJS-*'
             setInterval(async () => {
                 let time = dateHour().res; if (globalWindow.devMaster == 'AWS' && Number(time.hou) > 7 && Number(time.hou) < 24) {
                     logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `ACTION: LOOP` });
-                    let retMessageAction = await messageAction({ 'host': host, 'room': '*-NODEJS-*', 'destination': '*-NODEJS-*', 'action': globalWindow.par10, 'message': '', 'resWs': false, 'wsClients': wsClients, 'wsClientLoc': wsClientLoc })
+                    await messageAction({ 'host': host, 'room': '*-NODEJS-*', 'destination': '*-NODEJS-*', 'action': globalWindow.par10, 'message': '', 'resWs': false, 'wsClients': wsClients, 'wsClientLoc': wsClientLoc, 'headers': {} })
                 }
             }, (globalWindow.secLoop * 1000));
         });
