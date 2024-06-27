@@ -5,7 +5,7 @@ let e = import.meta.url, ee = e;
 async function html(inf) {
     let ret = { 'ret': false }; e = inf && inf.e ? inf.e : e;
     try {
-        let res = inf.server; let { room, infAdd, body, method, headers } = inf
+        let res = inf.server; let { room, infAdd, body, headers } = inf
 
         function setData(inf) { return inf.substring(8, 10) + "/" + inf.substring(5, 7) + "/" + inf.substring(0, 4) + " " + inf.substring(11, 13) + ":" + inf.substring(14, 16) + ":" + inf.substring(17, 19); }
 
@@ -18,7 +18,7 @@ async function html(inf) {
         if (headers.raw) {
             // ### [RAW]
             let bodyIsStringBufferObject = !(typeof body === 'object') ? 'STRING' : 'OBJECT'; // IDENTIFICAR SE É CONTEUDO DO BODY É: STRING/BUFFER/OBJETO
-            if (bodyIsStringBufferObject == 'OBJECT') { try { Buffer.isBuffer(Buffer.from(body)); bodyIsStringBufferObject = 'BUFFER' } catch (catchErr) { bodyIsStringBufferObject = 'OBJECT' } }
+            if (bodyIsStringBufferObject == 'OBJECT') { try { Buffer.isBuffer(Buffer.from(body)); bodyIsStringBufferObject = 'BUFFER' } catch (catchErr) { bodyIsStringBufferObject = 'OBJECT'; esLintIgnore = catchErr; }; }
             if (bodyIsStringBufferObject == 'STRING') {
                 // [STRING] (TEXTO)
                 res.writeHead(200, { 'Content-Type': 'text/html' }); res.end(body)
@@ -69,7 +69,7 @@ async function html(inf) {
                         }
                     }
                 } catch (catchErr) {
-                    res.writeHead(200, { 'Content-Type': 'text/html' }); res.end(bodyHtml.replace('####REPLACE####', `<pre>Erro ao exibir arquivo: ${error.message}</pre>`));
+                    res.writeHead(200, { 'Content-Type': 'text/html' }); res.end(bodyHtml.replace('####REPLACE####', `<pre>Erro ao exibir arquivo: ${error.message}</pre>`)); esLintIgnore = catchErr;
                 }
             }
         } else {

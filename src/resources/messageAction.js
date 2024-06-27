@@ -53,7 +53,7 @@ async function messageAction(inf) {
                 try {
                     infAdd.title = `Chat`; message = JSON.parse(message); let retChat = await chat({ 'e': e, ...message }); body = retChat
                 } catch (catchErr) {
-                    let errBody = `Erro ao fazer parse dos parametros!\n\n${message}`; logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `${errBody}` }); body = `${errBody}`
+                    let errBody = `Erro ao fazer parse dos parametros!\n\n${message}`; logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `${errBody}` }); body = `${errBody}`; esLintIgnore = catchErr;
                 }
             }; message = '';
         } else if (action.toLowerCase() == globalWindow.par5.toLowerCase()) {
@@ -68,7 +68,7 @@ async function messageAction(inf) {
                     infAdd.title = `API`; message = JSON.parse(message); let retApi = await api({ 'e': e, ...message });
                     if (retApi.res) { retApi['res'] = JSON.stringify(retApi.res, null, 2) }; body = retApi
                 } catch (catchErr) {
-                    let errBody = `Erro ao fazer parse dos parametros!\n\n${message}`; logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `${errBody}` }); body = `${errBody}`
+                    let errBody = `Erro ao fazer parse dos parametros!\n\n${message}`; logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `${errBody}` }); body = `${errBody}`; esLintIgnore = catchErr;
                 }
             }; message = '';
         } else if (action.toLowerCase() == globalWindow.par8.toLowerCase()) {
@@ -124,7 +124,7 @@ async function messageAction(inf) {
                 infAdd.type = 'text'; infAdd.title = `Outro tipo de ação/mensagem`; message = JSON.parse(message); message = message.message ? message.message : message
             } catch (catchErr) {
                 infAdd.type = 'text'; infAdd.title = `Erro`; let errBody = `Erro ao fazer parse da mensagem!\n\n${message}`
-                logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `${errBody}` }); message = ''
+                logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `${errBody}` }); message = ''; esLintIgnore = catchErr;
             }
         }
 
