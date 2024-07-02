@@ -16,7 +16,7 @@ async function messageAction(inf) {
             body = { 'ret': true, 'res': `${resWs.method} - OK | CLIENTS:\n\n${JSON.stringify(resClients, null, 2)}` }
         } else if (action.toLowerCase() == globalWindow.par3.toLowerCase()) {
             // ### RESET [→ TODA A SALA] (ACTION)
-            infAdd.type = 'text'; infAdd.title = `Reset (AnyDesk e Pm2)`
+            infAdd.type = 'text'; infAdd.title = `Reset (AnyDesk)`
             message = {
                 'fun': [
                     {
