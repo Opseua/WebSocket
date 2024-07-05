@@ -47,10 +47,9 @@ async function messageAction(inf) {
             }; message = '';
         } else if (action.toLowerCase() == globalWindow.par8.toLowerCase()) {
             // ### WEBFILE [→ TODA A SALA] (ACTION)
-            let path = message.length < 3 ? `!letter!:/` : message.includes('z/w/a/b/c/d') ? `!letter!:/` : message; infAdd.type = 'array'; infAdd.title = `WebFiles`; infAdd['path'] = path; message = {
-                'fun': [{
-                    'securityPass': globalWindow.securityPass, 'retInf': true, 'name': 'file', 'par': { 'action': 'isFolder', 'max': 1000, 'functionLocal': false, 'path': path, 'listRead': true }
-                }]
+            let path = message.length < 3 || (message.includes('!le') && message.length < 10) || message.includes('a/b/c/d') ? `!letter!:/` : message;
+            infAdd.type = 'array'; infAdd.title = `WebFiles`; infAdd['path'] = path; message = {
+                'fun': [{ 'securityPass': globalWindow.securityPass, 'retInf': true, 'name': 'file', 'par': { 'action': 'isFolder', 'max': 1000, 'functionLocal': false, 'path': path, 'listRead': true } }]
             }
         } else if (action.toLowerCase() == globalWindow.par9.toLowerCase()) {
             // ### SCREENSHOT [→ TODA A SALA] path.match(/\.(jpg|jpeg|png|ico)$/) (ACTION)

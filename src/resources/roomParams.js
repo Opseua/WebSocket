@@ -9,20 +9,14 @@ async function roomParams(inf) {
     let ret = { 'ret': false }; e = inf && inf.e ? inf.e : e;
     try {
         let { server, resWs, wsClients } = inf
-        let rooms = wsClients.rooms
-        let url = decodeURIComponent(server.url)
-        let { query } = _parse(url, true);
-        let urlParams = Object.keys(query).length === 0 ? false : query
-        let room, action, message, method = server.upgrade ? 'WEBSOCKET' : server.method
-        let host = server.headers.host
-        let locWeb = host.includes('127.0.0') ? `[LOC]` : `[WEB]`, urlParts = url.split('/')
-        let headers = server.headers
+        let rooms = wsClients.rooms; let url = decodeURIComponent(server.url); let { query } = _parse(url, true); let urlParams = Object.keys(query).length === 0 ? false : query
+        let room, action, message, method = server.upgrade ? 'WEBSOCKET' : server.method; let host = server.headers.host
+        let locWeb = host.includes('127.0.0') ? `[LOC]` : `[WEB]`, urlParts = url.split('/'); let headers = server.headers
 
         if (!urlParams) {
             room = false
         } else {
-            action = urlParams.act ? urlParams.act : false;
-            let { par1, } = globalWindow
+            action = urlParams.act ? urlParams.act : false; let { par1, } = globalWindow
             let actionPar = false; for (let [index, value] of [par1].entries()) { if (action && value.toLowerCase() === action.toLowerCase()) { actionPar = true; break } }
             room = action && actionPar ? 'x' : urlParams.roo ? urlParams.roo : false;
             if (method == 'GET' || method == 'POST') {
@@ -45,6 +39,21 @@ async function roomParams(inf) {
         } else if (method !== 'WEBSOCKET' && !rooms[`${hostRoom}`] && room !== 'x') {
             body = `ERRO | NÃO EXISTE '${room}'`
         }
+
+        // ECAMINHAR NOTIFICAÇÃO PARA O NFTY
+        if (method == 'POST' && message && message.includes('"notification"')) {
+            try {
+                let funOk = JSON.parse(message).fun[0]; if (funOk.securityPass == globalWindow.securityPass && !funOk.par.enc && funOk.name == 'notification' && funOk.par.ntfy) {
+                    (async () => {
+                        let infApi = {
+                            'method': 'POST', 'url': `https://ntfy.sh/${globalWindow.devMaster}?title=${encodeURIComponent(funOk.par.title)}`,
+                            'headers': { 'Content-Type': 'text/plain;charset=UTF-8', }, 'body': funOk.par.text,
+                        }; await api(infApi);
+                    })()
+                }
+            } catch (catchErr) { let retRegexE = await regexE({ 'inf': inf, 'e': catchErr, }); ret['msg'] = retRegexE.res; }
+        }
+
         // DEU ALGUM ERRO
         if (body) {
             if (method == 'WEBSOCKET') {
