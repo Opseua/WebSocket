@@ -15,6 +15,10 @@ async function html(inf) {
          <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>WebSocket</title> </head> <body> ####REPLACE####
         <script> document.addEventListener('keydown',function(event){if(event.key === 'Escape'){history.back()}}) </script> </body> </html>`;
 
+        // PERMITIR CORS
+        res.setHeader('Access-Control-Allow-Origin', '*'); res.setHeader('Access-Control-Allow-Methods', '*');
+        res.setHeader('Access-Control-Allow-Headers', '*'); res.setHeader('Access-Control-Allow-Credentials', 'true');
+
         if (headers.raw) {
             // ### [RAW]
             let bodyIsStringBufferObject = !(typeof body === 'object') ? 'STRING' : 'OBJECT'; // IDENTIFICAR SE É CONTEUDO DO BODY É: STRING/BUFFER/OBJETO

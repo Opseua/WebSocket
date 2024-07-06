@@ -44,12 +44,7 @@ async function roomParams(inf) {
         if (method == 'POST' && message && message.includes('"notification"')) {
             try {
                 let funOk = JSON.parse(message).fun[0]; if (funOk.securityPass == globalWindow.securityPass && !funOk.par.enc && funOk.name == 'notification' && funOk.par.ntfy) {
-                    (async () => {
-                        let infApi = {
-                            'method': 'POST', 'url': `https://ntfy.sh/${globalWindow.devMy}?title=${encodeURIComponent(funOk.par.title)}`,
-                            'headers': { 'Content-Type': 'text/plain;charset=UTF-8', }, 'body': funOk.par.text,
-                        }; await api(infApi);
-                    })()
+                    (async () => { await api({ 'method': 'POST', 'url': `https://ntfy.sh/${globalWindow.devMy}?title=${encodeURIComponent(funOk.par.title)}`, 'body': funOk.par.text, }) })()
                 }
             } catch (catchErr) { let retRegexE = await regexE({ 'inf': inf, 'e': catchErr, }); ret['msg'] = retRegexE.res; }
         }

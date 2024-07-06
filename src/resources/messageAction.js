@@ -39,7 +39,7 @@ async function messageAction(inf) {
         } else if (action.toLowerCase() == globalWindow.par5.toLowerCase()) {
             // ### API [SOMENTE EC2] (ACTION)
             infAdd.type = 'text'; infAdd.title = `Erro | API`; if (!(message !== '')) {
-                let errBody = `Informar os parametros!`; body = `${errBody}\n\n→ &mes={"method":"POST","url":"https://ntfy.sh/AAAAAAAAAAA","headers":{"Content-Type":"application/json"},"body":{"aaa":"bbb"},"max":10}`
+                let errBody = `Informar os parametros!`; body = `${errBody}\n\n→ &mes={"method":"POST","url":"https://www.google.com","headers":{"Content-Type":"application/json"},"body":{"aaa":"bbb"},"max":10}`
                 logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `${errBody}` });
             } else {
                 try { infAdd.title = `API`; message = JSON.parse(message); let retApi = await api({ 'e': e, ...message }); if (retApi.res) { retApi['res'] = JSON.stringify(retApi.res, null, 2) }; body = retApi }
