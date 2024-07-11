@@ -76,11 +76,8 @@ async function serverRun(inf) {
             // AGUARDAR INÍCIO [SERVIDOR]
             logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `RODANDO NA PORTA: ${globalWindow.portLoc}` }); await new Promise(resolve => { setTimeout(resolve, 1000) })
 
-            // CLIENT (NÃO POR COMO 'await'!!!)
-            client({ 'e': e })
-
-            // AGUARDAR INÍCIO [CLIENTE]
-            await new Promise(resolve => { setTimeout(resolve, 1000) })
+            // CLIENT (NÃO POR COMO 'await'!!!) | MANTER NO FINAL
+            client({ 'e': e });
 
             // ACTION LOOP [SOMENTE SE FOR NO AWS (08H<>23H)] PARA TODOS OS '*-NODEJS-*'
             setInterval(async () => {

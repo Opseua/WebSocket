@@ -10,7 +10,7 @@ async function roomParams(inf) {
     try {
         let { server, resWs, wsClients } = inf
         let rooms = wsClients.rooms; let url = decodeURIComponent(server.url); let { query } = _parse(url, true); let urlParams = Object.keys(query).length === 0 ? false : query
-        let room, action, message, method = server.upgrade ? 'WEBSOCKET' : server.method; let host = server.headers.host
+        let room, action, message, method = server.upgrade ? 'WEBSOCKET' : server.method; let host = server.headers.host.includes('192.168.') ? `127.0.0.1:${server.headers.host.split(':')[1]}` : server.headers.host
         let locWeb = host.includes('127.0.0') ? `[LOC]` : `[WEB]`, urlParts = url.split('/'); let headers = server.headers
 
         if (!urlParams) {
