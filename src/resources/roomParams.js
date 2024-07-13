@@ -16,8 +16,8 @@ async function roomParams(inf) {
         if (!urlParams) {
             room = false
         } else {
-            action = urlParams.act ? urlParams.act : false; let { par1, } = globalWindow
-            let actionPar = false; for (let [index, value] of [par1].entries()) { if (action && value.toLowerCase() === action.toLowerCase()) { actionPar = true; break } }
+            action = urlParams.act ? urlParams.act : false; let { par1, par11 } = globalWindow; let actionPar = false;
+            for (let [index, value] of [par1, par11].entries()) { if (action && value.toLowerCase() === action.toLowerCase()) { actionPar = true; break } }
             room = action && actionPar ? 'x' : urlParams.roo ? urlParams.roo : false;
             if (method == 'GET' || method == 'POST') {
                 if (method == 'GET') {
@@ -33,7 +33,7 @@ async function roomParams(inf) {
         // ERROS
         let body
         if (!room || (method == 'GET' && !action && !message) || (method == 'POST' && !message)) {
-            body = `ERRO | INFORMAR A SALA|ACTION/MENSAGEM\n\n→ ws|http://127.0.0.1:1234/?act=ACTION_AQUI&roo=SALA_AQUI&mes=MENSAGEM_AQUI`
+            body = `ERRO | INFORMAR A SALA|ACTION/MENSAGEM\n\n→ ws|http ://127.0.0.1:1234/?act=ACTION_AQUI&roo=SALA_AQUI&mes=MENSAGEM_AQUI`
         } else if (method !== 'WEBSOCKET' && !['GET', 'POST'].includes(method)) {
             body = `ERRO | METODOS ACEITOS 'GET' OU 'POST'`
         } else if (method !== 'WEBSOCKET' && !rooms[`${hostRoom}`] && room !== 'x') {

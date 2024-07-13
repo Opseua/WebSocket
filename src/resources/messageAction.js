@@ -70,7 +70,11 @@ async function messageAction(inf) {
                     'securityPass': globalWindow.securityPass, 'retInf': false, 'name': 'commandLine', 'par': { 'awaitFinish': true, 'command': `%nircmd% savescreenshot "${path}/${time2}_screenshot.png"` }
                 },]
             }
+        } else if (action.toLowerCase() == globalWindow.par11.toLowerCase()) {
+            // ### GET SECURITYPASS (SOMENTE NO 'LOC')
+            infAdd.type = 'text'; infAdd.title = `GET Security Pass`; body = { 'ret': true, 'res': resWs.locWeb == '[LOC]' ? globalWindow.securityPass : `ERRO | AÇÃO PERMITIDA APENAS NA '[LOC]'` }
         } else {
+            // ### OUTRO TIPO DE AÇÃO/MENSAGEM 
             try { infAdd.type = 'text'; infAdd.title = `Outro tipo de ação/mensagem`; message = JSON.parse(message); message = message.message ? message.message : message }
             catch (catchErr) {
                 infAdd.type = 'text'; infAdd.title = `Erro`; let errBody = `Erro ao fazer parse da mensagem!\n\n${message}`;
