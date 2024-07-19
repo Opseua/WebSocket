@@ -85,7 +85,7 @@ async function messageAction(inf) {
         // ENVIAR COMANDO(s)
         if (typeof message === 'object' || message !== '') {
             retMessageSend = await messageSend({ 'destination': destination, 'messageId': true, 'message': message, 'resWs': wsClientLoc, 'secondsAwait': 0, });
-            // logConsole({ 'e': e, 'ee': ee, 'write': false, 'msg': `RESPOSTA SENDO ESPERADA:\n${JSON.stringify(retMessageSend)}` });
+            // logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `RESPOSTA SENDO ESPERADA:\n${JSON.stringify(retMessageSend)}` });
             let bodyRes = infAdd.title.includes(`Outro tipo de ação/mensagem`) ? headers.raw ? retMessageSend.res : JSON.stringify(retMessageSend.res, null, 2) : retMessageSend.res
             body = !retMessageSend.res ? retMessageSend : { 'ret': retMessageSend.ret, 'msg': retMessageSend.msg, 'res': bodyRes }
         }
