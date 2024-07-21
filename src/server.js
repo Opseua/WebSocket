@@ -74,7 +74,7 @@ async function serverRun(inf) {
             }
             // -------------------------------------------------------------------------------------------------------------
             // AGUARDAR INÍCIO [SERVIDOR]
-            logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `RODANDO NA PORTA: ${globalWindow.portLoc}` }); await new Promise(resolve => { setTimeout(resolve, 1000) })
+            await new Promise(resolve => { setTimeout(resolve, 1000) }); logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `RODANDO NA PORTA: ${globalWindow.portLoc}` });
 
             // CLIENT (NÃO POR COMO 'await'!!!) | MANTER NO FINAL
             client({ 'e': e });
