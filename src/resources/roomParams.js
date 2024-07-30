@@ -33,7 +33,7 @@ async function roomParams(inf) {
         // ERROS
         let body
         if (!room || (method == 'GET' && !action && !message) || (method == 'POST' && !message)) {
-            body = `ERRO | INFORMAR A SALA|ACTION/MENSAGEM\n\n→ ws|http ://127.0.0.1:1234/?act=ACTION_AQUI&roo=SALA_AQUI&mes=MENSAGEM_AQUI`
+            body = `ERRO | INFORMAR A SALA|ACTION/MENSAGEM\n\n→ http://127.0.0.1:1234/?act=ACTION_AQUI&roo=SALA_AQUI&mes=MENSAGEM_AQUI`
         } else if (method !== 'WEBSOCKET' && !['GET', 'POST'].includes(method)) {
             body = `ERRO | METODOS ACEITOS 'GET' OU 'POST'`
         } else if (method !== 'WEBSOCKET' && !rooms[`${hostRoom}`] && room !== 'x') {
