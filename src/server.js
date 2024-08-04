@@ -88,8 +88,8 @@ async function serverRun(inf) {
             }, (globalWindow.secLoop * 1000));
         });
 
-        // APAGAR LOGS/TEMP ANTIGOS AO INICIAR O SERVER E A CADA 25 HORAS
-        await new Promise(resolve => { setTimeout(resolve, 30000) }); logsDelOld(); setInterval(() => { logsDelOld(); }, 90000 * 1000);
+        // APAGAR LOGS/TEMP ANTIGOS (30 SEGUNDOS APÓS INICIAR E A CADA 25 HORAS)
+        await new Promise(resolve => { setTimeout(resolve, 30 * 1000) }); logsDelOld(); setInterval(() => { logsDelOld(); }, 90000 * 1000);
 
         ret['ret'] = true;
         ret['msg'] = `SERVER: OK`;
