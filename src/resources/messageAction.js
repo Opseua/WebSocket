@@ -12,24 +12,18 @@ async function messageAction(inf) {
         if (action.toLowerCase() == globalWindow.par1.toLowerCase()) {
             // ### WSCLIENTS [→ EC2] (ACTION)
             let resClients = Object.keys(wsClients.rooms).filter(sala => sala.includes(host)).map(sala => ({ 'sala': sala, 'qtd': wsClients.rooms[sala].size }));
-            let dH = dateHour().res; resClients.unshift({ 'hour': `${dH.hou}:${dH.min}:${dH.sec}` }); infAdd.type = 'text'; infAdd.title = `Clients`
-            body = { 'ret': true, 'res': `${resWs.method} - OK | CLIENTS:\n\n${JSON.stringify(resClients, null, 2)}` }
+            let dH = dateHour().res; resClients.unshift({ 'hour': `${dH.hou}:${dH.min}:${dH.sec}` }); infAdd.type = 'obj'; infAdd.title = `Clients`; body = { 'ret': true, 'msg': 'CLIENTS: OK', 'res': resClients }
         } else if (action.toLowerCase() == globalWindow.par3.toLowerCase()) {
             // ### RESET [→ TODA A SALA] (ACTION)
-            infAdd.type = 'text'; infAdd.title = `Reset (AnyDesk)`; message = {
-                'fun': [{
-                    'securityPass': globalWindow.securityPass, 'retInf': false, 'name': 'commandLine', 'par': { 'awaitFinish': true, 'command': `taskkill /IM AnyDesk.exe /F` }
-                }, {
-                    'securityPass': globalWindow.securityPass, 'retInf': true, 'name': 'commandLine', 'par': { 'awaitFinish': true, 'command': `"C:/Program Files (x86)/AnyDesk/AnyDesk.exe" --restart-service` }
-                }, {
-                    'securityPass': globalWindow.securityPass, 'retInf': false, 'name': 'commandLine', 'par': { 'awaitFinish': false, 'command': `"C:/Program Files (x86)/AnyDesk/AnyDesk.exe"` }
-                }, {
-                    'securityPass': globalWindow.securityPass, 'retInf': false, 'name': 'commandLine', 'par': { 'awaitFinish': false, 'command': `"%fileChrome_Extension%\\src\\scripts\\scripts\\BAT\\z_AllRestart.lnk"` }
-                },]
+            infAdd.type = 'txt'; infAdd.title = `Reset (AnyDesk + Server's)`; message = {
+                'fun': [{ 'securityPass': globalWindow.securityPass, 'retInf': false, 'name': 'commandLine', 'par': { 'awaitFinish': true, 'command': `taskkill /IM AnyDesk.exe /F` } },
+                { 'securityPass': globalWindow.securityPass, 'retInf': true, 'name': 'commandLine', 'par': { 'awaitFinish': true, 'command': "\"C:\\Program Files (x86)\\AnyDesk\\AnyDesk.exe\" --restart-service" } },
+                { 'securityPass': globalWindow.securityPass, 'retInf': false, 'name': 'commandLine', 'par': { 'awaitFinish': false, 'command': "\"C:\\Program Files (x86)\\AnyDesk\\AnyDesk.exe\"" } },
+                { 'securityPass': globalWindow.securityPass, 'retInf': false, 'name': 'commandLine', 'par': { 'awaitFinish': false, 'command': "\"%fileChrome_Extension%\\src\\scripts\\BAT\\z_AllRestart.lnk\"" } },]
             }
         } else if (action.toLowerCase() == globalWindow.par4.toLowerCase()) {
             // ### CHAT [SOMENTE EC2] (ACTION)
-            infAdd.type = 'text'; infAdd.title = `Erro | Chat`; if (!(message !== '')) {
+            infAdd.type = 'txt'; infAdd.title = `Erro | Chat`; if (!(message !== '')) {
                 let errBody = `Informar os parametros!`; body = `${errBody}\n\n→ &mes={"provider":"globalgpt","input":"Qual a idade de Marte?"}\n\n→ &mes={"provider":"open.ai","input":"Qual a idade de Marte?"}`
                 logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `${errBody}` });
             } else {
@@ -38,7 +32,7 @@ async function messageAction(inf) {
             }; message = '';
         } else if (action.toLowerCase() == globalWindow.par5.toLowerCase()) {
             // ### API [SOMENTE EC2] (ACTION)
-            infAdd.type = 'text'; infAdd.title = `Erro | API`; if (!(message !== '')) {
+            infAdd.type = 'txt'; infAdd.title = `Erro | API`; if (!(message !== '')) {
                 let errBody = `Informar os parametros!`; body = `${errBody}\n\n→ &mes={"method":"POST","url":"https://www.google.com","headers":{"Content-Type":"application/json"},"body":{"aaa":"bbb"},"max":10}`
                 logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `${errBody}` });
             } else {
@@ -48,22 +42,18 @@ async function messageAction(inf) {
         } else if (action.toLowerCase() == globalWindow.par8.toLowerCase()) {
             // ### WEBFILE [→ TODA A SALA] (ACTION)
             let path = message.length < 3 || (message.includes('!le') && message.length < 10) || message.includes('a/b/c/d') ? `!letter!:/` : message;
-            infAdd.type = 'array'; infAdd.title = `WebFiles`; infAdd['path'] = path; message = {
+            infAdd.type = path.match(/\.(jpg|jpeg|png|ico)$/) ? 'img' : 'arr'; infAdd.title = `WebFiles`; infAdd['path'] = path; message = {
                 'fun': [{ 'securityPass': globalWindow.securityPass, 'retInf': true, 'name': 'file', 'par': { 'action': 'isFolder', 'max': 1000, 'functionLocal': false, 'path': path, 'listRead': true } }]
             }
         } else if (action.toLowerCase() == globalWindow.par9.toLowerCase()) {
             // ### SCREENSHOT [→ TODA A SALA] path.match(/\.(jpg|jpeg|png|ico)$/) (ACTION)
-            infAdd.type = 'image'; infAdd.title = `screenshot`; let path = `!letter!:/ARQUIVOS/PROJETOS/WebSocket/log/screenshot.png`; message = {
-                'fun': [{
-                    'securityPass': globalWindow.securityPass, 'retInf': false, 'name': 'commandLine', 'par': { 'awaitFinish': true, 'command': `%nircmd% savescreenshot "${path}"` }
-                }, {
-                    'securityPass': globalWindow.securityPass, 'retInf': true, 'name': 'file', 'par': { 'action': 'read', 'functionLocal': false, 'path': `${path}` }
-                },]
+            infAdd.type = 'img'; infAdd.title = `screenshot`; let path = `!letter!:/ARQUIVOS/PROJETOS/WebSocket/log/screenshot.png`; message = {
+                'fun': [{ 'securityPass': globalWindow.securityPass, 'retInf': false, 'name': 'commandLine', 'par': { 'awaitFinish': true, 'command': `%nircmd% savescreenshot "${path}"` } },
+                { 'securityPass': globalWindow.securityPass, 'retInf': true, 'name': 'file', 'par': { 'action': 'read', 'functionLocal': false, 'path': `${path}` } },]
             };
         } else if (action.toLowerCase() == globalWindow.par10.toLowerCase()) {
             // ### LOOP [→ TODA A SALA '...-NODEJS-...'] (ACTION)
-            infAdd.type = 'text'; infAdd.title = `Loop`;
-            let path = `!letter!:/ARQUIVOS/PROJETOS/WebSocket/log/Registros/${time1}/${time.hou}.00-${time.hou}.59`, time2 = `${time.hou}.${time.min}.${time.sec}.${time.mil}`; message = {
+            infAdd.type = 'txt'; infAdd.title = `Loop`; let path = `!letter!:/ARQUIVOS/PROJETOS/WebSocket/log/Registros/${time1}/${time.hou}.00-${time.hou}.59`, time2 = `${time.hou}.${time.min}.${time.sec}.${time.mil}`; message = {
                 'fun': [{ // CRIAR PADRÃO DE PASTA
                     'securityPass': globalWindow.securityPass, 'retInf': false, 'name': 'file', 'par': { 'action': 'write', 'functionLocal': false, 'path': `${path}/#_Z_#.txt`, 'rewrite': true, 'text': `${time2}\n` }
                 }, { // SCREENSHOT (MANTER awaitFinish 'true' DO CONTRÁRIO O NIRCMD ABRE O POPUP)
@@ -72,28 +62,23 @@ async function messageAction(inf) {
             }
         } else if (action.toLowerCase() == globalWindow.par11.toLowerCase()) {
             // ### GET SECURITYPASS (SOMENTE NO 'LOC')
-            infAdd.type = 'text'; infAdd.title = `GET Security Pass`; body = { 'ret': true, 'res': resWs.locWeb == '[LOC]' ? globalWindow.securityPass : `ERRO | AÇÃO PERMITIDA APENAS NA '[LOC]'` }
+            infAdd.type = 'txt'; infAdd.title = `GET Security Pass`; body = { 'ret': true, 'res': resWs.locWeb == '[LOC]' ? globalWindow.securityPass : `ERRO | AÇÃO PERMITIDA APENAS NA '[LOC]'` }
         } else {
             // ### OUTRO TIPO DE AÇÃO/MENSAGEM 
-            try { infAdd.type = 'text'; infAdd.title = `Outro tipo de ação/mensagem`; message = JSON.parse(message); message = message.message ? message.message : message }
-            catch (catchErr) {
-                infAdd.type = 'text'; infAdd.title = `Erro`; let errBody = `Erro ao fazer parse da mensagem!\n\n${message}`;
-                logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `${errBody}` }); message = ''; esLintIgnore = catchErr;
+            try { infAdd.type = 'obj'; infAdd.title = `Outro tipo de ação/mensagem`; message = JSON.parse(message); message = message.message ? message.message : message } catch (catchErr) {
+                infAdd.type = 'obj'; infAdd.title = `Erro`; let errBody = `Erro ao fazer parse da mensagem!\n\n${message}`;
+                logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `${errBody}` }); message = ''; esLintIgnore = catchErr; body = { 'ret': false, 'msg': errBody }
             }
         }
 
         // ENVIAR COMANDO(s)
         if (typeof message === 'object' || message !== '') {
-            retMessageSend = await messageSend({ 'destination': destination, 'messageId': true, 'message': message, 'resWs': wsClientLoc, 'secondsAwait': 0, });
-            // logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `RESPOSTA SENDO ESPERADA:\n${JSON.stringify(retMessageSend)}` });
-            let bodyRes = infAdd.title.includes(`Outro tipo de ação/mensagem`) ? headers.raw ? retMessageSend.res : JSON.stringify(retMessageSend.res, null, 2) : retMessageSend.res
-            body = !retMessageSend.res ? retMessageSend : { 'ret': retMessageSend.ret, 'msg': retMessageSend.msg, 'res': bodyRes }
+            retMessageSend = await messageSend({ 'destination': destination, 'messageId': true, 'message': message, 'resWs': wsClientLoc, 'secondsAwait': 0, }); body = retMessageSend
+            // logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `RESPOSTA SENDO ESPERADA:\n${JSON.stringify(body)}` });
         }
 
         // ENVIAR RETORNO HTTP (SE NECESSÁRIO)
         if (resWs) {
-            infAdd.type = body?.res ? infAdd.type : 'text'; let bodyBrowser = typeof body === 'object' ? JSON.stringify(body, null, 2) : body
-            body = body.ret && body.res ? body.res : body.ret ? headers.raw ? 'OK' : `AÇÃO EXECUTADA COM SUCESSO\n\n${bodyBrowser}` : headers.raw ? body : `ERRO AO EXECUTAR AÇÃO!\n\n${bodyBrowser}`
             await html({ 'e': e, 'server': resWs, 'body': body, 'room': room, 'infAdd': infAdd, 'method': resWs.method, 'headers': headers, })
         }
 

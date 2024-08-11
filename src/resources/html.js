@@ -16,68 +16,83 @@ async function html(inf) {
         <script> document.addEventListener('keydown',function(event){if(event.key === 'Escape'){history.back()}}) </script> </body> </html>`;
 
         // PERMITIR CORS
-        res.setHeader('Access-Control-Allow-Origin', '*'); res.setHeader('Access-Control-Allow-Methods', '*');
-        res.setHeader('Access-Control-Allow-Headers', '*'); res.setHeader('Access-Control-Allow-Credentials', 'true');
+        res.setHeader('Access-Control-Allow-Origin', '*'); res.setHeader('Access-Control-Allow-Methods', '*'); res.setHeader('Access-Control-Allow-Headers', '*'); res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+        function resBody(inf) {
+            let body = inf.body; if (inf.type == 'txt') { res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' }) } else if (['obj', 'arr'].includes(inf.type)) {
+                res.writeHead(200, { 'Content-Type': 'application/json' }); body = JSON.stringify(body, null, 2)
+            } else if (['img',].includes(inf.type)) { res.writeHead(200, { 'Content-Type': 'image/jpeg' }); body = Buffer.from(body) } else if (['base64',].includes(inf.type)) {
+                body = bodyHtml.replace('####REPLACE####', `<img src="data:image/png;base64,${Buffer.from({ type: 'Buffer', data: body }).toString('base64')}" alt="Imagem">`).replace('WebSocket', `${inf.pathFile}`);
+            }; res.end(body)
+        }
+
+        // console.log(headers.raw ? 'RAW' : 'RENDERIZAR')
 
         if (headers.raw) {
             // ### [RAW]
-            let bodyIsStringBufferObject = !(typeof body === 'object') ? 'STRING' : 'OBJECT'; // IDENTIFICAR SE É CONTEUDO DO BODY É: STRING/BUFFER/OBJETO
-            if (bodyIsStringBufferObject == 'OBJECT') { try { Buffer.isBuffer(Buffer.from(body)); bodyIsStringBufferObject = 'BUFFER' } catch (catchErr) { bodyIsStringBufferObject = 'OBJECT'; esLintIgnore = catchErr; }; }
-            if (bodyIsStringBufferObject == 'STRING') {
-                // [STRING] (TEXTO)
-                res.writeHead(200, { 'Content-Type': 'text/html' }); res.end(body)
-            } else if (bodyIsStringBufferObject == 'OBJECT') {
-                // [OBJETO] (VARIÁVEL)
-                res.writeHead(200, { 'Content-Type': 'text/html' }); res.end(JSON.stringify(body))
+            if (['obj', 'arr'].includes(infAdd.type)) {
+                // (OBJ/ARR)
+                let loc = infAdd.path; let type = (loc && loc.includes('/src/') && loc.includes('.json')) ? 'txt' : infAdd.type; resBody({ 'type': type, 'body': type == 'txt' ? 'ARQUIVO PROTEGIDO!' : body }); // console.log('OBJ/ARR');
+            } else if (body.ret === false) {
+                // [FALSE]
+                resBody({ 'type': 'obj', 'body': body }); // console.log('FALSE');
             } else {
-                // [BUFFER] (IMAGEM)
-                res.writeHead(200, { 'Content-Type': 'image/jpeg' }); res.end(Buffer.from(body));
-            }
-        } else if (infAdd.type == 'text') {
-            // ### TEXT
-            res.writeHead(200, { 'Content-Type': 'text/html' }); res.end(bodyHtml.replace('####REPLACE####', `<pre>${body}</pre>`).replace('WebSocket', `${infAdd.title}`));
-        } else if (infAdd.type == 'image') {
-            // ### IMAGE
-            let imagemBase64 = Buffer.from({ type: 'Buffer', data: body.data }).toString('base64');
-            res.end(bodyHtml.replace('####REPLACE####', `<img src="data:image/png;base64,${imagemBase64}" alt="Imagem">`).replace('WebSocket', `${infAdd.title}`));
-        } else if (infAdd.type == 'array') {
-            // ### ARRAY
-            let retFile = body; let path = infAdd.path; let pathFile; if (path.length > 3) { pathFile = path.lastIndexOf("/"); pathFile = path.substring(pathFile + 1); } else { pathFile = path.replace('/', '') }
-            if (retFile instanceof Array) {
-                let tableHtml = '', link = '', tipoEstilo = ''; res.writeHead(200, { 'Content-Type': 'text/html' });
-                try {
-                    let qtdFolder = 0, qtdFile = 0; for (let item of retFile) { if (item.isFolder) { qtdFolder++ } else { qtdFile++ } }
-                    tableHtml += '<table border="1"><tr>'; tableHtml += `<th style="width: 95px; text-align: center;">TAMANHO</th>`; tableHtml += `<th style="width: 150px; text-align: center;">MODIFICAÇÃO</th>`;
-                    tableHtml += `<th style="width: 260px; text-align: center;">MD5</th>`; tableHtml += `<th style="width: 80px; text-align: center;">TIPO</th>`;
-                    tableHtml += `<th style="width: 65%; text-align: center;">PATH [pastas: ${qtdFolder} | arquivos: ${qtdFile} | total: ${retFile.length}]</th>`; tableHtml += '</tr>'; for (let item of retFile) {
-                        link = `<a href="/?act=${globalWindow.par8}&roo=${room}&mes=${encodeURIComponent(encodeURIComponent(item.path))}">${item.path.replace(`/${item.name}`, '')}</a>`;
-                        tipoEstilo = item.isFolder ? 'background-color: #1bcf45; color: #ffffff;' : 'background-color: #db3434; color: #ffffff;'; let dataFormatada = item.edit ? setData(item.edit) : '';
-                        tableHtml += `<tr>`; tableHtml += `<td style="text-align: center;">${item.size || ''}</td>`; tableHtml += `<td style="text-align: center;">${dataFormatada}</td>`;
-                        tableHtml += `<td style="text-align: center;">${item.md5 || ''}</td>`; tableHtml += `<td style="text-align: center; ${tipoEstilo}">${item.isFolder ? 'PASTA' : 'ARQUIVO'}</td>`;
-                        tableHtml += `<td style="text-align: left;">${link}&nbsp;&nbsp;&nbsp;${item.name || ''}&nbsp;</td>`; tableHtml += `</tr>`;
-                    }; tableHtml += '</table>';
-                    res.end(bodyHtml.replace('####REPLACE####', tableHtml).replace('WebSocket', `${pathFile}`));
-                } catch (catchErr) {
-                    res.end(bodyHtml.replace('####REPLACE####', `<pre>Erro ao listar arquivos: ${catchErr.message}</pre>`));
-                }
-            } else {
-                try {
-                    if (path.includes('/src/') && (path.includes('.json'))) {
-                        res.writeHead(200, { 'Content-Type': 'text/html' }); res.end(bodyHtml.replace('####REPLACE####', `<pre>ARQUIVO PROTEGIDO!</pre>`));
-                    } else {
-                        let resultado = retFile; if (path.match(/\.(jpg|jpeg|png|ico)$/)) {
-                            let imagemBase64 = Buffer.from({ type: 'Buffer', data: resultado.data }).toString('base64');
-                            res.end(bodyHtml.replace('####REPLACE####', `<img src="data:image/png;base64,${imagemBase64}" alt="Imagem">`).replace('WebSocket', `${pathFile}`));
-                        } else {
-                            res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' }); res.end(bodyHtml.replace('####REPLACE####', `<pre>${resultado}</pre>`).replace('WebSocket', `${pathFile}`));
-                        }
-                    }
-                } catch (catchErr) {
-                    res.writeHead(200, { 'Content-Type': 'text/html' }); res.end(bodyHtml.replace('####REPLACE####', `<pre>Erro ao exibir arquivo: ${error.message}</pre>`)); esLintIgnore = catchErr;
+                if (!body.res) {
+                    // [TRUE]
+                    resBody({ 'type': 'txt', 'body': 'Ação executada com sucesso!' }); // console.log('OK');
+                } else if (['txt'].includes(infAdd.type)) {
+                    // (TXT)
+                    resBody({ 'type': 'txt', 'body': body.res }); // console.log('TXT');
+                } else if (['img'].includes(infAdd.type)) {
+                    // (IMG)
+                    resBody({ 'type': 'img', 'body': body.res }); // console.log('IMG');
                 }
             }
         } else {
-            res.writeHead(200, { 'Content-Type': 'text/html' }); res.end(bodyHtml.replace('####REPLACE####', `<pre>${body}</pre>`).replace('WebSocket', `Tipo de conteúdo não identificado`));
+            // ### [RENDERIZAR]
+            if (body.ret === false) {
+                // [FALSE]
+                resBody({ 'type': 'txt', 'body': bodyHtml.replace('####REPLACE####', `<pre>Erro ao executar ação!\n\n${JSON.stringify(body, null, 2)}</pre>`).replace('WebSocket', `${infAdd.title}`) }); // console.log('FALSE');
+            } else if (['obj', 'txt',].includes(infAdd.type)) {
+                // (OBJ)
+                resBody({ 'type': 'txt', 'body': bodyHtml.replace('####REPLACE####', `<pre>Ação executada com sucesso!\n\n${JSON.stringify(body, null, 2)}</pre>`).replace('WebSocket', `${infAdd.title}`) }); // console.log('OBJ');
+            } else if (['txt'].includes(infAdd.type)) {
+                // (TXT)
+                resBody({ 'type': 'txt', 'body': bodyHtml.replace('####REPLACE####', `<pre>${body.res}</pre>`).replace('WebSocket', `${infAdd.title}`) }); // console.log('TXT');
+            } else if (['arr', 'img'].includes(infAdd.type)) {
+                // (ARR)
+                let retFile = body.res; let path = infAdd.path; let pathFile; if (path) { if (path.length > 3) { pathFile = path.lastIndexOf("/"); pathFile = path.substring(pathFile + 1); } else { pathFile = path.replace('/', '') } }
+                if (retFile instanceof Array) {
+                    let tableHtml = '', link = '', tipoEstilo = ''; try {
+                        let qtdFolder = 0, qtdFile = 0; for (let item of retFile) { if (item.isFolder) { qtdFolder++ } else { qtdFile++ } }
+                        tableHtml += '<table border="1"><tr>'; tableHtml += `<th style="width: 95px; text-align: center;">TAMANHO</th>`; tableHtml += `<th style="width: 150px; text-align: center;">MODIFICAÇÃO</th>`;
+                        tableHtml += `<th style="width: 260px; text-align: center;">MD5</th>`; tableHtml += `<th style="width: 80px; text-align: center;">TIPO</th>`;
+                        tableHtml += `<th style="width: 65%; text-align: center;">PATH [pastas: ${qtdFolder} | arquivos: ${qtdFile} | total: ${retFile.length}]</th>`; tableHtml += '</tr>'; for (let item of retFile) {
+                            link = `<a href="/?act=${globalWindow.par8}&roo=${room}&mes=${encodeURIComponent(encodeURIComponent(item.path))}">${item.path.replace(`/${item.name}`, '')}</a>`;
+                            tipoEstilo = item.isFolder ? 'background-color: #1bcf45; color: #ffffff;' : 'background-color: #db3434; color: #ffffff;'; let dataFormatada = item.edit ? setData(item.edit) : '';
+                            tableHtml += `<tr>`; tableHtml += `<td style="text-align: center;">${item.size || ''}</td>`; tableHtml += `<td style="text-align: center;">${dataFormatada}</td>`;
+                            tableHtml += `<td style="text-align: center;">${item.md5 || ''}</td>`; tableHtml += `<td style="text-align: center; ${tipoEstilo}">${item.isFolder ? 'PASTA' : 'ARQUIVO'}</td>`;
+                            tableHtml += `<td style="text-align: left;">${link}&nbsp;&nbsp;&nbsp;${item.name || ''}&nbsp;</td>`; tableHtml += `</tr>`;
+                        }; tableHtml += '</table>'; resBody({ 'type': 'txt', 'body': bodyHtml.replace('####REPLACE####', tableHtml).replace('WebSocket', `${pathFile}`) });
+                    } catch (catchErr) {
+                        resBody({ 'type': 'txt', 'body': bodyHtml.replace('####REPLACE####', `<pre>Erro ao listar arquivos: ${catchErr.message}</pre>`) });
+                    }; // console.log('ARR');
+                } else {
+                    try {
+                        if (path && path.includes('/src/') && path.includes('.json')) {
+                            resBody({ 'type': 'txt', 'body': bodyHtml.replace('####REPLACE####', `<pre>ARQUIVO PROTEGIDO!</pre>`) });
+                        } else {
+                            let resultado = retFile; if (infAdd.type == 'img' || path.match(/\.(jpg|jpeg|png|ico)$/)) {
+                                resBody({ 'type': 'base64', 'body': resultado.data, 'pathFile': infAdd.title }); // console.log('IMG');
+                            } else {
+                                resBody({ 'type': 'txt', 'body': bodyHtml.replace('####REPLACE####', `<pre>${resultado}</pre>`).replace('WebSocket', `${pathFile}`) }); // console.log('TXT');
+                            }
+                        }
+                    } catch (catchErr) {
+                        resBody({ 'type': 'txt', 'body': bodyHtml.replace('####REPLACE####', `<pre>Erro ao exibir arquivo: ${catchErr.message}</pre>`) }); esLintIgnore = catchErr; // console.log('TXT');
+                    }
+                }
+            }
         }
 
         ret['ret'] = true;

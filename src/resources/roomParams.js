@@ -56,7 +56,7 @@ async function roomParams(inf) {
                 resWs.send(body); resWs.terminate()
             } else {
                 // ### HTTP
-                html({ 'e': e, 'server': resWs, 'body': body, 'room': room, 'infAdd': { 'type': 'text', 'title': 'Server' }, 'method': method, 'headers': headers, })
+                html({ 'e': e, 'server': resWs, 'body': { 'ret': false, 'msg': body }, 'room': room, 'infAdd': { 'type': 'obj', 'title': 'Server' }, 'method': method, 'headers': headers, })
             }
         } else {
             ret['ret'] = true;
