@@ -16,8 +16,8 @@ async function roomParams(inf) {
         if (!urlParams) {
             room = false
         } else {
-            action = urlParams.act ? urlParams.act : false; let { par1, par11 } = globalWindow; let actionPar = false;
-            for (let [index, value] of [par1, par11].entries()) { if (action && value.toLowerCase() === action.toLowerCase()) { actionPar = true; break } }
+            action = urlParams.act ? urlParams.act : false; let { par1, par11, par12 } = globalWindow; let actionPar = false;
+            for (let [index, value] of [par1, par11, par12].entries()) { if (action && value.toLowerCase() === action.toLowerCase()) { actionPar = true; break } }
             room = action && actionPar ? 'x' : urlParams.roo ? urlParams.roo : false;
             if (method == 'GET' || method == 'POST') {
                 if (method == 'GET') {
