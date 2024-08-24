@@ -63,6 +63,9 @@ async function messageAction(inf) {
         } else if (action.toLowerCase() == globalWindow.par11.toLowerCase()) {
             // ### GET SECURITYPASS (SOMENTE NO 'LOC')
             infAdd.type = 'txt'; infAdd.title = `GET Security Pass`; body = { 'ret': true, 'res': resWs.locWeb == '[LOC]' ? globalWindow.securityPass : `ERRO | AÇÃO PERMITIDA APENAS NA '[LOC]'` }
+        } else if (action.toLowerCase() == globalWindow.par12.toLowerCase()) {
+            // ### PAGE
+            infAdd.type = 'txt'; infAdd.title = `Page`; body = { 'ret': true, 'res': `page${message}.html` }; message = ''
         } else {
             // ### OUTRO TIPO DE AÇÃO/MENSAGEM 
             try { infAdd.type = 'obj'; infAdd.title = `Outro tipo de ação/mensagem`; message = JSON.parse(message); message = message.message ? message.message : message } catch (catchErr) {
