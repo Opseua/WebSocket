@@ -24,7 +24,7 @@ async function messageAction(inf) {
         } else if (action.toLowerCase() == globalWindow.par4.toLowerCase()) {
             // ### CHAT [SOMENTE EC2] (ACTION)
             infAdd.type = 'txt'; infAdd.title = `Erro | Chat`; if (!(message !== '')) {
-                let errBody = `Informar os parametros!`; body = `${errBody}\n\n→ &mes={"provider":"globalgpt","input":"Qual a idade de Marte?"}\n\n→ &mes={"provider":"open.ai","input":"Qual a idade de Marte?"}`
+                let errBody = `Informar os parametros!`; body = `${errBody}\n\n→ &mes={"provider":"globalgpt","input":"Qual a idade de Marte?"}\n\n→ &mes={"provider":"openAi","input":"Qual a idade de Marte?"}`
                 logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `${errBody}` });
             } else {
                 try { infAdd.title = `Chat`; message = JSON.parse(message); let retChat = await chat({ 'e': e, ...message }); body = retChat }
