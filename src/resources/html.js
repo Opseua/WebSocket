@@ -68,7 +68,7 @@ async function html(inf) {
                 }
             } else if (['arr', 'img'].includes(infAdd.type)) { // (ARR)
                 let retFile = body.res; let path = infAdd.path; let pathFile; if (path) { if (path.length > 3) { pathFile = path.lastIndexOf("/"); pathFile = path.substring(pathFile + 1) } else { pathFile = path.replace('/', '') } }
-                if (retFile instanceof Array) {
+                if (Array.isArray(retFile)) {
                     let tableHtml = '', link = '', tipoEstilo = ''; try {
                         let qtdFolder = 0, qtdFile = 0; for (let item of retFile) { if (item.isFolder) { qtdFolder++ } else { qtdFile++ } }
                         tableHtml += '<table border="1"><tr>'; tableHtml += `<th style="width: 95px; text-align: center;">TAMANHO</th>`; tableHtml += `<th style="width: 150px; text-align: center;">MODIFICAÇÃO</th>`;
