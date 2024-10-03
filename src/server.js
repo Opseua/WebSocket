@@ -6,6 +6,10 @@ async function serverRun(inf) {
     try {
         logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `**************** SERVER **************** [${startupFun(startup, new Date())}]` })
 
+        // IMPORTAR BIBLIOTECA [NODEJS]
+        if (typeof _WebSocket === 'undefined') { await functionImportLibrary({ 'lib': '_WebSocket' }); }; if (typeof _WebSocketServer === 'undefined') { await functionImportLibrary({ 'lib': '_WebSocketServer' }); };
+        if (typeof _http === 'undefined') { await functionImportLibrary({ 'lib': '_http' }); };
+
         // SERVIDOR HTTP
         let wsClients = { 'rooms': {} }, wsClientLoc; let server = _http.createServer(async (req, res) => {
             if (req.url.includes('favicon.ico')) { let ico = await _fs.promises.readFile(`${letter}:/ARQUIVOS/WINDOWS/BAT/z_ICONES/websocket.ico`); res.writeHead(200, { 'Content-Type': 'image/x-icon' }).end(ico); return; }
