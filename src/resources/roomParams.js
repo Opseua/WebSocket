@@ -43,7 +43,7 @@ async function roomParams(inf) {
             body = `ERRO | NÃO EXISTE '${room}'`
         }
 
-        // ECAMINHAR NOTIFICAÇÃO PARA O NFTY
+        // ENCAMINHAR NOTIFICAÇÃO PARA O NFTY
         if (method == 'POST' && message && message.includes('"notification"')) {
             try {
                 let funOk = JSON.parse(message).fun[0]; if (funOk.securityPass == globalWindow.securityPass && !funOk.par.enc && funOk.name == 'notification' && funOk.par.ntfy) {
