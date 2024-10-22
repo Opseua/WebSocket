@@ -7,8 +7,8 @@ async function serverRun(inf) {
         logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `**************** SERVER **************** [${startupFun(startup, new Date())}]` })
 
         // IMPORTAR BIBLIOTECA [NODEJS]
-        if (typeof _WebSocket === 'undefined') { await functionImportLibrary({ 'lib': '_WebSocket' }); }; if (typeof _WebSocketServer === 'undefined') { await functionImportLibrary({ 'lib': '_WebSocketServer' }); };
-        if (typeof _http === 'undefined') { await functionImportLibrary({ 'lib': '_http' }); };
+        if (typeof _WebSocket === 'undefined') { await funLibrary({ 'lib': '_WebSocket' }); }; if (typeof _WebSocketServer === 'undefined') { await funLibrary({ 'lib': '_WebSocketServer' }); };
+        if (typeof _http === 'undefined') { await funLibrary({ 'lib': '_http' }); };
 
         // SERVIDOR HTTP
         let wsClients = { 'rooms': {} }, wsClientLoc; let server = _http.createServer(async (req, res) => {

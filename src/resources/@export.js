@@ -15,16 +15,19 @@ await getPath({ 'e': new Error(), 'devChildren': devChildren })
 // console.log('devSend:', globalWindow.devSend); console.log('devGet:', globalWindow.devGet); console.log('conf:', globalWindow.conf);
 // console.log('root:', globalWindow.root); console.log('functions:', globalWindow.functions); console.log('project:', globalWindow.project);
 
+// PEGAR O NOME DO ARQUIVO(SEM EXTENSÃO)
+function funFile(inf) { return inf.match(/([^\\/]+)(?=\.[^\\.]+$)/)[0]; }
+
 // IMPORTAR FUNÇÕES DINAMICAMENTE QUANDO NECESSÁRIO 
-let qtd = 0; async function functionImport(infOk) { let { name, path, inf } = infOk; qtd++; if (qtd > 30) { console.log('IMP...', name) }; await import(`${path}`); return await gloWin[name](inf) }
+let qtd1 = 0; async function funImport(infOk) { let { path, inf } = infOk; qtd1++; let name = funFile(path); if (qtd1 > 30) { console.log('IMPORTANDO...', name) }; await import(`${path}`); return await gloWin[name](inf); }
 
 // FUNÇÃO GENÉRICA (QUANDO O ENGINE ESTIVER ERRADO) | ENCAMINHAR PARA DEVICE
-async function functionGeneric(infOk) { let { name, inf, retInf } = infOk; let retDevAndFun = await devFun({ 'e': import.meta.url, 'enc': true, 'data': { 'name': name, 'par': inf, 'retInf': retInf, } }); return retDevAndFun }
+async function funGeneric(infOk) { let { path, inf } = infOk; let name = funFile(path); let retDevAndFun = await devFun({ 'e': import.meta.url, 'enc': true, 'data': { 'name': name, 'par': inf, } }); return retDevAndFun; }
 
 // FUNÇÕES DESSE PROJETO
-gloWin['html'] = (inf) => { let fun = (!eng) ? functionImport : functionGeneric; return fun({ 'name': 'html', 'path': './html.js', 'inf': inf }); };
-gloWin['messageAction'] = (inf) => { let fun = (!eng) ? functionImport : functionGeneric; return fun({ 'name': 'messageAction', 'path': './messageAction.js', 'inf': inf }); };
-gloWin['roomParams'] = (inf) => { let fun = (!eng) ? functionImport : functionGeneric; return fun({ 'name': 'roomParams', 'path': './roomParams.js', 'inf': inf }); };
+gloWin['html'] = (inf) => { let fun = (!eng) ? funImport : funGeneric; return fun({ 'path': './html.js', 'inf': inf }); };
+gloWin['messageAction'] = (inf) => { let fun = (!eng) ? funImport : funGeneric; return fun({ 'path': './messageAction.js', 'inf': inf }); };
+gloWin['roomParams'] = (inf) => { let fun = (!eng) ? funImport : funGeneric; return fun({ 'path': './roomParams.js', 'inf': inf }); };
 
 
 

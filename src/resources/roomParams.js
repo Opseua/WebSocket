@@ -9,7 +9,7 @@ async function roomParams(inf) {
     let ret = { 'ret': false }; e = inf && inf.e ? inf.e : e;
     try {
         // IMPORTAR BIBLIOTECA [NODEJS]
-        if (typeof _parse === 'undefined') { await functionImportLibrary({ 'lib': '_parse' }); };
+        if (typeof _parse === 'undefined') { await funLibrary({ 'lib': '_parse' }); };
 
         let { server, resWs, wsClients } = inf
         let rooms = wsClients.rooms; let url = decodeURIComponent(server.url); let { query } = _parse(url, true); let urlParams = Object.keys(query).length === 0 ? false : query
