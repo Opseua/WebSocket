@@ -1,18 +1,18 @@
 // let infHtml, retHtml, infAdd = { 'title': 'Erro', 'type': '' }
-// retHtml = await html({ 'e': e, 'server': resWs, 'body': body, 'room': room, 'infAdd': infAdd }); console.log(retHtml)
+// retHtml = await html({ e, 'server': resWs, 'body': body, 'room': room, 'infAdd': infAdd }); console.log(retHtml)
 
 let e = import.meta.url, ee = e;
-async function html(inf) {
+async function html(inf = {}) {
     let ret = { 'ret': false }; e = inf && inf.e ? inf.e : e;
     try {
-        let res = inf.server; let { room, infAdd, body, headers } = inf
+        let { room, infAdd, body, headers, server: res, } = inf;
 
-        function setData(inf) { return inf.substring(8, 10) + "/" + inf.substring(5, 7) + "/" + inf.substring(0, 4) + " " + inf.substring(11, 13) + ":" + inf.substring(14, 16) + ":" + inf.substring(17, 19); }
+        function setData(txt) { return txt.substring(8, 10) + "/" + txt.substring(5, 7) + "/" + txt.substring(0, 4) + " " + txt.substring(11, 13) + ":" + txt.substring(14, 16) + ":" + txt.substring(17, 19); }
 
         // DEFINIR PÁGINAS DINÂMICAS
         if (!globalWindow.pages) {
-            let retFile; retFile = await file({ 'e': e, 'action': 'list', 'functionLocal': false, 'path': './src/pages', 'max': 10 }); if (!retFile.ret) { retFile['res'] = [] }; let retFileNew = []
-            for (let [index, value] of retFile.res.entries()) { if (value.path.includes('.html')) { retFile = await file({ 'e': e, 'action': 'read', 'path': value.path }); if (retFile.ret) { retFileNew.push(retFile.res) } } };
+            let retFile; retFile = await file({ e, 'action': 'list', 'functionLocal': false, 'path': './src/pages', 'max': 10 }); if (!retFile.ret) { retFile['res'] = [] }; let retFileNew = []
+            for (let [index, value] of retFile.res.entries()) { if (value.path.includes('.html')) { retFile = await file({ e, 'action': 'read', 'path': value.path }); if (retFile.ret) { retFileNew.push(retFile.res) } } };
             if (retFileNew.length > 0) { globalWindow.pages = retFileNew };
         }
 
@@ -26,11 +26,11 @@ async function html(inf) {
         // PERMITIR CORS
         res.setHeader('Access-Control-Allow-Origin', '*'); res.setHeader('Access-Control-Allow-Methods', '*'); res.setHeader('Access-Control-Allow-Headers', '*'); res.setHeader('Access-Control-Allow-Credentials', 'true');
 
-        function resBody(inf) {
-            let body = inf.body; if (inf.type == 'txt') { res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' }) }
-            else if (['obj', 'arr'].includes(inf.type)) { res.writeHead(200, { 'Content-Type': 'application/json' }); body = JSON.stringify(body, null, 2) }
-            else if (['img',].includes(inf.type)) { res.writeHead(200, { 'Content-Type': 'image/jpeg' }); body = Buffer.from(body) } else if (['base64',].includes(inf.type)) {
-                body = bodyHtml.replace('####REPLACE####', `<img src="data:image/png;base64,${Buffer.from({ type: 'Buffer', data: body }).toString('base64')}" alt="Imagem">`).replace('WebSocket', `${inf.pathFile}`);
+        function resBody(inf = {}) {
+            let { body, type, pathFile, } = inf; if (type == 'txt') { res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' }) }
+            else if (['obj', 'arr'].includes(type)) { res.writeHead(200, { 'Content-Type': 'application/json' }); body = JSON.stringify(body, null, 2) }
+            else if (['img',].includes(type)) { res.writeHead(200, { 'Content-Type': 'image/jpeg' }); body = Buffer.from(body) } else if (['base64',].includes(type)) {
+                body = bodyHtml.replace('####REPLACE####', `<img src="data:image/png;base64,${Buffer.from({ 'type': 'Buffer', 'data': body }).toString('base64')}" alt="Imagem">`).replace('WebSocket', `${pathFile}`);
             }; res.end(body)
         }
 

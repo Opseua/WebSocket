@@ -26,7 +26,7 @@
 
     <script>
         // PEGAR O SECURITY PASS
-        let ipServer = 'http://127.0.0.1:8889/'; let securityPass = 'aaa'; async function getSecurityPass(inf) {
+        let ipServer = 'http://127.0.0.1:8889/'; let securityPass = 'aaa'; async function getSecurityPass(inf = {}) {
             try {
                 let url = `${ipServer}?act=getSecurityPass&roo=&mes=`; let retFetch = await fetch(url, { 'method': 'GET', 'headers': { 'Content-Type': 'application/json', 'raw': true }, });
                 if (!retFetch.ok) { alert('FETCH [GET SECURITY PASS]: ERRO | AO FAZER REQUISIÇÃO'); } else { let data = await retFetch.text(); securityPass = data; }

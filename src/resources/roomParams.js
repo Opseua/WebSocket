@@ -1,17 +1,18 @@
 // http://127.0.0.1:1234/?act=PasswordAqui-screenshot&roo=SalaAqui&mes=MensagemAqui
 
 // let infRoomParams, retRoomParams
-// infRoomParams = { 'e': e, 'wsClients': wsClients, 'resWs': res, 'server': req, }
+// infRoomParams = { e, 'wsClients': wsClients, 'resWs': res, 'server': req, }
 // retRoomParams = await roomParams(infRoomParams); console.log(retRoomParams)
 
 let e = import.meta.url, ee = e;
-async function roomParams(inf) {
+async function roomParams(inf = {}) {
     let ret = { 'ret': false }; e = inf && inf.e ? inf.e : e;
     try {
+        let { server, resWs, wsClients, } = inf;
+
         // IMPORTAR BIBLIOTECA [NODEJS]
         if (typeof _parse === 'undefined') { await funLibrary({ 'lib': '_parse' }); };
 
-        let { server, resWs, wsClients } = inf
         let rooms = wsClients.rooms; let url = decodeURIComponent(server.url); let { query } = _parse(url, true); let urlParams = Object.keys(query).length === 0 ? false : query
         let room, action, message, method = server.upgrade ? 'WEBSOCKET' : server.method; let host = server.headers.host.includes('192.168.') ? `127.0.0.1:${server.headers.host.split(':')[1]}` : server.headers.host
         let locWeb = host.includes('127.0.0') ? `[LOC]` : `[WEB]`, urlParts = url.split('/'); let headers = server.headers
@@ -59,7 +60,7 @@ async function roomParams(inf) {
                 resWs.send(body); resWs.terminate()
             } else {
                 // ### HTTP
-                html({ 'e': e, 'server': resWs, 'body': { 'ret': false, 'msg': body }, 'room': room, 'infAdd': { 'type': 'obj', 'title': 'Server' }, 'method': method, 'headers': headers, })
+                html({ e, 'server': resWs, 'body': { 'ret': false, 'msg': body }, 'room': room, 'infAdd': { 'type': 'obj', 'title': 'Server' }, 'method': method, 'headers': headers, })
             }
         } else {
             ret['ret'] = true;

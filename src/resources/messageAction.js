@@ -3,11 +3,11 @@
 // retMessageAction = await messageAction(infMessageAction); console.log(retMessageAction)
 
 let e = import.meta.url, ee = e;
-async function messageAction(inf) {
+async function messageAction(inf = {}) {
     let ret = { 'ret': false }; e = inf && inf.e ? inf.e : e;
     try {
-        let time = dateHour().res, time1 = `MES_${time.mon}_${time.monNam}/DIA_${time.day}`; let { host, room, action, message, resWs, wsClients, wsClientLoc, headers } = inf
-        let body = {}, retMessageSend, infAdd = { 'title': 'Erro', 'type': '' }, destination = inf.destination ? inf.destination : `${host}/?roo=${room}`
+        let { host, room, action, message, resWs, wsClients, wsClientLoc, headers, destination } = inf; let time = dateHour().res, time1 = `MES_${time.mon}_${time.monNam}/DIA_${time.day}`;
+        let body = {}, retMessageSend, infAdd = { 'title': 'Erro', 'type': '' }; destination = destination || `${host}/?roo=${room}`
 
         if (action.toLowerCase() == globalWindow.par1.toLowerCase()) {
             // ### WSCLIENTS [→ EC2] (ACTION)
@@ -25,19 +25,19 @@ async function messageAction(inf) {
             // ### CHAT [SOMENTE EC2] (ACTION)
             infAdd.type = 'txt'; infAdd.title = `Erro | Chat`; if (!(message !== '')) {
                 let errBody = `Informar os parametros!`; body = `${errBody}\n\n→ &mes={"provider":"globalgpt","input":"Qual a idade de Marte?"}\n\n→ &mes={"provider":"openAi","input":"Qual a idade de Marte?"}`
-                logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `${errBody}` });
+                logConsole({ e, ee, 'write': true, 'msg': `${errBody}` });
             } else {
-                try { infAdd.title = `Chat`; message = JSON.parse(message); let retChat = await chat({ 'e': e, ...message }); body = retChat }
-                catch (catchErr) { let errBody = `Erro ao fazer parse dos parametros!\n\n${message}`; logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `${errBody}` }); body = `${errBody}`; esLintIgnore = catchErr; }
+                try { infAdd.title = `Chat`; message = JSON.parse(message); let retChat = await chat({ e, ...message }); body = retChat }
+                catch (catchErr) { let errBody = `Erro ao fazer parse dos parametros!\n\n${message}`; logConsole({ e, ee, 'write': true, 'msg': `${errBody}` }); body = `${errBody}`; esLintIgnore = catchErr; }
             }; message = '';
         } else if (action.toLowerCase() == globalWindow.par5.toLowerCase()) {
             // ### API [SOMENTE EC2] (ACTION)
             infAdd.type = 'txt'; infAdd.title = `Erro | API`; if (!(message !== '')) {
                 let errBody = `Informar os parametros!`; body = `${errBody}\n\n→ &mes={"method":"POST","url":"https://www.google.com","headers":{"Content-Type":"application/json"},"body":{"aaa":"bbb"},"max":10}`
-                logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `${errBody}` });
+                logConsole({ e, ee, 'write': true, 'msg': `${errBody}` });
             } else {
-                try { infAdd.title = `API`; message = JSON.parse(message); let retApi = await api({ 'e': e, ...message }); if (retApi.res) { retApi['res'] = JSON.stringify(retApi.res, null, 2) }; body = retApi }
-                catch (catchErr) { let errBody = `Erro ao fazer parse dos parametros!\n\n${message}`; logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `${errBody}` }); body = `${errBody}`; esLintIgnore = catchErr; }
+                try { infAdd.title = `API`; message = JSON.parse(message); let retApi = await api({ e, ...message }); if (retApi.res) { retApi['res'] = JSON.stringify(retApi.res, null, 2) }; body = retApi }
+                catch (catchErr) { let errBody = `Erro ao fazer parse dos parametros!\n\n${message}`; logConsole({ e, ee, 'write': true, 'msg': `${errBody}` }); body = `${errBody}`; esLintIgnore = catchErr; }
             }; message = '';
         } else if (action.toLowerCase() == globalWindow.par8.toLowerCase()) {
             // ### WEBFILE [→ TODA A SALA] (ACTION)
@@ -70,19 +70,19 @@ async function messageAction(inf) {
             // ### OUTRO TIPO DE AÇÃO/MENSAGEM 
             try { infAdd.type = 'obj'; infAdd.title = `Outro tipo de ação/mensagem`; message = JSON.parse(message); message = message.message ? message.message : message } catch (catchErr) {
                 infAdd.type = 'obj'; infAdd.title = `Erro`; let errBody = `Erro ao fazer parse da mensagem!\n\n${message}`;
-                logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `${errBody}` }); message = ''; esLintIgnore = catchErr; body = { 'ret': false, 'msg': errBody }
+                logConsole({ e, ee, 'write': true, 'msg': `${errBody}` }); message = ''; esLintIgnore = catchErr; body = { 'ret': false, 'msg': errBody }
             }
         }
 
         // ENVIAR COMANDO(s)
         if (typeof message === 'object' || message !== '') {
             retMessageSend = await messageSend({ 'destination': destination, 'messageId': true, 'message': message, 'resWs': wsClientLoc, 'secondsAwait': 0, }); body = retMessageSend
-            // logConsole({ 'e': e, 'ee': ee, 'write': true, 'msg': `RESPOSTA SENDO ESPERADA:\n${JSON.stringify(body)}` });
+            // logConsole({ e, ee, 'write': true, 'msg': `RESPOSTA SENDO ESPERADA:\n${JSON.stringify(body)}` });
         }
 
         // ENVIAR RETORNO HTTP (SE NECESSÁRIO)
         if (resWs) {
-            await html({ 'e': e, 'server': resWs, 'body': body, 'room': room, 'infAdd': infAdd, 'method': resWs.method, 'headers': headers, })
+            await html({ e, 'server': resWs, 'body': body, 'room': room, 'infAdd': infAdd, 'method': resWs.method, 'headers': headers, })
         }
 
         ret['ret'] = true;
