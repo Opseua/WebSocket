@@ -50,7 +50,7 @@ async function roomParams(inf = {}) {
                 let funOk = JSON.parse(message).fun[0]; if (funOk.securityPass == globalWindow.securityPass && !funOk.par.enc && funOk.name == 'notification' && funOk.par.ntfy) {
                     (async () => { await api({ 'method': 'POST', 'url': `https://ntfy.sh/${globalWindow.devMy}?title=${encodeURIComponent(funOk.par.title)}`, 'body': funOk.par.text, }) })()
                 }
-            } catch (catchErr) { let retRegexE = await regexE({ 'inf': inf, 'e': catchErr, }); ret['msg'] = retRegexE.res; }
+            } catch (catchErr) { let retRegexE = await regexE({ 'inf': inf, 'e': catchErr, }); ret['msg'] = retRegexE.res; ret['ret'] = false; delete ret['res']; }
         }
 
         // DEU ALGUM ERRO
@@ -78,7 +78,7 @@ async function roomParams(inf = {}) {
         }
 
     } catch (catchErr) {
-        let retRegexE = await regexE({ 'inf': inf, 'e': catchErr, }); ret['msg'] = retRegexE.res;
+        let retRegexE = await regexE({ 'inf': inf, 'e': catchErr, }); ret['msg'] = retRegexE.res; ret['ret'] = false; delete ret['res'];
     };
 
     return { ...({ 'ret': ret.ret }), ...(ret.msg && { 'msg': ret.msg }), ...(ret.res && { 'res': ret.res }), };
