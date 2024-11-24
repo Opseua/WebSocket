@@ -37,7 +37,7 @@
         async function getInput() {
             let valueInput1 = document.getElementById('input1').value || false; let valueInput2 = document.getElementById('input2').value || false; let valueInput3 = document.getElementById('input3').value || false
             if (!valueInput1 && !valueInput2 && !valueInput3) {
-                document.getElementById('input1').placeholder = 'Nada foi inserido'; setTimeout(() => { document.getElementById('input1').placeholder = 'Digite algo...'; }, 700);
+                document.getElementById('input1').placeholder = 'Nada foi inserido'; setTimeout(() => { document.getElementById('input1').placeholder = 'Digite algo...'; }, 1000);
             } else {
                 let url = `${ipServer}?roo=OPSEUA-CHROME-CHROME_EXTENSION-USUARIO_3`; let retFetch = await fetch(url, {
                     'method': 'POST', 'headers': { 'Content-Type': 'application/json', 'raw': true }, 'body': JSON.stringify({

@@ -6,61 +6,72 @@
 
 let e = import.meta.url, ee = e;
 async function roomParams(inf = {}) {
-    let ret = { 'ret': false }; e = inf && inf.e ? inf.e : e;
+    let ret = { 'ret': false, }; e = inf && inf.e ? inf.e : e;
     try {
-        let { server, resWs, wsClients, } = inf;
+        let { server, resWs, } = inf;
 
         // IMPORTAR BIBLIOTECA [NODEJS]
         if (typeof _parse === 'undefined') { await funLibrary({ 'lib': '_parse' }); };
 
-        let rooms = wsClients.rooms; let url = decodeURIComponent(server.url); let { query } = _parse(url, true); let urlParams = Object.keys(query).length === 0 ? false : query
-        let room, action, message, method = server.upgrade ? 'WEBSOCKET' : server.method; let host = server.headers.host.includes('192.168.') ? `127.0.0.1:${server.headers.host.split(':')[1]}` : server.headers.host
-        let locWeb = host.includes('127.0.0') ? `[LOC]` : `[WEB]`, urlParts = url.split('/'); let headers = server.headers
+        let url = decodeURIComponent(server.url); let { query } = _parse(url, true); let urlParams = Object.keys(query).length === 0 ? false : query; let room, action, message;
+        let method = server.upgrade ? 'WEBSOCKET' : server.method; let host = server.headers.host.includes('192.168.') ? `127.0.0.1:${server.headers.host.split(':')[1]}` : server.headers.host;
+        let locWeb = host.includes('127.0.0') ? `[LOC]` : `[WEB]`, urlParts = url.split('/'); let headers = server.headers;
 
         if (!urlParams) {
             room = false
         } else {
-            action = urlParams.act ? urlParams.act : false; let { par1, par11, par12 } = globalWindow; let actionPar = false;
-            for (let [index, value] of [par1, par11, par12].entries()) { if (action && value.toLowerCase() === action.toLowerCase()) { actionPar = true; break } }
-            room = action && actionPar ? 'x' : urlParams.roo ? urlParams.roo : false;
+            action = urlParams.act || false; let { par1, par11, par12, par13, } = gW; let actionPar = false;
+            for (let [index, value] of [par1, par11, par12, par13,].entries()) { if (action && value.toLowerCase() === action.toLowerCase()) { actionPar = true; break } }
+            room = action && actionPar ? 'x' : urlParams.roo || false;
             if (method == 'GET' || method == 'POST') {
                 if (method == 'GET') {
-                    message = urlParams.mes ? urlParams.mes : urlParts.slice(2).join('/')
+                    message = urlParams.mes || urlParts.slice(2).join('/')
                 } else {
-                    message = await new Promise((resolve) => { server.on('data', (chunk) => { resolve(chunk.toString()) }) });
+                    // message = await new Promise((resolve) => { server.on('data', (chunk) => { resolve(chunk.toString()) }) });
+                    message = await new Promise((resolve) => {
+                        let bodyOk = ''; server.on('data', (chunk) => { if (chunk) { bodyOk += chunk.toString(); } });
+                        server.on('end', () => { if (bodyOk) { resolve(bodyOk); } else { resolve(null); } }); server.on('error', () => { resolve(null); });
+                    });
                 }
             }
         }
 
-        let hostRoom = `${host}/?roo=${room}`
+        let body; let hostRoom = `${host}/?roo=${room}`;
 
         // ERROS
-        let body
         if (!room || (method == 'GET' && !action && !message) || (method == 'POST' && !message)) {
-            body = `ERRO | INFORMAR A SALA|ACTION/MENSAGEM\n\n→ http://127.0.0.1:1234/?act=ACTION_AQUI&roo=SALA_AQUI&mes=MENSAGEM_AQUI`
+            body = `HTTP: ERRO | INFORMAR A SALA|ACTION/MENSAGEM\n\n→ http://127.0.0.1:1234/?act=ACTION_AQUI&roo=SALA_AQUI&mes=MENSAGEM_AQUI`
         } else if (method !== 'WEBSOCKET' && !['GET', 'POST'].includes(method)) {
-            body = `ERRO | METODOS ACEITOS 'GET' OU 'POST'`
-        } else if (method !== 'WEBSOCKET' && !rooms[`${hostRoom}`] && room !== 'x') {
-            body = `ERRO | NÃO EXISTE '${room}'`
+            body = `HTTP: ERRO | METODOS ACEITOS 'GET' OU 'POST'`
         }
 
-        // ENCAMINHAR NOTIFICAÇÃO PARA O NFTY
-        if (method == 'POST' && message && message.includes('"notification"')) {
+        // ENCAMINHAR NOTIFICAÇÃO
+        if (method == 'POST' && message && message.includes('"name": "notification"')) {
             try {
-                let funOk = JSON.parse(message).fun[0]; if (funOk.securityPass == globalWindow.securityPass && !funOk.par.enc && funOk.name == 'notification' && funOk.par.ntfy) {
-                    (async () => { await api({ 'method': 'POST', 'url': `https://ntfy.sh/${globalWindow.devMy}?title=${encodeURIComponent(funOk.par.title)}`, 'body': funOk.par.text, }) })()
+                let funOk = JSON.parse(message).fun[0]; if (funOk.securityPass == gW.securityPass && funOk.name == 'notification') {
+                    delete funOk.par['legacyNew']; let retNotification = await notification({ ...funOk, ...funOk.par });
+                    body = { 'ret': retNotification.ret, 'msg': retNotification.msg, 'res': retNotification.res, 'type': 'obj', 'title': 'Notification', }; message = false;
                 }
-            } catch (catchErr) { let retRegexE = await regexE({ 'inf': inf, 'e': catchErr, }); ret['msg'] = retRegexE.res; ret['ret'] = false; delete ret['res']; }
+            } catch (catchErr) {
+                // NÃO PASSAR O 'inf' PARA A 'regexE' PORQUE DA ERRO DEVIDO O SERVIDOR HTTP SER ENVIADO JUNTO!!!
+                let retRegexE = await regexE({ 'inf': message, 'e': catchErr, }); ret['msg'] = retRegexE.res; ret['ret'] = false; delete ret['res'];
+                body = `HTTP: ERRO | AO ENCAMINHAR NOTIFICAÇÃO`; message = false
+            }
         }
 
         // DEU ALGUM ERRO
         if (body) {
             if (method == 'WEBSOCKET') {
                 // ### WEBSOCKET
-                resWs.send(body); resWs.terminate()
+                resWs.send(body); resWs.terminate();
             } else {
                 // ### HTTP
-                html({ e, 'server': resWs, 'body': { 'ret': false, 'msg': body }, 'room': room, 'infAdd': { 'type': 'obj', 'title': 'Server' }, 'method': method, 'headers': headers, })
+                if (!(typeof body === 'object')) { body = { 'ret': false, 'msg': body, 'res': null, 'type': 'obj', 'title': 'Server', } }
+                else { body = { 'ret': body.ret, 'msg': body.msg, 'res': null, 'type': body.type, 'title': body.title, } };
+                html({
+                    e, 'server': resWs, 'body': { 'ret': body.ret, ...(body.msg && { 'msg': body.msg }), ...(body.res && { 'res': body.res }) },
+                    'room': room, 'infAdd': { 'type': body.type, 'title': body.title }, 'method': method, 'headers': headers,
+                });
             }
         } else {
             ret['ret'] = true;
@@ -71,8 +82,8 @@ async function roomParams(inf = {}) {
                 'room': room,
                 'hostRoom': hostRoom,
                 'locWeb': locWeb,
-                'action': action ? action : '',
-                'message': message ? message : '',
+                'action': action || '',
+                'message': message || '',
                 'headers': headers,
             }
         }
