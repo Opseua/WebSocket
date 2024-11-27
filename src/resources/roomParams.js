@@ -21,7 +21,7 @@ async function roomParams(inf = {}) {
             room = false
         } else {
             action = urlParams.act || false; let { par1, par11, par12, par13, } = gW; let actionPar = false;
-            for (let [index, value] of [par1, par11, par12, par13,].entries()) { if (action && value.toLowerCase() === action.toLowerCase()) { actionPar = true; break } }
+            for (let [index, value] of [par1, par11, par12, par13,].entries()) { if (action && value.toLowerCase() === action.toLowerCase()) { actionPar = true; break } };
             room = action && actionPar ? 'x' : urlParams.roo || false;
             if (method == 'GET' || method == 'POST') {
                 if (method == 'GET') {
@@ -49,7 +49,7 @@ async function roomParams(inf = {}) {
         if (method == 'POST' && message && message.includes('"name": "notification"')) {
             try {
                 let funOk = JSON.parse(message).fun[0]; if (funOk.securityPass == gW.securityPass && funOk.name == 'notification') {
-                    delete funOk.par['legacyNew']; let retNotification = await notification({ ...funOk, ...funOk.par });
+                    delete funOk.par['legacy']; let retNotification = await notification({ ...funOk, ...funOk.par, 'encNot': room.includes('CHROME_EXTENSION-USUARIO_'), });
                     body = { 'ret': retNotification.ret, 'msg': retNotification.msg, 'res': retNotification.res, 'type': 'obj', 'title': 'Notification', }; message = false;
                 }
             } catch (catchErr) {
