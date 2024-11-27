@@ -38,7 +38,7 @@ async function messageAction(inf = {}) {
         } else if (action.toLowerCase() == gW.par5.toLowerCase()) {
             // ### (ACTION) API
             infAdd.type = 'obj'; infAdd.title = `API`; try {
-                if (message !== '') { let retApi = await api({ e, ...JSON.parse(message) }); body = retApi; }
+                if (message !== '') { let retApi = await api({ e, 'bodyObject': true, ...JSON.parse(message) }); body = retApi; }
                 else { body['msg'] = `API: ERRO | INFORMAR OS PARAMETROS\n\n→ &mes={"method":"POST","url":"https://www.google.com","headers":{"Content-Type":"application/json"},"body":{"aaa":"bbb"},"max":10}`; }
             } catch (catchErr) { esLintIgnore = catchErr; body['msg'] = `API: ERRO | AO FAZER PARSE`; };
         } else if (action.toLowerCase() == gW.par8.toLowerCase()) {

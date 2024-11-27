@@ -13,36 +13,51 @@ async function roomParams(inf = {}) {
         // IMPORTAR BIBLIOTECA [NODEJS]
         if (typeof _parse === 'undefined') { await funLibrary({ 'lib': '_parse' }); };
 
-        let url = decodeURIComponent(server.url); let { query } = _parse(url, true); let urlParams = Object.keys(query).length === 0 ? false : query; let room, action, message;
-        let method = server.upgrade ? 'WEBSOCKET' : server.method; let host = server.headers.host.includes('192.168.') ? `127.0.0.1:${server.headers.host.split(':')[1]}` : server.headers.host;
-        let locWeb = host.includes('127.0.0') ? `[LOC]` : `[WEB]`, urlParts = url.split('/'); let headers = server.headers;
+        let method, host, room, locWeb, action, message, headers, url, urlParts, body;
 
-        if (!urlParams) {
-            room = false
-        } else {
-            action = urlParams.act || false; let { par1, par11, par12, par13, } = gW; let actionPar = false;
-            for (let [index, value] of [par1, par11, par12, par13,].entries()) { if (action && value.toLowerCase() === action.toLowerCase()) { actionPar = true; break } };
-            room = action && actionPar ? 'x' : urlParams.roo || false;
-            if (method == 'GET' || method == 'POST') {
-                if (method == 'GET') {
-                    message = urlParams.mes || urlParts.slice(2).join('/')
-                } else {
-                    // message = await new Promise((resolve) => { server.on('data', (chunk) => { resolve(chunk.toString()) }) });
-                    message = await new Promise((resolve) => {
-                        let bodyOk = ''; server.on('data', (chunk) => { if (chunk) { bodyOk += chunk.toString(); } });
-                        server.on('end', () => { if (bodyOk) { resolve(bodyOk); } else { resolve(null); } }); server.on('error', () => { resolve(null); });
-                    });
+        try {
+            method = server.upgrade ? 'WEBSOCKET' : server.method; host = server.headers.host.includes('192.168.') ? `127.0.0.1:${server.headers.host.split(':')[1]}` : server.headers.host;
+            locWeb = host.includes('127.0.0') ? `[LOC]` : `[WEB]`; headers = server.headers;
+
+            // CORRIGIR PRAMENTROS COM JSON BRUTO
+            function scapeNotEncode(input) {
+                let substituicoes = [
+                    ['%', '%25'], // MANTER EM PRIMEIRO!!!
+                    ['{', '%7B'], ['}', '%7D'], ['"', '%22'], ["'", '%27'], [':', '%3A'], [',', '%2C'], ['[', '%5B'], [']', '%5D'], ['/', '%2F'], ['#', '%23'], ['`', '%60'], ['@', '%40'],
+                    ['=', '%3D'], ['&', '%26'], ['?', '%3F']
+                ]; return substituicoes.reduce((str, [antigo, novo]) => { return str.replace(new RegExp(antigo.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), novo); }, input);
+            }; if (server.url && (server.url.includes('{') || server.url.includes('['))) { server.url = `/${scapeNotEncode(server.url.replace('/', ''))}`; };
+
+            url = decodeURIComponent(server.url); let { query } = _parse(url, true); let urlParams = Object.keys(query).length === 0 ? false : query; urlParts = url.split('/');
+            if (!urlParams) {
+                room = false
+            } else {
+                action = urlParams.act || false; let { par1, par11, par12, par13, } = gW; let actionPar = false;
+                for (let [index, value] of [par1, par11, par12, par13,].entries()) { if (action && value.toLowerCase() === action.toLowerCase()) { actionPar = true; break } };
+                room = action && actionPar ? 'x' : urlParams.roo || false;
+                if (method == 'GET' || method == 'POST') {
+                    if (method == 'GET') {
+                        message = urlParams.mes || urlParts.slice(2).join('/')
+                    } else {
+                        // message = await new Promise((resolve) => { server.on('data', (chunk) => { resolve(chunk.toString()) }) });
+                        message = await new Promise((resolve) => {
+                            let bodyOk = ''; server.on('data', (chunk) => { if (chunk) { bodyOk += chunk.toString(); } });
+                            server.on('end', () => { if (bodyOk) { resolve(bodyOk); } else { resolve(null); } }); server.on('error', () => { resolve(null); });
+                        });
+                    }
                 }
             }
-        }
+        } catch (catchErr) {
+            esLintIgnore = catchErr; body = `HTTP: ERRO | URL INVÁLIDA`; notification({ 'keepOld': true, 'ntfy': true, 'title': `### ERRO (${gW.devMaster}) [${gW.devSlave}]`, 'text': `→ ${body}\n\n${server.url}`, });
+        };
 
-        let body; let hostRoom = `${host}/?roo=${room}`;
+        let hostRoom = `${host}/?roo=${room}`;
 
         // ERROS
-        if (!room || (method == 'GET' && !action && !message) || (method == 'POST' && !message)) {
-            body = `HTTP: ERRO | INFORMAR A SALA|ACTION/MENSAGEM\n\n→ http://127.0.0.1:1234/?act=ACTION_AQUI&roo=SALA_AQUI&mes=MENSAGEM_AQUI`
+        if (!body && (!room || (method == 'GET' && !action && !message) || (method == 'POST' && !message))) {
+            body = `HTTP: ERRO | INFORMAR A SALA|ACTION/MENSAGEM\n\n→ http://127.0.0.1:1234/?act=ACTION_AQUI&roo=SALA_AQUI&mes=MENSAGEM_AQUI`;
         } else if (method !== 'WEBSOCKET' && !['GET', 'POST'].includes(method)) {
-            body = `HTTP: ERRO | METODOS ACEITOS 'GET' OU 'POST'`
+            body = `HTTP: ERRO | METODOS ACEITOS 'GET' OU 'POST'`;
         }
 
         // ENCAMINHAR NOTIFICAÇÃO
