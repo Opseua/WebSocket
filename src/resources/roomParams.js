@@ -58,10 +58,11 @@ async function roomParams(inf = {}) {
             body = `HTTP: ERRO | INFORMAR A SALA|ACTION/MENSAGEM\n\n→ http://127.0.0.1:1234/?act=ACTION_AQUI&roo=SALA_AQUI&mes=MENSAGEM_AQUI`;
         } else if (method !== 'WEBSOCKET' && !['GET', 'POST'].includes(method)) {
             body = `HTTP: ERRO | METODOS ACEITOS 'GET' OU 'POST'`;
-        }
+        };
 
         // ENCAMINHAR NOTIFICAÇÃO
-        if (method == 'POST' && message && message.includes('"name": "notification"')) {
+        if (method == 'POST' && message && message.includes('"name":"notification"')) {
+
             try {
                 let funOk = JSON.parse(message).fun[0]; if (funOk.securityPass == gW.securityPass && funOk.name == 'notification') {
                     delete funOk.par['legacy']; let retNotification = await notification({ ...funOk, ...funOk.par, 'encNot': room.includes('CHROME_EXTENSION-USUARIO_'), });
