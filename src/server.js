@@ -25,9 +25,9 @@ async function serverRun(inf = {}) {
         let wss = new _WebSocketServer({ server }); wss.on('connection', async (ws, res) => {
             // SALA PARAMETROS E [ADICIONAR] | ENVIAR PING DE INÍCIO DE CONEXÃO
             if (!rate.check()) { return } // EVITAR LOOP INFINITO
-            let retRoomParams = await roomParams({ e, wsClients, 'resWs': ws, 'server': res, }); if (!retRoomParams.ret) { return };
-            let { host, room, hostRoom, locWeb, method, } = retRoomParams.res; ws['host'] = host; ws['room'] = room; ws['hostRoom'] = hostRoom; ws['locWeb'] = locWeb; ws['method'] = method;
-            if (!wsClients.rooms[hostRoom]) { wsClients.rooms[hostRoom] = new Set(); }; wsClients.rooms[hostRoom].add(ws);
+            let retRoomParams = await roomParams({ e, wsClients, 'resWs': ws, 'server': res, }); if (!retRoomParams.ret) { return }; let { host, room, hostRoom, locWeb, method, } = retRoomParams.res; ws['host'] = host;
+            ws['room'] = room; ws['hostRoom'] = hostRoom; ws['locWeb'] = locWeb; ws['method'] = method; let t = dateHour().res; let time1 = `${t.day}/${t.mon}/${t.yea} ${t.hou}:${t.min}:${t.sec}.${t.mil}`;
+            let time2 = `${t.timMil}`; ws['dateHour'] = time1; ws['timestamp'] = time2; if (!wsClients.rooms[hostRoom]) { wsClients.rooms[hostRoom] = new Set(); }; wsClients.rooms[hostRoom].add(ws);
 
             // ### ON MESSAGE
             ws.on('message', async (data) => {

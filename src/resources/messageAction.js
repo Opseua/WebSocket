@@ -14,8 +14,10 @@ async function messageAction(inf = {}) {
         if (action.toLowerCase() == gW.par1.toLowerCase()) {
             // ### (ACTION) WSCLIENTS
             infAdd.type = 'obj'; infAdd.title = `Clients`; try {
-                let resClients = Object.keys(wsClients.rooms).filter(sala => sala.includes(host)).map(sala => ({ sala, 'qtd': wsClients.rooms[sala].size, }));
-                let dH = dateHour().res; resClients.unshift({ 'hour': `${dH.hou}:${dH.min}:${dH.sec}` }); body['ret'] = true; body['msg'] = `CLIENTS: OK`; body['res'] = resClients;
+                // let resClients = Object.keys(wsClients.rooms).filter(sala => sala.includes(host)).map(sala => ({ sala, 'qtd': wsClients.rooms[sala].size, })); resClients.unshift({ 'hour': `DATA_HORA` });
+                let dH = dateHour().res; let resClients = [{ 'hour': `${dH.hou}:${dH.min}:${dH.sec}` },]; resClients = [...resClients, ...Object.keys(wsClients.rooms).filter(sala => sala.includes(host))
+                    .map(sala => ({ sala, ...Array.from(wsClients.rooms[sala]).reduce((acc, ws, index) => { acc[`_${index + 1}`] = `${ws.dateHour || 'N/A'} | ${ws.timestamp || 'N/A'}`; return acc; }, {}), }))];
+                body['ret'] = true; body['msg'] = `CLIENTS: OK`; body['res'] = resClients;
             } catch (catchErr) { esLintIgnore = catchErr; body['msg'] = `CLIENTS: ERRO | AO PEGAR CLIENTES`; };
         } else if (action.toLowerCase() == gW.par3.toLowerCase()) {
             // ### (ACTION) RESET [→ TODA A SALA]
