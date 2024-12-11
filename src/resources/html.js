@@ -5,7 +5,7 @@ let e = import.meta.url, ee = e;
 async function html(inf = {}) {
     let ret = { 'ret': false, }; e = inf && inf.e ? inf.e : e;
     try {
-        let { room, infAdd, body, headers, server: res, } = inf;
+        let { room, infAdd = {}, body, headers = {}, server: res, } = inf;
 
         function setData(txt) { return txt.substring(8, 10) + "/" + txt.substring(5, 7) + "/" + txt.substring(0, 4) + " " + txt.substring(11, 13) + ":" + txt.substring(14, 16) + ":" + txt.substring(17, 19); }
 

@@ -16,7 +16,7 @@ async function messageAction(inf = {}) {
             infAdd.type = 'obj'; infAdd.title = `Clients`; try {
                 // let resClients = Object.keys(wsClients.rooms).filter(sala => sala.includes(host)).map(sala => ({ sala, 'qtd': wsClients.rooms[sala].size, })); resClients.unshift({ 'hour': `DATA_HORA` });
                 let dH = dateHour().res; let resClients = [{ 'hour': `${dH.hou}:${dH.min}:${dH.sec}` },]; resClients = [...resClients, ...Object.keys(wsClients.rooms).filter(sala => sala.includes(host))
-                    .map(sala => ({ sala, ...Array.from(wsClients.rooms[sala]).reduce((acc, ws, index) => { acc[`_${index + 1}`] = `${ws.dateHour || 'N/A'} | ${ws.timestamp || 'N/A'}`; return acc; }, {}), }))];
+                    .map(sala => ({ sala, ...Array.from(wsClients.rooms[sala]).reduce((acc, ws, index) => { acc[`_${index + 1}`] = `${ws.dateHour}`; return acc; }, {}), }))];
                 body['ret'] = true; body['msg'] = `CLIENTS: OK`; body['res'] = resClients;
             } catch (catchErr) { esLintIgnore = catchErr; body['msg'] = `CLIENTS: ERRO | AO PEGAR CLIENTES`; };
         } else if (action.toLowerCase() == gW.par3.toLowerCase()) {
@@ -50,13 +50,13 @@ async function messageAction(inf = {}) {
             message = { 'fun': [{ 'securityPass': gW.securityPass, 'retInf': true, 'name': 'file', 'par': { 'action': 'isFolder', 'max': 1000, 'functionLocal': false, path, 'listRead': true, } }] }
         } else if (action.toLowerCase() == gW.par9.toLowerCase()) {
             // ### (ACTION) SCREENSHOT [→ TODA A SALA] path.match(/\.(jpg|jpeg|png|ico)$/)
-            infAdd.type = 'img'; infAdd.title = `screenshot`; let path = `${fileProjetos}/WebSocket/log/screenshot.png`; message = {
+            infAdd.type = 'img'; infAdd.title = `screenshot`; let path = `${fileProjetos}/WebSocket/log/screenshot.png`.replace(new RegExp(`${letter}:`, 'g'), `!letter!:`); message = {
                 'fun': [{ 'securityPass': gW.securityPass, 'retInf': false, 'name': 'commandLine', 'par': { 'awaitFinish': true, 'command': `%nircmd% savescreenshot "${path}"` } },
                 { 'securityPass': gW.securityPass, 'retInf': true, 'name': 'file', 'par': { 'action': 'read', 'functionLocal': false, path, } },]
             };
         } else if (action.toLowerCase() == gW.par10.toLowerCase()) {
             // ### (ACTION) LOOP [→ TODA A SALA '...-NODEJS-...']
-            infAdd.type = 'obj'; infAdd.title = `Loop`; let path = `${fileProjetos}/WebSocket/log/Registros/${time1}/${time.hou}.00-${time.hou}.59`; message = {
+            infAdd.type = 'obj'; infAdd.title = `Loop`; let path = `${fileProjetos}/WebSocket/log/Registros/${time1}/${time.hou}.00-${time.hou}.59`.replace(new RegExp(`${letter}:`, 'g'), `!letter!:`); message = {
                 'fun': [{ // CRIAR PADRÃO DE PASTA
                     'securityPass': gW.securityPass, 'retInf': false, 'name': 'file', 'par': { 'action': 'write', 'functionLocal': false, 'path': `${path}/#_Z_#.txt`, 'rewrite': true, 'text': `${time2}\n` }
                 }, {  // SCREENSHOT (MANTER awaitFinish 'true' DO CONTRÁRIO O NIRCMD ABRE O POPUP)
