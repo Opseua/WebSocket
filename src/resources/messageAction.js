@@ -90,7 +90,7 @@ async function messageAction(inf = {}) {
         } else if (!body.ret) {
             // ERRO AO EXECUTAR AÇÃO
             logConsole({ e, ee, 'write': true, 'msg': `${JSON.stringify(body, null, 2)}` }); let { devMaster, project, } = gW;
-            notification({ e, 'legacy': true, 'title': `*** FALSE (${devMaster}) [${engName}]`, 'text': `→ messageAction {${project}}\n\n${JSON.stringify(body).substring(0, 300)}`, 'ntfy': true });
+            notification({ e, 'legacy': true, 'ntfy': true, 'title': `*** FALSE (${devMaster}) [${engName}]`, 'text': `→ messageAction {${project}}\n\n${JSON.stringify(body).substring(0, 300)}`, });
         }
 
         // ENVIAR RETORNO HTTP (SE NECESSÁRIO)

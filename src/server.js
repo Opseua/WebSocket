@@ -33,10 +33,7 @@ async function serverRun(inf = {}) {
             ws.on('message', async (data) => {
                 let message = data.toString('utf-8'); if (message.length == 0) { ws.send(`WEBSCOKET: ERRO | MENSAGEM VAZIA ${locWeb} '${room}'`) } else {
                     let pingPong = message == `${gW.par6}` ? 1 : message == `${gW.par7}` ? 2 : 0; ws['lastMessage'] = ws.lastMessage || pingPong > 0 ? Number(dateHour().res.tim) : false; // ÚLTIMA MENSAGEM RECEBIDA
-                    // logConsole({ e, ee, 'write': true, 'msg': `← SER | ${ws.lastMessage} | ${hostRoom}` });
-                    if (pingPong > 0) { // RECEBIDO: 'PING' ENVIAR 'PONG'
-                        if (pingPong == 2) { return }; ws.send('pong'); // logConsole({ e, ee, 'write': true, 'msg': `RECEBEU PING ${locWeb} '${room}'` });
-                    } else {
+                    if (pingPong > 0) { if (pingPong == 2) { return }; ws.send('pong'); /* RECEBIDO: 'PING' ENVIAR 'PONG' */ } else {
                         try { message = JSON.parse(message); } catch (catchErr) { message = { 'message': message }; regexE({ 'inf': message, 'e': catchErr, }); };
                         if (!message.message) { message = { 'message': message }; logConsole({ e, ee, 'write': true, 'msg': `ERRO M2` }); };
                         if (ws.lastMessage) { ws.send(`pong`) }; messageReceived({ ...message, host, room, 'resWs': ws, wsClients, }); // PROCESSAR MENSAGEM RECEBIDA
@@ -91,8 +88,24 @@ async function serverRun(inf = {}) {
             }, (gW.secLoop * 1000));
         });
 
-        // APAGAR LOGS/TEMP ANTIGOS (30 SEGUNDOS APÓS INICIAR E A CADA 25 HORAS)
-        await new Promise(resolve => { setTimeout(resolve, 30 * 1000) }); logsDelOld(); setInterval(() => { logsDelOld(); }, 90000 * 1000);
+        // APAGAR LOGS/TEMP ANTIGOS (60 SEGUNDOS APÓS INICIAR E A CADA x HORAS)
+        await new Promise(resolve => { setTimeout(resolve, 60 * 1000) }); logsDelOld(); setInterval(() => { logsDelOld(); }, 25 * 3600000);
+
+        // CONSUMO DE CPU e MÉMORIA RAM (A CADA x MINUTOS)
+        async function performance() {
+            if (typeof _exec === 'undefined') { await funLibrary({ 'lib': '_exec' }); }; /* IMPORTAR BIBLIOTECA [NODEJS] */; _exec('wmic cpu get loadpercentage', async (err, resOk, errm) => {
+                let alertMax = gW.devMaster == 'AWS' ? [70, 95] : gW.devMaster == 'ESTRELAR' ? [70, 85] : [999, 999]; try {
+                    if (err || errm) { console.log(`ERRO: CPU`); return; }; resOk = resOk.replace(/[^0-9]/g, ''); let alertRun = false; if (resOk > alertMax[0]) { alertRun = true; }; // USO: CPU
+                    let msg = `CONSUMO → CPU: ${resOk || 0}% | `; _exec('wmic os get TotalVisibleMemorySize', async (err, resOk, errm) => { // USO: RAM
+                        if (err || errm) { console.log(`ERRO: RAM`); return; }; let rT = parseInt(resOk.replace(/[^0-9]/g, '')); _exec('wmic os get FreePhysicalMemory', async (err, resOk, errm) => {
+                            if (err || errm) { console.log(`ERRO: RAM`); return; }; let rF = parseInt(resOk.replace(/[^0-9]/g, '')); resOk = Number(((rT - rF) / rT) * 100).toFixed(0);
+                            if (resOk > alertMax[1]) { alertRun = true; }; msg = `${msg}RAM: ${resOk || 0}%`; logConsole({ e, ee, 'write': true, 'msg': `${msg}` });
+                            if (alertRun) { await notification({ e, 'legacy': true, 'ntfy': true, 'title': `ALERTA | (${gW.devMaster}) [NODEJS]`, 'text': `${msg}` }) };
+                        });
+                    });
+                } catch (catchErr) { esLintIgnore = catchErr; logConsole({ e, ee, 'write': true, 'msg': `CONSUMO ERRO → CPU e RAM` }); };
+            });
+        }; setInterval(() => { performance(); }, 15 * 60000);
 
         ret['ret'] = true;
         ret['msg'] = `SERVER: OK`;
