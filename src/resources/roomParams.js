@@ -11,7 +11,7 @@ async function roomParams(inf = {}) {
         let { server, resWs, } = inf;
 
         // IMPORTAR BIBLIOTECA [NODEJS]
-        if (typeof _parse === 'undefined') { await funLibrary({ 'lib': '_parse' }); };
+        if (typeof _parse === 'undefined') { await funLibrary({ 'lib': '_parse', }); }
 
         let method, host, room, locWeb, action, message, headers, url, urlParts, body;
 
@@ -22,22 +22,22 @@ async function roomParams(inf = {}) {
             // CORRIGIR PRAMENTROS COM JSON BRUTO
             function scapeNotEncode(input) {
                 let substituicoes = [
-                    ['%', '%25'], // MANTER EM PRIMEIRO!!!
-                    ['{', '%7B'], ['}', '%7D'], ['"', '%22'], ["'", '%27'], [':', '%3A'], [',', '%2C'], ['[', '%5B'], [']', '%5D'], ['/', '%2F'], ['#', '%23'], ['`', '%60'], ['@', '%40'],
-                    ['=', '%3D'], ['&', '%26'], ['?', '%3F']
-                ]; return substituicoes.reduce((str, [antigo, novo]) => { return str.replace(new RegExp(antigo.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), novo); }, input);
+                    ['%', '%25',], // MANTER EM PRIMEIRO!!!
+                    ['{', '%7B',], ['}', '%7D',], ['"', '%22',], ["'", '%27',], [':', '%3A',], [',', '%2C',], ['[', '%5B',], [']', '%5D',], ['/', '%2F',], ['#', '%23',], ['`', '%60',], ['@', '%40',],
+                    ['=', '%3D',], ['&', '%26',], ['?', '%3F',],
+                ]; return substituicoes.reduce((str, [antigo, novo,]) => { return str.replace(new RegExp(antigo.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), novo); }, input);
             }; if (server.url && (server.url.includes('{') || server.url.includes('['))) { server.url = `/${scapeNotEncode(server.url.replace('/', ''))}`; };
 
-            url = decodeURIComponent(server.url); let { query } = _parse(url, true); let urlParams = Object.keys(query).length === 0 ? false : query; urlParts = url.split('/');
+            url = decodeURIComponent(server.url); let { query, } = _parse(url, true); let urlParams = Object.keys(query).length === 0 ? false : query; urlParts = url.split('/');
             if (!urlParams) {
-                room = false
+                room = false;
             } else {
                 action = urlParams.act || false; let { par1, par11, par12, par13, } = gW; let actionPar = false;
-                for (let [index, value] of [par1, par11, par12, par13,].entries()) { if (action && value.toLowerCase() === action.toLowerCase()) { actionPar = true; break } };
+                for (let [index, value,] of [par1, par11, par12, par13,].entries()) { if (action && value.toLowerCase() === action.toLowerCase()) { actionPar = true; break; } };
                 room = action && actionPar ? 'x' : urlParams.roo || false;
-                if (method == 'GET' || method == 'POST') {
-                    if (method == 'GET') {
-                        message = urlParams.mes || urlParts.slice(2).join('/')
+                if (method === 'GET' || method === 'POST') {
+                    if (method === 'GET') {
+                        message = urlParams.mes || urlParts.slice(2).join('/');
                     } else {
                         // message = await new Promise((resolve) => { server.on('data', (chunk) => { resolve(chunk.toString()) }) });
                         message = await new Promise((resolve) => {
@@ -54,39 +54,39 @@ async function roomParams(inf = {}) {
         let hostRoom = `${host}/?roo=${room}`;
 
         // ERROS
-        if (!body && (!room || (method == 'GET' && !action && !message) || (method == 'POST' && !message))) {
+        if (!body && (!room || (method === 'GET' && !action && !message) || (method === 'POST' && !message))) {
             body = `HTTP: ERRO | INFORMAR A SALA|ACTION/MENSAGEM\n\n→ http://127.0.0.1:1234/?act=ACTION_AQUI&roo=SALA_AQUI&mes=MENSAGEM_AQUI`;
-        } else if (method !== 'WEBSOCKET' && !['GET', 'POST'].includes(method)) {
+        } else if (method !== 'WEBSOCKET' && !['GET', 'POST',].includes(method)) {
             body = `HTTP: ERRO | METODOS ACEITOS 'GET' OU 'POST'`;
         };
 
         // ENCAMINHAR NOTIFICAÇÃO
-        if (method == 'POST' && message && message.includes('"name":"notification"')) {
+        if (method === 'POST' && message && message.includes('"name":"notification"')) {
 
             try {
-                let funOk = JSON.parse(message).fun[0]; if (funOk.securityPass == gW.securityPass && funOk.name == 'notification') {
+                let funOk = JSON.parse(message).fun[0]; if (funOk.securityPass === gW.securityPass && funOk.name === 'notification') {
                     delete funOk.par['legacy']; let retNotification = await notification({ ...funOk, ...funOk.par, 'encNot': room.includes('CHROME_EXTENSION-USUARIO_'), });
                     body = { 'ret': retNotification.ret, 'msg': retNotification.msg, 'res': retNotification.res, 'type': 'obj', 'title': 'Notification', }; message = false;
                 }
             } catch (catchErr) {
                 // NÃO PASSAR O 'inf' PARA A 'regexE' PORQUE DA ERRO DEVIDO O SERVIDOR HTTP SER ENVIADO JUNTO!!!
                 let retRegexE = await regexE({ 'inf': message, 'e': catchErr, }); ret['msg'] = retRegexE.res; ret['ret'] = false; delete ret['res'];
-                body = `HTTP: ERRO | AO ENCAMINHAR NOTIFICAÇÃO`; message = false
+                body = `HTTP: ERRO | AO ENCAMINHAR NOTIFICAÇÃO`; message = false;
             }
         }
 
         // DEU ALGUM ERRO
         if (body) {
-            if (method == 'WEBSOCKET') {
+            if (method === 'WEBSOCKET') {
                 // ### WEBSOCKET
                 resWs.send(body); resWs.terminate();
             } else {
                 // ### HTTP
-                if (!(typeof body === 'object')) { body = { 'ret': false, 'msg': body, 'res': null, 'type': 'obj', 'title': 'Server', } }
-                else { body = { 'ret': body.ret, 'msg': body.msg, 'res': null, 'type': body.type, 'title': body.title, } };
+                if (!(typeof body === 'object')) { body = { 'ret': false, 'msg': body, 'res': null, 'type': 'obj', 'title': 'Server', }; }
+                else { body = { 'ret': body.ret, 'msg': body.msg, 'res': null, 'type': body.type, 'title': body.title, }; };
                 html({
-                    e, 'server': resWs, 'body': { 'ret': body.ret, ...(body.msg && { 'msg': body.msg }), ...(body.res && { 'res': body.res }) },
-                    'room': room, 'infAdd': { 'type': body.type, 'title': body.title }, 'method': method, 'headers': headers,
+                    e, 'server': resWs, 'body': { 'ret': body.ret, ...(body.msg && { 'msg': body.msg, }), ...(body.res && { 'res': body.res, }), },
+                    'room': room, 'infAdd': { 'type': body.type, 'title': body.title, }, 'method': method, 'headers': headers,
                 });
             }
         } else {
@@ -101,14 +101,14 @@ async function roomParams(inf = {}) {
                 'action': action || '',
                 'message': message || '',
                 'headers': headers,
-            }
+            };
         }
 
     } catch (catchErr) {
         let retRegexE = await regexE({ 'inf': inf, 'e': catchErr, }); ret['msg'] = retRegexE.res; ret['ret'] = false; delete ret['res'];
     };
 
-    return { ...({ 'ret': ret.ret }), ...(ret.msg && { 'msg': ret.msg }), ...(ret.res && { 'res': ret.res }), };
+    return { ...({ 'ret': ret.ret, }), ...(ret.msg && { 'msg': ret.msg, }), ...(ret.res && { 'res': ret.res, }), };
 };
 
 // CHROME | NODEJS
