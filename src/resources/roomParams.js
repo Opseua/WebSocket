@@ -1,107 +1,94 @@
-// http://127.0.0.1:1234/?act=PasswordAqui-screenshot&roo=SalaAqui&mes=MensagemAqui
+// let infRoomParams, retRoomParams;
+// infRoomParams = { e, 'server': 'req/res', };
+// retRoomParams = await roomParams(infRoomParams); console.log(retRoomParams);
 
-// let infRoomParams, retRoomParams
-// infRoomParams = { e, 'wsClients': wsClients, 'resWs': res, 'server': req, }
-// retRoomParams = await roomParams(infRoomParams); console.log(retRoomParams)
+// http://127.0.0.1:1234/?act=PasswordAqui-screenshot&roo=SalaAqui&mes=MensagemAqui
 
 let e = import.meta.url, ee = e;
 async function roomParams(inf = {}) {
     let ret = { 'ret': false, }; e = inf && inf.e ? inf.e : e;
     try {
-        let { server, resWs, } = inf;
+        let { server, } = inf;
 
         // IMPORTAR BIBLIOTECA [NODEJS]
-        if (typeof _parse === 'undefined') { await funLibrary({ 'lib': '_parse', }); }
+        if (typeof _parse === 'undefined') { await funLibrary({ 'lib': '_parse', }); };
 
-        let method, host, room, locWeb, action, message, headers, url, urlParts, body;
+        let headers = server.headers; let url = server.url, host = headers.host, room = false, locWeb, action = false, message = false, pass = false, messageTemp, title = false;
+        let method = server.upgrade ? 'WEBSOCKET' : server.method; host = host.includes('192.168.') ? `127.0.0.1:${host.split(':')[1]}` : host; locWeb = host.includes('127.0.0') ? `[LOC]` : `[WEB]`;
 
+        // CAPTURAR URL/PARÂMETROS/MENSAGEM|BODY
         try {
-            method = server.upgrade ? 'WEBSOCKET' : server.method; host = server.headers.host.includes('192.168.') ? `127.0.0.1:${server.headers.host.split(':')[1]}` : server.headers.host;
-            locWeb = host.includes('127.0.0') ? `[LOC]` : `[WEB]`; headers = server.headers;
+            if (method !== 'WEBSOCKET' && !['GET', 'POST',].includes(method)) { ret['msg'] = `METODOS ACEITOS 'GET' OU 'POST'`; } else {
+                function scapeNotEncode(input) {
+                    // CORRIGIR PRAMENTROS COM JSON BRUTO
+                    let substituicoes = [
+                        ['%', '%25',], // MANTER EM PRIMEIRO!!!
+                        ['{', '%7B',], ['}', '%7D',], ['"', '%22',], ["'", '%27',], [':', '%3A',], [',', '%2C',], ['[', '%5B',], [']', '%5D',], ['/', '%2F',], ['#', '%23',],
+                        ['`', '%60',], ['@', '%40',], ['=', '%3D',], ['&', '%26',], ['?', '%3F',],
+                    ]; return substituicoes.reduce((str, [antigo, novo,]) => { return str.replace(new RegExp(antigo.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), novo); }, input);
+                }; if (url && (url.includes('{') || url.includes('['))) { url = `/${scapeNotEncode(url.replace('/', ''))}`; };
 
-            // CORRIGIR PRAMENTROS COM JSON BRUTO
-            function scapeNotEncode(input) {
-                let substituicoes = [
-                    ['%', '%25',], // MANTER EM PRIMEIRO!!!
-                    ['{', '%7B',], ['}', '%7D',], ['"', '%22',], ["'", '%27',], [':', '%3A',], [',', '%2C',], ['[', '%5B',], [']', '%5D',], ['/', '%2F',], ['#', '%23',], ['`', '%60',], ['@', '%40',],
-                    ['=', '%3D',], ['&', '%26',], ['?', '%3F',],
-                ]; return substituicoes.reduce((str, [antigo, novo,]) => { return str.replace(new RegExp(antigo.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), novo); }, input);
-            }; if (server.url && (server.url.includes('{') || server.url.includes('['))) { server.url = `/${scapeNotEncode(server.url.replace('/', ''))}`; };
-
-            url = decodeURIComponent(server.url); let { query, } = _parse(url, true); let urlParams = Object.keys(query).length === 0 ? false : query; urlParts = url.split('/');
-            if (!urlParams) {
-                room = false;
-            } else {
-                action = urlParams.act || false; let { par1, par11, par12, par13, } = gW; let actionPar = false;
-                for (let [index, value,] of [par1, par11, par12, par13,].entries()) { if (action && value.toLowerCase() === action.toLowerCase()) { actionPar = true; break; } };
-                room = action && actionPar ? 'x' : urlParams.roo || false;
-                if (method === 'GET' || method === 'POST') {
-                    if (method === 'GET') {
-                        message = urlParams.mes || urlParts.slice(2).join('/');
-                    } else {
-                        // message = await new Promise((resolve) => { server.on('data', (chunk) => { resolve(chunk.toString()) }) });
-                        message = await new Promise((resolve) => {
-                            let bodyOk = ''; server.on('data', (chunk) => { if (chunk) { bodyOk += chunk.toString(); } });
-                            server.on('end', () => { if (bodyOk) { resolve(bodyOk); } else { resolve(null); } }); server.on('error', () => { resolve(null); });
-                        });
-                    }
+                url = decodeURIComponent(url); let { query, } = _parse(url, true); let urlParams = Object.keys(query).length === 0 ? false : query;
+                if (urlParams) { action = urlParams.act || false; room = urlParams.roo || false; if (method === 'GET') { message = urlParams.mes || false; } }; if (method === 'POST') {
+                    message = await new Promise((resolve) => {
+                        let bodyOk = ''; server.on('data', (chunk) => { if (chunk) { bodyOk += chunk.toString(); } });
+                        server.on('end', () => { if (bodyOk) { resolve(bodyOk); } else { resolve(null); } }); server.on('error', () => { resolve(null); });
+                    });
                 }
             }
-        } catch (catchErr) {
-            esLintIgnore = catchErr; body = `HTTP: ERRO | URL INVÁLIDA`; notification({ 'keepOld': true, 'ntfy': true, 'title': `### ERRO (${gW.devMaster}) [${gW.devSlave}]`, 'text': `→ ${body}\n\n${server.url}`, });
-        };
+        } catch (catchErr) { ret['msg'] = `AO CAPTURAR URL/PARÂMETROS/MENSAGEM|BODY\n\n${catchErr}`; };
+
+        // VALIDAÇÕES INICIAIS
+        if (!ret.msg && method !== 'WEBSOCKET' && (action || message)) {
+            let { par1, par3, par4, par5, par8, par9, par10, par11, par12, par13, } = gW; let arrActMes = [par1, par3, par4, par5, par8, par9, par10, par11, par12, par13, message,];
+            for (let [index, v,] of arrActMes.entries()) {
+                if (index + 1 < arrActMes.length) {
+                    // ACTION
+                    if (action && v.toLowerCase() === action.toLowerCase()) { pass = true; break; };
+                } else if (message) {
+                    //  MESSAGE
+                    try {
+                        messageTemp = JSON.parse(message); if (!(messageTemp.fun && Array.isArray(messageTemp.fun))) { ret['msg'] = `CHAVE 'fun' NÃO ENCONTRADA/NÃO É ARRAY`; }
+                        else if (messageTemp.fun.length === 0) { ret['msg'] = `CHAVE 'fun' VAZIA`; }
+                        else if (!messageTemp.fun.every(item => item.securityPass === gW.securityPass)) { ret['msg'] = `SECURITY PASS INVÁLIDO`; } else { pass = true; break; };
+                    } catch (catchErr) { ret['msg'] = `AO FAZER PARSE DA MENSAGEM\n\n${catchErr}`; };
+                }
+            }; if (pass) { room = room || 'x'; } else if (method === 'GET') { ret['msg'] = `NENHUMA AÇÃO VÁLIDA`; };
+        }
 
         let hostRoom = `${host}/?roo=${room}`;
 
-        // ERROS
-        if (!body && (!room || (method === 'GET' && !action && !message) || (method === 'POST' && !message))) {
-            body = `HTTP: ERRO | INFORMAR A SALA|ACTION/MENSAGEM\n\n→ http://127.0.0.1:1234/?act=ACTION_AQUI&roo=SALA_AQUI&mes=MENSAGEM_AQUI`;
-        } else if (method !== 'WEBSOCKET' && !['GET', 'POST',].includes(method)) {
-            body = `HTTP: ERRO | METODOS ACEITOS 'GET' OU 'POST'`;
-        };
-
-        // ENCAMINHAR NOTIFICAÇÃO
-        if (method === 'POST' && message && message.includes('"name":"notification"')) {
-
-            try {
-                let funOk = JSON.parse(message).fun[0]; if (funOk.securityPass === gW.securityPass && funOk.name === 'notification') {
-                    delete funOk.par['legacy']; let retNotification = await notification({ ...funOk, ...funOk.par, 'encNot': room.includes('CHROME_EXTENSION-USUARIO_'), });
-                    body = { 'ret': retNotification.ret, 'msg': retNotification.msg, 'res': retNotification.res, 'type': 'obj', 'title': 'Notification', }; message = false;
-                }
-            } catch (catchErr) {
-                // NÃO PASSAR O 'inf' PARA A 'regexE' PORQUE DA ERRO DEVIDO O SERVIDOR HTTP SER ENVIADO JUNTO!!!
-                let retRegexE = await regexE({ 'inf': message, 'e': catchErr, }); ret['msg'] = retRegexE.res; ret['ret'] = false; delete ret['res'];
-                body = `HTTP: ERRO | AO ENCAMINHAR NOTIFICAÇÃO`; message = false;
-            }
+        // VALIDAÇÃO FINAL
+        if (!ret.msg && !room) {
+            ret['msg'] = `INFORMAR A SALA${method === 'WEBSOCKET' ? ' → ws://127.0.0.1:1234/?roo=SALA_AQUI' : '|ACTION/MENSAGEM → http://127.0.0.1:1234/?act=ACTION_AQUI&roo=SALA_AQUI&mes=MENSAGEM_AQUI'}`;
         }
 
-        // DEU ALGUM ERRO
-        if (body) {
-            if (method === 'WEBSOCKET') {
-                // ### WEBSOCKET
-                resWs.send(body); resWs.terminate();
-            } else {
-                // ### HTTP
-                if (!(typeof body === 'object')) { body = { 'ret': false, 'msg': body, 'res': null, 'type': 'obj', 'title': 'Server', }; }
-                else { body = { 'ret': body.ret, 'msg': body.msg, 'res': null, 'type': body.type, 'title': body.title, }; };
-                html({
-                    e, 'server': resWs, 'body': { 'ret': body.ret, ...(body.msg && { 'msg': body.msg, }), ...(body.res && { 'res': body.res, }), },
-                    'room': room, 'infAdd': { 'type': body.type, 'title': body.title, }, 'method': method, 'headers': headers,
-                });
-            }
-        } else {
-            ret['ret'] = true;
-            ret['msg'] = `ROOM PARAMS: OK`;
-            ret['res'] = {
-                'method': method,
-                'host': host,
-                'room': room,
-                'hostRoom': hostRoom,
-                'locWeb': locWeb,
-                'action': action || '',
-                'message': message || '',
-                'headers': headers,
-            };
+        // ENVIAR NOTIFICAÇÃO
+        if (!ret.msg && method !== 'WEBSOCKET' && !!messageTemp && messageTemp?.fun[0]?.name === 'notification' && hostRoom === gW.devSever) {
+            try {
+                let funOk = messageTemp.fun[0]; delete funOk.par['legacy']; funOk.par['ignoreErr'] = true;
+                let retNot = await notification(funOk.par); ret['ret'] = retNot.ret; ret['msg'] = retNot.msg; title = 'Notification';
+            } catch (catchErr) { ret['msg'] = `AO ENCAMINHAR NOTIFICAÇÃO\n\n${catchErr}`; }; messageTemp = false;
+        }
+
+        ret['ret'] = title ? ret.ret : !ret.msg;
+        ret['msg'] = `${title ? ret.msg : ret.ret ? 'ROOM PARAMS: OK' : `ROOM PARAMS: ERRO | ${ret.msg}`}`;
+        ret['res'] = {
+            'method': method,
+            'host': host,
+            'room': room || '',
+            'hostRoom': hostRoom,
+            'locWeb': locWeb,
+            'action': action || '',
+            'message': message || '',
+            'headers': headers,
+            'title': title,
+        };
+
+        if (!ret.ret) {
+            let text = `→ [${method}] ${host}${url}\n${ret.msg}`;
+            logConsole({ e, ee, 'write': true, 'msg': `${text}\n\n${JSON.stringify({ 'ret': ret.ret, 'msg': ret.msg, })}\n\nHEADERS:\n${JSON.stringify(headers)}\n\nMENSAGEM/BODY:\n${message || ''}`, });
+            if (!title) { notification({ 'keepOld': true, 'ntfy': true, 'title': `# SERVER (${gW.devMaster}) [NODEJS]`, text, 'ignoreErr': true, }); }; // ALERTAR SOBRE O ERRO
         }
 
     } catch (catchErr) {

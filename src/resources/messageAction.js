@@ -1,12 +1,12 @@
-// let infMessageAction, retMessageAction
-// infMessageAction = { 'host': host, 'room': room, 'action': action, 'message': message, 'resWs': res, 'wsClients': wsClients, 'wsClientLoc': wsClientLoc }
-// retMessageAction = await messageAction(infMessageAction); console.log(retMessageAction)
+// let infMessageAction, retMessageAction;
+// infMessageAction = { 'host': host, 'room': room, 'action': action, 'message': message, 'resWs': res, 'wsClients': wsClients, 'wsClientLoc': wsClientLoc, };
+// retMessageAction = await messageAction(infMessageAction); console.log(retMessageAction);
 
 let e = import.meta.url, ee = e;
 async function messageAction(inf = {}) {
     let ret = { 'ret': false, }; e = inf && inf.e ? inf.e : e;
     try {
-        let { host, room, action, message, resWs, wsClients, wsClientLoc, headers, destination, } = inf;
+        let { host, room, action, message, resWs, wsClients, wsClientLoc, destination, } = inf;
 
         let time = dateHour().res; let time1 = `MES_${time.mon}_${time.monNam}/DIA_${time.day}`; let time2 = `${time.hou}.${time.min}.${time.sec}.${time.mil}`;
         let body = { 'ret': false, }; let retMessageSend; let infAdd = { 'title': 'Erro', 'type': '', }; destination = destination || `${host}/?roo=${room}`;
@@ -22,7 +22,7 @@ async function messageAction(inf = {}) {
         } else if (action.toLowerCase() === gW.par3.toLowerCase()) {
             // ### (ACTION) RESET [→ TODA A SALA]
             infAdd.type = 'obj'; infAdd.title = `Reset (AnyDesk + Server's)`; message = {
-                'fun': [{ 'securityPass': gW.securityPass, 'retInf': false, 'name': 'commandLine', 'par': { 'awaitFinish': true, 'command': `taskkill /IM AnyDesk.exe /F`, }, }, // NÃO POR ENTRE ASPAS!!!
+                'fun': [{ 'securityPass': gW.securityPass, 'retInf': false, 'name': 'commandLine', 'par': { 'awaitFinish': true, 'command': `taskkill /IM AnyDesk.exe /F`, }, }, // ← NÃO POR ENTRE ASPAS!!!
                 { 'securityPass': gW.securityPass, 'retInf': true, 'name': 'commandLine', 'par': { 'awaitFinish': true, 'command': `"C:\\Program Files (x86)\\AnyDesk\\AnyDesk.exe" --restart-service`, }, },
                 { 'securityPass': gW.securityPass, 'retInf': false, 'name': 'commandLine', 'par': { 'awaitFinish': false, 'command': `"C:\\Program Files (x86)\\AnyDesk\\AnyDesk.exe"`, }, },
                 { 'securityPass': gW.securityPass, 'retInf': false, 'name': 'commandLine', 'par': { 'awaitFinish': false, 'command': `"%fileChrome_Extension%\\src\\scripts\\BAT\\z_AllRestart.lnk"`, }, },],
@@ -55,13 +55,10 @@ async function messageAction(inf = {}) {
                 { 'securityPass': gW.securityPass, 'retInf': true, 'name': 'file', 'par': { 'action': 'read', 'functionLocal': false, path, }, },],
             };
         } else if (action.toLowerCase() === gW.par10.toLowerCase()) {
-            // ### (ACTION) LOOP [→ TODA A SALA '...-NODEJS-...']
+            // ### (ACTION) LOOP [→ TODA A SALA '...-NODEJS-...'] | CRIAR PADRÃO DE PASTA | SCREENSHOT (MANTER awaitFinish 'true' DO CONTRÁRIO O NIRCMD ABRE O POPUP)
             infAdd.type = 'obj'; infAdd.title = `Loop`; let path = `${fileProjetos}/WebSocket/log/Registros/${time1}/${time.hou}.00-${time.hou}.59`.replace(new RegExp(`${letter}:`, 'g'), `!letter!:`); message = {
-                'fun': [{ // CRIAR PADRÃO DE PASTA
-                    'securityPass': gW.securityPass, 'retInf': false, 'name': 'file', 'par': { 'action': 'write', 'functionLocal': false, 'path': `${path}/#_Z_#.txt`, 'rewrite': true, 'text': `${time2}\n`, },
-                }, {  // SCREENSHOT (MANTER awaitFinish 'true' DO CONTRÁRIO O NIRCMD ABRE O POPUP)
-                    'securityPass': gW.securityPass, 'retInf': false, 'name': 'commandLine', 'par': { 'awaitFinish': true, 'command': `%nircmd% savescreenshot "${path}/${time2}_screenshot.png"`, },
-                },],
+                'fun': [{ 'securityPass': gW.securityPass, 'retInf': false, 'name': 'file', 'par': { 'action': 'write', 'functionLocal': false, 'path': `${path}/#_Z_#.txt`, 'rewrite': true, 'text': `${time2}\n`, }, },
+                { 'securityPass': gW.securityPass, 'retInf': false, 'name': 'commandLine', 'par': { 'awaitFinish': true, 'command': `%nircmd% savescreenshot "${path}/${time2}_screenshot.png"`, }, },],
             };
         } else if (action.toLowerCase() === gW.par11.toLowerCase()) {
             // ### (ACTION) GET SECURITYPASS (SOMENTE NO 'LOC')
@@ -80,23 +77,23 @@ async function messageAction(inf = {}) {
             infAdd.type = 'obj'; infAdd.title = `Outro tipo de ação/mensagem`; try {
                 message = JSON.parse(message); message = message.message || message;
                 if (!(message.fun && Array.isArray(message.fun))) { body['msg'] = `OUTRO TIPO DE AÇÃO: ERRO | CHAVE 'fun' NÃO ENCONTRADA OU NÃO É ARRAY`; message = ''; }
-            } catch (catchErr) { esLintIgnore = catchErr; body['msg'] = `OUTRO TIPO DE AÇÃO: ERRO | AO FAZER PARSE`; message = ''; };
+            } catch (catchErr) { esLintIgnore = catchErr; body['msg'] = `OUTRO TIPO DE AÇÃO: ERRO | AO FAZER PARSE/MENSAGEM VAZIA`; message = ''; };
         }
 
         // ENVIAR COMANDO(s)
         if (typeof message === 'object') {
             retMessageSend = await messageSend({ destination, 'messageId': true, message, 'resWs': wsClientLoc, 'secondsAwaitA': 0, }); body = retMessageSend;
             // logConsole({ e, ee, 'write': true, 'msg': `RESPOSTA SENDO ESPERADA:\n${JSON.stringify(body)}` });
-        } else if (!body.ret) {
+        }
+
+        if (!body.ret) {
             // ERRO AO EXECUTAR AÇÃO
-            logConsole({ e, ee, 'write': true, 'msg': `${JSON.stringify(body, null, 2)}`, }); let { devMaster, project, } = gW;
-            notification({ e, 'legacy': true, 'ntfy': true, 'title': `*** FALSE (${devMaster}) [${engName}]`, 'text': `→ messageAction {${project}}\n\n${JSON.stringify(body).substring(0, 300)}`, });
+            logConsole({ e, ee, 'write': true, 'msg': `${JSON.stringify(body, null, 2)}`, });
+            notification({ e, 'ntfy': true, 'chromeNot': false, 'title': `# FALSE (${gW.devMaster}) [NODEJS]`, 'text': `→ messageAction {${gW.project}}\n${body.msg.substring(0, 300)}`, 'ignoreErr': true, });
         }
 
         // ENVIAR RETORNO HTTP (SE NECESSÁRIO)
-        if (resWs) {
-            await html({ e, 'server': resWs, 'body': body, 'room': room, 'infAdd': infAdd, 'method': resWs.method, 'headers': headers, });
-        }
+        if (resWs) { await html({ e, 'server': resWs, 'body': body, 'room': room, 'infAdd': infAdd, }); }
 
         ret['ret'] = true;
         ret['msg'] = `ACTIONS: OK`;
