@@ -4,7 +4,7 @@ set "letra=%letra:~0,1%" & set "local=%local:~0,-1%" & set "arquivo=%~nx0" & set
 set "usuario=%USERNAME%" & set "argTUDO=%~1 %~2 %~3 %~4 %~5" & set "arg1=%~1" & set "arg2=%~2" & set "arg3=%~3" & set "arg4=%~4" & set "arg5=%~5"
 
 rem AVISO PARA USAR O ATALHO COM PARAMENTROS
-if "!arg1!" equ "" !fileMsg! "[!local!\!arquivo!]\n\nNao usar o BAT/BACKGROUND" & exit
+if "!arg1!"=="" ( !fileMsg! "[!local!\!arquivo!]\n\nNao usar o BAT/BACKGROUND" & exit )
 
 rem set "start=ERRO" & set "adm=ERRO" & NET SESSION >nul 2>&1 & if !errorlevel! neq 0 ( set "adm=NAO" ) else ( set "adm=SIM" )
 
@@ -35,7 +35,7 @@ rem if "!ret!"=="TRUE" ( )
 
 rem  (NAO SUBIR OS 'if'!!!)
 if "!mode!"=="CMD" ( set "scriptType=processCmdKeep" ) else ( if "!mode!"=="LEGACY" ( set "scriptType=processCmdKeep" ) )
-if "!scriptType!" equ "ERRO" !fileMsg! "[!local!\!arquivo!]\n\n'mode' deve ser\n'CMD', 'LEGACY'" & exit
+if "!scriptType!"=="ERRO" ( !fileMsg! "[!local!\!arquivo!]\n\n'mode' deve ser\n'CMD', 'LEGACY'" & exit )
 endlocal & call "%fileChrome_Extension%\src\scripts\BAT\%scriptType%.bat" "%arg1%_WINTP1" "%project%@%outrosAdd%" "%fileScript%" "%mode%" "%programExe%" "%ret%" & setlocal enabledelayedexpansion
 set "ret=%ret2%"
 rem #####################################################################
@@ -46,18 +46,6 @@ if "%~2"=="FORCE_STOP" ( exit )
 exit
 exit
 
-rem TIMESTAMP ATUAL (OBRIGATORIO FICAR APOS O CALL!!!)
-rem echo WScript.Echo(new Date().getTime()); > !temp!\time.js & for /f "delims=" %%a in ('cscript //nologo !temp!\time.js') do set "timeNow=%%a"
-rem set "timeNow=!timeNow:~0,-3!" & set "dia=!DATE:~0,2!" & set "mes=!DATE:~3,2!"
-
-rem ESTAVA RODANDO [SIM]
-rem if "!ret!"=="TRUE" ( )
-
-rem ESTAVA RODANDO [NAO]
-rem if "!ret!"=="FALSE" ( )
-
-exit
-exit
 
 
 
