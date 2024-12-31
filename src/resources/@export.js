@@ -29,6 +29,3 @@ gloWin['messageAction'] = (inf) => { let fun = (!eng) ? funImport : funGeneric; 
 gloWin['roomParams'] = (inf) => { let fun = (!eng) ? funImport : funGeneric; return fun({ 'path': './roomParams.js', 'inf': inf, }); };
 
 
-
-
-
