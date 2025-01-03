@@ -20,11 +20,9 @@ async function html(inf = {}) {
         }
 
         // HTML | PERMITIR CORS
-        let bodyHtml = `
-        <!DOCTYPE html> <html lang="en"><head><meta charset="UTF-8"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> 
-        <style> body { background-color: #17191A; color: white; } a:link, a:visited, a:hover, a:active { color: #66b2ff; text-decoration: none; } </style>
-         <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>WebSocket</title> </head> <body> ###REPLACE###
-        <script> document.addEventListener('keydown',function(event){if(event.key === 'Escape'){history.back()}}) </script> </body> </html>`;
+        let bodyHtml = ` <!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> 
+        <style> body { background-color: #17191A; color: white; } a:link, a:visited, a:hover, a:active { color: #66b2ff; text-decoration: none}</style><meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+        <title>WebSocket</title> </head> <body> ###REPLACE### <script> document.addEventListener('keydown', function (event)  {if (event.key === 'Escape') { history.back(); history.back() } } ) </script> </body> </html>`;
         res.setHeader('Access-Control-Allow-Origin', '*'); res.setHeader('Access-Control-Allow-Methods', '*'); res.setHeader('Access-Control-Allow-Headers', '*'); res.setHeader('Access-Control-Allow-Credentials', 'true');
 
         function resBody(inf = {}) {

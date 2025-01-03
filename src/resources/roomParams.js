@@ -13,7 +13,7 @@ async function roomParams(inf = {}) {
         // IMPORTAR BIBLIOTECA [NODEJS]
         if (typeof _parse === 'undefined') { await funLibrary({ 'lib': '_parse', }); };
 
-        let headers = server.headers; let url = server.url, host = headers.host, room = false, locWeb, action = false, message = false, pass = false, messageTemp, title = false;
+        let headers = server.headers; let url = server.url, host = headers.host, room = false, locWeb, action = false, message = false, pass = false, messageTemp, title = false, ip = server?.socket?.remoteAddress;
         let method = server.upgrade ? 'WEBSOCKET' : server.method; host = host.includes('192.168.') ? `127.0.0.1:${host.split(':')[1]}` : host; locWeb = host.includes('127.0.0') ? `[LOC]` : `[WEB]`;
 
         // CAPTURAR URL/PARÂMETROS/MENSAGEM|BODY
@@ -86,7 +86,7 @@ async function roomParams(inf = {}) {
         };
 
         if (!ret.ret) {
-            let text = `→ [${method}] ${host}${url}\n${ret.msg}`;
+            let text = `→ {IP: ${ip}}\n[${method}] ${host}${url}\n${ret.msg}`;
             logConsole({ e, ee, 'write': true, 'msg': `${text}\n\n${JSON.stringify({ 'ret': ret.ret, 'msg': ret.msg, })}\n\nHEADERS:\n${JSON.stringify(headers)}\n\nMENSAGEM/BODY:\n${message || ''}`, });
             if (!title) { notification({ 'keepOld': true, 'ntfy': true, 'title': `# SERVER (${gW.devMaster}) [NODEJS]`, text, 'ignoreErr': true, }); }; // ALERTAR SOBRE O ERRO
         }
