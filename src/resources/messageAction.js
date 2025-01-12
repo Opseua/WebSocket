@@ -20,12 +20,12 @@ async function messageAction(inf = {}) {
                 body['ret'] = true; body['msg'] = `CLIENTS: OK`; body['res'] = resClients;
             } catch (catchErr) { esLintIgnore = catchErr; body['msg'] = `CLIENTS: ERRO | AO PEGAR CLIENTES`; };
         } else if (action.toLowerCase() === gW.par3.toLowerCase()) {
-            // ### (ACTION) RESET [→ TODA A SALA]
-            infAdd.type = 'obj'; infAdd.title = `Reset (AnyDesk + Server's)`; message = {
+            // ### (ACTION) RESTART (+AnyDesk) [→ TODA A SALA]
+            infAdd.type = 'obj'; infAdd.title = `Restart (Server's + AnyDesk)`; message = {
                 'fun': [{ 'securityPass': gW.securityPass, 'retInf': false, 'name': 'commandLine', 'par': { 'awaitFinish': true, 'command': `taskkill /IM AnyDesk.exe /F`, }, }, // ← NÃO POR ENTRE ASPAS!!!
                 { 'securityPass': gW.securityPass, 'retInf': true, 'name': 'commandLine', 'par': { 'awaitFinish': true, 'command': `"C:\\Program Files (x86)\\AnyDesk\\AnyDesk.exe" --restart-service`, }, },
                 { 'securityPass': gW.securityPass, 'retInf': false, 'name': 'commandLine', 'par': { 'awaitFinish': false, 'command': `"C:\\Program Files (x86)\\AnyDesk\\AnyDesk.exe"`, }, },
-                { 'securityPass': gW.securityPass, 'retInf': false, 'name': 'commandLine', 'par': { 'awaitFinish': false, 'command': `"%fileChrome_Extension%\\src\\scripts\\BAT\\z_AllRestart.lnk"`, }, },],
+                { 'securityPass': gW.securityPass, 'retInf': false, 'name': 'commandLine', 'par': { 'awaitFinish': false, 'command': `"%fileChrome_Extension%\\src\\scripts\\BAT\\z_SomeRestart.lnk"`, }, },],
             };
         } else if (action.toLowerCase() === gW.par4.toLowerCase()) {
             // ### (ACTION) CHAT

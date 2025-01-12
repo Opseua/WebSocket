@@ -25,6 +25,7 @@ async function funGeneric(infOk) { let { path, inf, } = infOk; let name = funFil
 
 // FUNÇÕES DESSE PROJETO
 gloWin['html'] = (inf) => { let fun = (!eng) ? funImport : funGeneric; return fun({ 'path': './html.js', 'inf': inf, }); };
+gloWin['logsDelOld'] = (inf) => { let fun = (!eng) ? funImport : funGeneric; return fun({ 'path': './logsDelOld.js', 'inf': inf, }); };
 gloWin['messageAction'] = (inf) => { let fun = (!eng) ? funImport : funGeneric; return fun({ 'path': './messageAction.js', 'inf': inf, }); };
 gloWin['roomParams'] = (inf) => { let fun = (!eng) ? funImport : funGeneric; return fun({ 'path': './roomParams.js', 'inf': inf, }); };
 
