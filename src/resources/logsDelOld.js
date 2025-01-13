@@ -76,7 +76,7 @@ async function logsDelOld(inf = {}) {
         }
 
         // LIMPAR PASTA 'Temp'
-        await commandLine({ e, 'command': `${fileWindows}/BAT/clearTemp.bat`, });
+        await commandLine({ e, 'command': `${fileWindows}/BAT/clearTemp.bat LOGS_DEL_OLD`, });
 
         ret['res'] = pathsDel;
         ret['msg'] = `LOGS DEL OLD: OK`;
