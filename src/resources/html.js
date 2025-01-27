@@ -9,7 +9,7 @@ async function html(inf = {}) {
     try {
         let { room, infAdd = {}, body, server, } = inf;
 
-        let res = server; let headers = res.headers;
+        let res = server; let headers = res.headers || {};
         function setData(txt) { return txt.substring(8, 10) + '/' + txt.substring(5, 7) + '/' + txt.substring(0, 4) + ' ' + txt.substring(11, 13) + ':' + txt.substring(14, 16) + ':' + txt.substring(17, 19); }
 
         // DEFINIR PÁGINAS DINÂMICAS
@@ -36,12 +36,10 @@ async function html(inf = {}) {
 
         if (headers.raw && infAdd.type !== 'download') {
             // ### [RAW]
-            if (['obj', 'arr',].includes(infAdd.type)) { // (OBJ/ARR)
+            if (['obj', 'arr',].includes(infAdd.type)) { // (OBJ/ARR) # [FALSE] | (TXT) | (IMG)
                 let loc = infAdd.path; let type = (loc && loc.includes('/src/') && loc.includes('.json')) ? 'txt' : infAdd.type; resBody({ 'type': type, 'body': type === 'txt' ? 'ARQUIVO PROTEGIDO!' : body, });
-            } else if (body.ret === false) { resBody({ 'type': 'obj', 'body': body, }); } // [FALSE]
-            else if (!body.res) { resBody({ 'type': 'txt', 'body': 'Ação executada com sucesso!', }); } // [TRUE]
-            else if (['txt',].includes(infAdd.type)) { resBody({ 'type': 'txt', 'body': body.res, }); } // (TXT)
-            else if (['img',].includes(infAdd.type)) { resBody({ 'type': 'img', 'body': body.res, }); } // (IMG)
+            } else if (body.ret === false) { resBody({ 'type': 'obj', 'body': body, }); } else if (!body.res) { resBody({ 'type': 'txt', 'body': 'Ação executada com sucesso!', }); }
+            else if (['txt',].includes(infAdd.type)) { resBody({ 'type': 'txt', 'body': body.res, }); } else if (['img',].includes(infAdd.type)) { resBody({ 'type': 'img', 'body': body.res, }); }
         } else {
             // ### [RENDERIZAR]
             if (body.ret === false) { // [FALSE]
@@ -52,9 +50,7 @@ async function html(inf = {}) {
                 if (body.res.startsWith('page') && body.res.endsWith('.html')) { // PÁGINA DINÂMICA
                     let page = Number(body.res.replace('page', '').replace('.html', '')); if (Array.isArray(gW.pages) && gW.pages[page]) { resBody({ 'type': 'txt', 'body': gW.pages[page], }); }
                     else { resBody({ 'type': 'txt', 'body': bodyHtml.replace('###REPLACE###', `<pre>Erro ao executar ação!\n\nPágina não encontrada</pre>`).replace('WebSocket', `${infAdd.title}`), }); }
-                } else {
-                    resBody({ 'type': 'txt', 'body': bodyHtml.replace('###REPLACE###', `<pre>${body.res}</pre>`).replace('WebSocket', `${infAdd.title}`), });
-                }
+                } else { resBody({ 'type': 'txt', 'body': bodyHtml.replace('###REPLACE###', `<pre>${body.res}</pre>`).replace('WebSocket', `${infAdd.title}`), }); }
             } else if (['arr', 'img',].includes(infAdd.type)) { // (ARR)
                 let retFile = body.res; let path = infAdd.path; let pathFile;
                 if (path) { if (path.length > 3) { pathFile = path.lastIndexOf('/'); pathFile = path.substring(pathFile + 1); } else { pathFile = path.replace('/', ''); } }; if (Array.isArray(retFile)) {
@@ -105,3 +101,5 @@ async function html(inf = {}) {
 
 // CHROME | NODEJS
 (eng ? window : global)['html'] = html;
+
+

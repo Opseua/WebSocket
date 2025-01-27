@@ -14,7 +14,6 @@ async function messageAction(inf = {}) {
         if (action.toLowerCase() === gW.par1.toLowerCase()) {
             // ### (ACTION) WSCLIENTS
             infAdd.type = 'obj'; infAdd.title = `Clients`; try {
-                // let resClients = Object.keys(wsClients.rooms).filter(sala => sala.includes(host)).map(sala => ({ sala, 'qtd': wsClients.rooms[sala].size, })); resClients.unshift({ 'hour': `DATA_HORA` });
                 let dH = dateHour().res; let resClients = [{ 'hour': `${dH.hou}:${dH.min}:${dH.sec}`, },]; resClients = [...resClients, ...Object.keys(wsClients.rooms).filter(sala => sala.includes(host))
                     .map(sala => ({ sala, ...Array.from(wsClients.rooms[sala]).reduce((acc, ws, index) => { acc[`_${index + 1}`] = `${ws.dateHour}`; return acc; }, {}), })),];
                 body['ret'] = true; body['msg'] = `CLIENTS: OK`; body['res'] = resClients;
@@ -107,3 +106,5 @@ async function messageAction(inf = {}) {
 
 // CHROME | NODEJS
 (eng ? window : global)['messageAction'] = messageAction;
+
+
