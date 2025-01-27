@@ -13,22 +13,18 @@ async function serverRun(inf = {}) {
 
         // SERVIDOR HTTP
         let wsClients = { 'rooms': {}, }, wsClientLoc; let serverHttp = _http.createServer(async (req, res) => { // EVITAR LOOP INFINITO | PRÉ-CONFIGURAÇÕES HTTP
+            function resEnd(d) { res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', }); res.end(JSON.stringify({ 'ret': !!d.ret, 'msg': d.msg || 'ERRO', })); }; let s = 'Access-Control-Allow-';
             if (req.url === '/favicon.ico') { let ico = await _fs.promises.readFile(`${fileWindows}/BAT/z_ICONES/websocket.ico`); res.writeHead(200, { 'Content-Type': 'image/x-icon', }).end(ico); return; }
-            if (['OPTIONS',].includes(req.method)) {
-                res.setHeader('Access-Control-Allow-Origin', '*'); res.setHeader('Access-Control-Allow-Methods', '*'); res.setHeader('Access-Control-Allow-Headers', '*');
-                res.setHeader('Access-Control-Allow-Credentials', 'true'); res.writeHead(200, { 'Content-Type': 'text/plain', }); res.end(`APENAS 'GET' ou 'POST'`); return;
-            }; if (!rate.check()) { res.writeHead(200, { 'Content-Type': 'text/plain', }); res.end(`{"ret":false,"msg":"MUITAS REQUISICOES"}`); return; };
-            // SALA E PARAMETROS | PROCESSAR AÇÃO/MENSAGEM RECEBIDA
-            let rRP = await roomParams({ e, 'server': req, }); let { host, room, hostRoom, locWeb, action, message, method, headers, } = rRP.res;
+            if (!['GET', 'POST',].includes(req.method)) {
+                res.setHeader(`${s}Origin`, '*').setHeader(`${s}Methods`, '*').setHeader(`${s}Headers`, '*').setHeader(`${s}Credentials`, 'true'); resEnd({ 'msg': `APENAS 'GET' ou 'POST'`, }); return;
+            }; if (!rate.check()) { resEnd({ 'msg': `MUITAS REQUISICOES`, }); return; }; // SALA E PARAMETROS | PROCESSAR AÇÃO/MENSAGEM RECEBIDA
+            let rRP = await roomParams({ e, 'server': req, }); if (!rRP.ret) { resEnd({ 'ret': rRP.ret, 'msg': rRP.msg, }); return; }; let { host, room, hostRoom, locWeb, action, message, method, headers, } = rRP.res;
             res['host'] = host; res['room'] = room; res['hostRoom'] = hostRoom; res['locWeb'] = locWeb; res['method'] = method; res['headers'] = headers;
-            if (!rRP.ret || rRP.res.title) { html({ e, room, 'server': res, 'body': { 'ret': rRP.ret, 'msg': rRP.msg, }, 'infAdd': { 'type': 'obj', 'title': rRP.res.title || 'ERRO', }, }); return; };
             messageAction({ host, room, action, message, 'resWs': res, wsClients, wsClientLoc, });
         });
 
         // REMOVER CLIENTE
-        function removeSerCli(inf = {}) {
-            let { resWs, hostRoom, } = inf; if (wsClients.rooms[hostRoom]) { wsClients.rooms[hostRoom].delete(resWs); if (wsClients.rooms[hostRoom].size === 0) { delete wsClients.rooms[hostRoom]; } }
-        }
+        function remSerCli(i) { let { resWs, hostRoom, } = i; if (wsClients.rooms[hostRoom]) { wsClients.rooms[hostRoom].delete(resWs); if (wsClients.rooms[hostRoom].size === 0) { delete wsClients.rooms[hostRoom]; } } }
 
         // LOOP: CHECAR ÚLTIMA MENSAGEM
         let secPing = gW.secPing; function lastMessageReceived() {
@@ -46,7 +42,7 @@ async function serverRun(inf = {}) {
             // SERVIDOR WEBSOCKET | ### ON CONNECTION
             let wss = new _WebSocketServer({ 'server': serverHttp, }); wss.on('connection', async (ws, res) => {
                 // SALA PARAMETROS E [ADICIONAR] | ENVIAR PING DE INÍCIO DE CONEXÃO | EVITAR LOOP INFINITO
-                if (!rate.check()) { return; } let rRP = await roomParams({ e, 'server': res, }); if (!rRP.ret) { ws.send(JSON.stringify({ 'ret': rRP.ret, 'msg': rRP.msg, })); ws.terminate(); return; };
+                if (!rate.check()) { return; } let rRP = await roomParams({ e, 'server': res, }); if (!rRP.ret) { ws.send(JSON.stringify({ 'ret': rRP.ret, 'msg': rRP.msg || 'ERRO', })); ws.terminate(); return; };
                 let { host, room, hostRoom, locWeb, method, } = rRP.res; ws['host'] = host; ws['room'] = room; ws['hostRoom'] = hostRoom; ws['locWeb'] = locWeb; ws['method'] = method; let t = dateHour().res;
                 t = `${t.day}/${t.mon}/${t.yea} ${t.hou}:${t.min}:${t.sec}.${t.mil}`; ws['dateHour'] = t; if (!wsClients.rooms[hostRoom]) { wsClients.rooms[hostRoom] = new Set(); }; wsClients.rooms[hostRoom].add(ws);
 
@@ -57,11 +53,10 @@ async function serverRun(inf = {}) {
                         if (pingPong > 0) { if (pingPong === 2) { return; }; ws.send('pong'); /* RECEBIDO: 'PING' ENVIAR 'PONG' */ } else {
                             try { message = JSON.parse(message); } catch (catchErr) { message = { 'message': message, }; regexE({ 'inf': message, 'e': catchErr, }); };
                             if (!message.message) { message = { 'message': message, }; logConsole({ e, ee, 'write': true, 'msg': `ERRO M2`, }); }; if (ws.lastMessage) { ws.send(`pong`); };
-                            // messageReceived({ ...message, host, room, 'resWs': ws, wsClients, }); // PROCESSAR MENSAGEM RECEBIDA
                             function processMes() { messageReceived({ ...message, host, room, 'resWs': ws, wsClients, }); }; if (!(typeof message.message === 'object' && !message.buffer)) { processMes(); } else {
                                 let text = false; if (!(message.message.fun && Array.isArray(message.message.fun))) { text = `SERVER WS: ERRO | CHAVE 'fun' NÃO ENCONTRADA/NÃO É ARRAY\n\n→ ${ws.hostRoom}`; }
                                 else if (!message.message.fun.every(item => item.securityPass === gW.securityPass)) { text = `SERVER WS: ERRO | SECURITY PASS INVÁLIDO\n\n→ ${ws.hostRoom}`; }
-                                if (!text) { processMes(); } else {
+                                if (!text) { processMes(); /* PROCESSAR MENSAGEM RECEBIDA */ } else {
                                     ws.send(JSON.stringify({ 'ret': false, 'msg': text, })); logConsole({ e, ee, 'write': true, 'msg': `${text}\n\n${data.toString('utf-8')}`, });
                                     notification({ 'keepOld': true, 'ntfy': true, 'title': `# WS (${gW.devMaster}) [NODEJS]`, text, 'ignoreErr': true, }); // ALERTAR SOBRE O ERRO
                                 }
@@ -71,8 +66,8 @@ async function serverRun(inf = {}) {
                 });
 
                 // ### ON ERROR/CLOSE
-                ws.on('error', (error) => { removeSerCli({ 'resWs': ws, host, room, hostRoom, 'write': true, 'msg': `CLIENTE ERRO ${locWeb} '${room}'\n${error}`, }); });
-                ws.on('close', () => { removeSerCli({ 'resWs': ws, host, room, hostRoom, 'write': true, 'msg': `CLIENTE DESCONECTADO ${locWeb} '${room}'`, }); });
+                ws.on('error', (error) => { remSerCli({ 'resWs': ws, host, room, hostRoom, 'write': true, 'msg': `CLIENTE ERRO ${locWeb} '${room}'\n${error}`, }); });
+                ws.on('close', () => { remSerCli({ 'resWs': ws, host, room, hostRoom, 'write': true, 'msg': `CLIENTE DESCONECTADO ${locWeb} '${room}'`, }); });
             });
 
             // WEBSOCKET [CLIENT LOC] ------------------------------------------------------------------------------------------
@@ -97,24 +92,8 @@ async function serverRun(inf = {}) {
             }, (gW.secLoop * 1000));
         }).on('error', (err) => { serverErr(err); });
 
-        // APAGAR LOGS/TEMP ANTIGOS (60 SEGUNDOS APÓS INICIAR E A CADA x HORAS)
-        await new Promise(resolve => { setTimeout(resolve, 60 * 1000); }); logsDelOld(); setInterval(() => { logsDelOld(); }, 25 * 3600000);
-
-        // CONSUMO DE CPU e MÉMORIA RAM (A CADA x MINUTOS)
-        async function performance() {
-            if (typeof _exec === 'undefined') { await funLibrary({ 'lib': '_exec', }); }; /* IMPORTAR BIBLIOTECA [NODEJS] */; _exec('wmic cpu get loadpercentage', async (err, resOk, errm) => {
-                let alertMax = gW.devMaster === 'AWS' ? [70, 95,] : gW.devMaster === 'ESTRELAR' ? [70, 85,] : [999, 999,]; try {
-                    if (err || errm) { console.log(`ERRO: CPU`); return; }; resOk = resOk.replace(/[^0-9]/g, ''); let alertRun = false; if (resOk > alertMax[0]) { alertRun = true; }; // USO: CPU
-                    let msg = `CONSUMO → CPU: ${resOk || 0}% | `; _exec('wmic os get TotalVisibleMemorySize', async (err, resOk, errm) => { // USO: RAM
-                        if (err || errm) { console.log(`ERRO: RAM`); return; }; let rT = parseInt(resOk.replace(/[^0-9]/g, '')); _exec('wmic os get FreePhysicalMemory', async (err, resOk, errm) => {
-                            if (err || errm) { console.log(`ERRO: RAM`); return; }; let rF = parseInt(resOk.replace(/[^0-9]/g, '')); resOk = Number(((rT - rF) / rT) * 100).toFixed(0);
-                            if (resOk > alertMax[1]) { alertRun = true; }; msg = `${msg}RAM: ${resOk || 0}%`; logConsole({ e, ee, 'write': true, 'msg': `${msg}`, });
-                            if (alertRun) { await notification({ e, 'ntfy': true, 'title': `# ALERTA | (${gW.devMaster}) [NODEJS]`, 'text': `${msg}`, 'ignoreErr': true, }); };
-                        });
-                    });
-                } catch (catchErr) { esLintIgnore = catchErr; logConsole({ e, ee, 'write': true, 'msg': `CONSUMO ERRO → CPU e RAM`, }); };
-            });
-        }; setInterval(() => { performance(); }, 15 * 60000);
+        // 60 SEGUNDOS APÓS INICIAR → APAGAR LOGS/TEMP ANTIGOS (A CADA x HORAS) | CONSUMO DE CPU e MÉMORIA RAM (A CADA x MINUTOS)
+        await new Promise(resolve => { setTimeout(resolve, 60 * 1000); }); logsDelOld(); setInterval(() => { logsDelOld(); }, 25 * 3600000); setInterval(() => { performanceDev(); }, 15 * 60000);
 
         ret['ret'] = true;
         ret['msg'] = `SERVER: OK`;
