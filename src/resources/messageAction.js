@@ -9,7 +9,7 @@ async function messageAction(inf = {}) {
         let { host, room, action, message, resWs, wsClients, wsClientLoc, destination, } = inf;
 
         let time = dateHour().res; let time1 = `MES_${time.mon}_${time.monNam}/DIA_${time.day}`; let time2 = `${time.hou}.${time.min}.${time.sec}.${time.mil}`;
-        let body = { 'ret': false, }; let retMessageSend; let infAdd = { 'title': 'Erro', 'type': '', }; destination = destination || `${host}/?roo=${room}`;
+        let body = { 'ret': false, }; let infAdd = { 'title': 'Erro', 'type': '', }; destination = destination || `${host}/?roo=${room}`;
 
         if (action.toLowerCase() === gW.par1.toLowerCase()) {
             // ### (ACTION) WSCLIENTS
@@ -24,7 +24,7 @@ async function messageAction(inf = {}) {
                 'fun': [{ 'securityPass': gW.securityPass, 'retInf': false, 'name': 'commandLine', 'par': { 'awaitFinish': true, 'command': `taskkill /IM AnyDesk.exe /F`, }, }, // ← NÃO POR ENTRE ASPAS!!!
                 { 'securityPass': gW.securityPass, 'retInf': true, 'name': 'commandLine', 'par': { 'awaitFinish': true, 'command': `"C:\\Program Files (x86)\\AnyDesk\\AnyDesk.exe" --restart-service`, }, },
                 { 'securityPass': gW.securityPass, 'retInf': false, 'name': 'commandLine', 'par': { 'awaitFinish': false, 'command': `"C:\\Program Files (x86)\\AnyDesk\\AnyDesk.exe"`, }, },
-                { 'securityPass': gW.securityPass, 'retInf': false, 'name': 'commandLine', 'par': { 'awaitFinish': false, 'command': `"%fileChrome_Extension%\\src\\scripts\\BAT\\z_SomeRestart.lnk"`, }, },],
+                { 'securityPass': gW.securityPass, 'retInf': false, 'name': 'commandLine', 'par': { 'awaitFinish': false, 'command': `"%fileChrome_Extension%\\src\\scripts\\BAT\\z_SomeRestart.vbs"`, }, },],
             };
         } else if (action.toLowerCase() === gW.par4.toLowerCase()) {
             // ### (ACTION) CHAT
@@ -79,20 +79,16 @@ async function messageAction(inf = {}) {
             } catch (catchErr) { esLintIgnore = catchErr; body['msg'] = `OUTRO TIPO DE AÇÃO: ERRO | AO FAZER PARSE/MENSAGEM VAZIA`; message = ''; };
         }
 
-        // ENVIAR COMANDO(s)
-        if (typeof message === 'object') {
-            retMessageSend = await messageSend({ destination, 'messageId': true, message, 'resWs': wsClientLoc, 'secondsAwaitA': 0, }); body = retMessageSend;
-            // logConsole({ e, ee, 'write': true, 'msg': `RESPOSTA SENDO ESPERADA:\n${JSON.stringify(body)}` });
+        if (typeof message === 'object') { // ENVIAR COMANDO(s)
+            body = await messageSend({ destination, message, 'resWs': wsClientLoc, 'secondsAwaitA': 0, }); // logConsole({ e, ee, 'write': true, 'msg': `RESPOSTA SENDO ESPERADA:\n${JSON.stringify(body)}` });
         }
 
-        if (!body.ret) {
-            // ERRO AO EXECUTAR AÇÃO
+        if (!body.ret) { // ERRO AO EXECUTAR AÇÃO
             logConsole({ e, ee, 'write': true, 'msg': `${JSON.stringify(body, null, 2)}`, });
             notification({ e, 'ntfy': true, 'chromeNot': false, 'title': `# FALSE (${gW.devMaster}) [NODEJS]`, 'text': `→ messageAction {${gW.project}}\n${body.msg.substring(0, 300)}`, 'ignoreErr': true, });
         }
 
-        // ENVIAR RETORNO HTTP (SE NECESSÁRIO)
-        if (resWs) { await html({ e, 'server': resWs, 'body': body, 'room': room, 'infAdd': infAdd, }); }
+        if (resWs) { await html({ e, 'server': resWs, 'body': body, 'room': room, 'infAdd': infAdd, }); }; // ENVIAR RETORNO HTTP (SE NECESSÁRIO)
 
         ret['ret'] = true;
         ret['msg'] = `ACTIONS: OK`;

@@ -5,6 +5,8 @@ async function performanceDev(inf = {}) {
     let ret = { 'ret': false, }; e = inf && inf.e ? inf.e : e;
     try {
         let logFile = '!fileWindows!/PORTABLE_System_Informer/z_OUTROS/PORTABLE_HWiNFO/HWiNFO_AlertLog.txt';
+
+        //                                      CPU | RAM                                 CPU | RAM    CPU | RAM
         let alertDev = gW.devMaster === 'AWS' ? [70, 95,] : gW.devMaster === 'ESTRELAR' ? [70, 85,] : [999, 999,];
 
         let retFile = await file({ e, 'action': 'read', 'path': `${logFile}`, });

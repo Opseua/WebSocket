@@ -1,7 +1,7 @@
 function startupFun(b, c) { let a = c - b; let s = Math.floor(a / 1000); let m = a % 1000; let f = m.toString().padStart(3, '0'); return `${s}.${f}`; }; let startup = new Date();
 await import('./resources/@export.js'); let e = import.meta.url, ee = e;
 
-let rate = rateLimiter({ 'max': 20, 'sec': 10, });
+let rate = rateLimiter({ 'max': 20, 'sec': 10, }); let ico = `${fileWindows}/BAT/z_ICONES/websocket.ico`;
 async function serverRun(inf = {}) {
     let ret = { 'ret': false, }; e = inf && inf.e ? inf.e : e;
     try {
@@ -13,14 +13,12 @@ async function serverRun(inf = {}) {
 
         // SERVIDOR HTTP
         let wsClients = { 'rooms': {}, }, wsClientLoc; let serverHttp = _http.createServer(async (req, res) => { // EVITAR LOOP INFINITO | PRÉ-CONFIGURAÇÕES HTTP
-            function resEnd(d) { res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', }); res.end(JSON.stringify({ 'ret': !!d.ret, 'msg': d.msg || 'ERRO', })); }; let s = 'Access-Control-Allow-';
-            if (req.url === '/favicon.ico') { let ico = await _fs.promises.readFile(`${fileWindows}/BAT/z_ICONES/websocket.ico`); res.writeHead(200, { 'Content-Type': 'image/x-icon', }).end(ico); return; }
-            if (!['GET', 'POST',].includes(req.method)) {
+            function resEnd(d) { res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', }).end(JSON.stringify({ 'ret': !!d.ret, 'msg': d.msg || 'ERRO', })); }; let s = 'Access-Control-Allow-';
+            if (req.url === '/favicon.ico') { let c = await _fs.promises.readFile(ico); res.writeHead(200, { 'Content-Type': 'image/x-icon', }).end(c); return; } if (!['GET', 'POST',].includes(req.method)) {
                 res.setHeader(`${s}Origin`, '*').setHeader(`${s}Methods`, '*').setHeader(`${s}Headers`, '*').setHeader(`${s}Credentials`, 'true'); resEnd({ 'msg': `APENAS 'GET' ou 'POST'`, }); return;
-            }; if (!rate.check()) { resEnd({ 'msg': `MUITAS REQUISICOES`, }); return; }; // SALA E PARAMETROS | PROCESSAR AÇÃO/MENSAGEM RECEBIDA
-            let rRP = await roomParams({ e, 'server': req, }); if (!rRP.ret) { resEnd({ 'ret': rRP.ret, 'msg': rRP.msg, }); return; }; let { host, room, hostRoom, locWeb, action, message, method, headers, } = rRP.res;
-            res['host'] = host; res['room'] = room; res['hostRoom'] = hostRoom; res['locWeb'] = locWeb; res['method'] = method; res['headers'] = headers;
-            messageAction({ host, room, action, message, 'resWs': res, wsClients, wsClientLoc, });
+            }; if (!rate.check()) { resEnd({ 'msg': `MUITAS REQUISICOES`, }); return; }; /* SALA E PARAMETROS | PROCESSAR AÇÃO/MENSAGEM RECEBIDA */  let r = await roomParams({ e, 'server': req, });
+            if (!r.ret || r.stop) { resEnd({ 'ret': r.ret, 'msg': r.msg, }); return; }; let { host, room, hostRoom, locWeb, action, message, method, headers, } = r.res; res['host'] = host; res['room'] = room;
+            res['hostRoom'] = hostRoom; res['locWeb'] = locWeb; res['method'] = method; res['headers'] = headers; messageAction({ host, room, action, message, 'resWs': res, wsClients, wsClientLoc, });
         });
 
         // REMOVER CLIENTE
