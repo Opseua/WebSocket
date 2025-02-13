@@ -14,7 +14,7 @@ async function html(inf = {}) {
 
         // DEFINIR PÁGINAS DINÂMICAS
         if (!gW.pages) {
-            let retFile; retFile = await file({ e, 'action': 'list', 'functionLocal': false, 'path': './src/pages', 'max': 10, }); if (!retFile.ret) { retFile['res'] = []; }; let retFileNew = [];
+            let retFile; retFile = await file({ e, 'action': 'list', 'path': './src/pages', 'max': 10, }); if (!retFile.ret) { retFile['res'] = []; }; let retFileNew = [];
             for (let [index, v,] of retFile.res.entries()) { if (v.path.includes('.html')) { retFile = await file({ e, 'action': 'read', 'path': v.path, }); if (retFile.ret) { retFileNew.push(retFile.res); } } };
             if (retFileNew.length > 0) { gW.pages = retFileNew; };
         }
@@ -37,7 +37,7 @@ async function html(inf = {}) {
         if (headers.raw && infAdd.type !== 'download') {
             // ### [RAW]
             if (['obj', 'arr',].includes(infAdd.type)) { // (OBJ/ARR) # [FALSE] | (TXT) | (IMG)
-                let loc = infAdd.path; let type = (loc && loc.includes('/src/') && loc.includes('.json')) ? 'txt' : infAdd.type; resBody({ 'type': type, 'body': type === 'txt' ? 'ARQUIVO PROTEGIDO!' : body, });
+                let loc = infAdd.path; let type = (loc && loc.includes('/src/') && loc.includes('.jsonAAA')) ? 'txt' : infAdd.type; resBody({ 'type': type, 'body': type === 'txt' ? 'ARQUIVO PROTEGIDO!' : body, });
             } else if (body.ret === false) { resBody({ 'type': 'obj', 'body': body, }); } else if (!body.res) { resBody({ 'type': 'txt', 'body': 'Ação executada com sucesso!', }); }
             else if (['txt',].includes(infAdd.type)) { resBody({ 'type': 'txt', 'body': body.res, }); } else if (['img',].includes(infAdd.type)) { resBody({ 'type': 'img', 'body': body.res, }); }
         } else {
@@ -56,7 +56,7 @@ async function html(inf = {}) {
                 if (path) { if (path.length > 3) { pathFile = path.lastIndexOf('/'); pathFile = path.substring(pathFile + 1); } else { pathFile = path.replace('/', ''); } }; if (Array.isArray(retFile)) {
                     try {
                         let tableHtml = '', link = '', tipoEstilo = ''; let qtdFolder = 0, qtdFile = 0; for (let item of retFile) { if (item.isFolder) { qtdFolder++; } else { qtdFile++; } }
-                        tableHtml += '<table border="1" id="fileTable"><tr>'; tableHtml += `<th style="width: 125px; text-align: center; cursor: pointer;" onclick="sortTable(0)">TAMANHO</th>`;
+                        tableHtml += '<table border="1" id="fileTable" style="margin-bottom: 50px;"><tr>'; tableHtml += `<th style="width: 125px; text-align: center; cursor: pointer;" onclick="sortTable(0)">TAMANHO</th>`;
                         tableHtml += `<th style="width: 160px; text-align: center; cursor: pointer;" onclick="sortTable(1)">MODIFICAÇÃO</th>`;
                         tableHtml += `<th style="width: 270px; text-align: center; cursor: pointer;" onclick="sortTable(2)">MD5</th>`;
                         tableHtml += `<th style="width: 80px; text-align: center; cursor: pointer;" onclick="sortTable(3)">TIPO</th>`;
@@ -78,7 +78,7 @@ async function html(inf = {}) {
                     } catch (catchErr) { resBody({ 'type': 'txt', 'body': bodyHtml.replace('###REPLACE###', `<pre>Erro ao listar arquivos: ${catchErr.message}</pre>`), }); };
                 } else {
                     try {
-                        if (path && path.includes('/src/') && path.includes('.json')) { resBody({ 'type': 'txt', 'body': bodyHtml.replace('###REPLACE###', `<pre>ARQUIVO PROTEGIDO!</pre>`), }); } else {
+                        if (path && path.includes('/src/') && path.includes('.jsonAAA')) { resBody({ 'type': 'txt', 'body': bodyHtml.replace('###REPLACE###', `<pre>ARQUIVO PROTEGIDO!</pre>`), }); } else {
                             let resultado = retFile; if (infAdd.type === 'img' || path.match(/\.(jpg|jpeg|png|ico)$/)) { resBody({ 'type': 'base64', 'body': resultado.data, 'pathFile': infAdd.title, }); } else {
                                 resultado = resultado.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
                                 resBody({ 'type': 'txt', 'body': bodyHtml.replace('###REPLACE###', `<pre>${resultado}</pre>`).replace('WebSocket', `${pathFile}`), });

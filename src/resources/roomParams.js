@@ -56,14 +56,14 @@ async function roomParams(inf = {}) {
 
         // ENVIAR NOTIFICAÇÃO
         if (!ret.msg && method !== 'WEBSOCKET' && !!mesTem && mesTem?.fun[0]?.name === 'notification' && hostRoom === gW.devSever) {
-            try { let f = mesTem.fun[0]; delete f.par['legacy']; f.par['ignoreErr'] = true; f.par['retInf'] = f.retInf; let r = await notification(f.par); ret['ret'] = r.ret; ret['msg'] = r.msg; title = 'Notification'; }
+            try { let f = mesTem.fun[0]; f.par['legacy'] = false; f.par['ignoreErr'] = true; f.par['retInf'] = f.retInf; let r = await notification(f.par); ret['ret'] = r.ret; ret['msg'] = r.msg; title = 'Notification'; }
             catch (catchErr) { esLintIgnore = catchErr; ret['msg'] = `AO ENCAMINHAR NOTIFICAÇÃO`; }; mesTem = false; ret['stop'] = true; return ret;
         }
 
         // ALERTAR SOBRE O ERRO
         if (ret.msg && !title) {
             if (sendAlert) {
-                let text = `→ {${method}} ${ret.msg}\n➡️ ${locWeb} ${url}`; logConsole({ e, ee, 'write': true, 'msg': `${text}\n\nHEADERS:\n${JSON.stringify(headers)}\n\nMENSAGEM/BODY:\n${message || ''}`, });
+                let text = `→ {${method}} ${ret.msg}\n➡️ ${locWeb} ${url}`; logConsole({ e, ee, 'msg': `${text}\n\nHEADERS:\n${JSON.stringify(headers)}\n\nMENSAGEM/BODY:\n${message || ''}`, });
                 notification({ 'keepOld': true, 'ntfy': true, 'title': `# SERVER (${gW.devMaster}) [NODEJS]`, text, 'ignoreErr': true, });
             }; ret['stop'] = true; return ret;
         }

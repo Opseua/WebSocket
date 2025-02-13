@@ -32,7 +32,7 @@ async function messageAction(inf = {}) {
                 if (message !== '') { let retChat = await chat({ e, ...JSON.parse(message), }); body = retChat; } else {
                     body['msg'] = `CHAT: ERRO | INFORMAR OS PARAMETROS
                     provider → *JS       [nextWay]: gpt-3.5-turbo / gpt-4o-free / gemini-pro   ###   [openAi]: gpt-4o-mini
-                    provider → *PYTHON   [telegram]: gpt-4o   ###   [g4f]: gpt-4o   ###   [zukiJourney]: gpt-4   ###   [naga]: gpt-4
+                    provider → *PYTHON   [telegram]: gpt-4o   ###   [g4f]: gpt-4o   ###   [zukijourney]: gpt-4   ###   [naga]: gpt-4
                     &mes={"provider":"nextWay","model":"gpt-3.5-turbo","input":"Qual a idade de Saturno"} `;
                 }
             } catch (catchErr) { esLintIgnore = catchErr; body['msg'] = `CHAT: ERRO | AO FAZER PARSE`; };
@@ -46,17 +46,17 @@ async function messageAction(inf = {}) {
             // ### (ACTION) WEBFILE [→ TODA A SALA]
             let path = message.length < 3 || (message.includes('!le') && message.length < 10) || message.includes('a/b/c/d') ? `!letter!:/` : message;
             infAdd.type = path.match(/\.(jpg|jpeg|png|ico)$/) ? 'img' : 'arr'; infAdd.title = `WebFiles`; infAdd['path'] = path;
-            message = { 'fun': [{ 'securityPass': gW.securityPass, 'retInf': true, 'name': 'file', 'par': { 'action': 'isFolder', 'max': 1000, 'functionLocal': false, path, 'listRead': true, }, },], };
+            message = { 'fun': [{ 'securityPass': gW.securityPass, 'retInf': true, 'name': 'file', 'par': { 'action': 'isFolder', 'max': 1000, path, 'listRead': true, }, },], };
         } else if (action.toLowerCase() === gW.par9.toLowerCase()) {
             // ### (ACTION) SCREENSHOT [→ TODA A SALA] path.match(/\.(jpg|jpeg|png|ico)$/)
             infAdd.type = 'img'; infAdd.title = `screenshot`; let path = `${fileProjetos}/WebSocket/log/screenshot.png`.replace(new RegExp(`${letter}:`, 'g'), `!letter!:`); message = {
                 'fun': [{ 'securityPass': gW.securityPass, 'retInf': false, 'name': 'commandLine', 'par': { 'awaitFinish': true, 'command': `%nircmd% savescreenshot "${path}"`, }, },
-                { 'securityPass': gW.securityPass, 'retInf': true, 'name': 'file', 'par': { 'action': 'read', 'functionLocal': false, path, }, },],
+                { 'securityPass': gW.securityPass, 'retInf': true, 'name': 'file', 'par': { 'action': 'read', path, }, },],
             };
         } else if (action.toLowerCase() === gW.par10.toLowerCase()) {
             // ### (ACTION) LOOP [→ TODA A SALA '...-NODEJS-...'] | CRIAR PADRÃO DE PASTA | SCREENSHOT (MANTER awaitFinish 'true' DO CONTRÁRIO O NIRCMD ABRE O POPUP)
             infAdd.type = 'obj'; infAdd.title = `Loop`; let path = `${fileProjetos}/WebSocket/log/Registros/${time1}/${time.hou}.00-${time.hou}.59`.replace(new RegExp(`${letter}:`, 'g'), `!letter!:`); message = {
-                'fun': [{ 'securityPass': gW.securityPass, 'retInf': false, 'name': 'file', 'par': { 'action': 'write', 'functionLocal': false, 'path': `${path}/#_Z_#.txt`, 'text': `${time2}\n`, }, },
+                'fun': [{ 'securityPass': gW.securityPass, 'retInf': false, 'name': 'file', 'par': { 'action': 'write', 'path': `${path}/#_Z_#.txt`, 'text': `${time2}\n`, }, },
                 { 'securityPass': gW.securityPass, 'retInf': false, 'name': 'commandLine', 'par': { 'awaitFinish': true, 'command': `%nircmd% savescreenshot "${path}/${time2}_screenshot.png"`, }, },],
             };
         } else if (action.toLowerCase() === gW.par11.toLowerCase()) {
@@ -80,11 +80,11 @@ async function messageAction(inf = {}) {
         }
 
         if (typeof message === 'object') { // ENVIAR COMANDO(s)
-            body = await messageSend({ destination, message, 'resWs': wsClientLoc, 'secondsAwaitA': 0, }); // logConsole({ e, ee, 'write': true, 'msg': `RESPOSTA SENDO ESPERADA:\n${JSON.stringify(body)}` });
+            body = await messageSend({ destination, message, 'resWs': wsClientLoc, }); // logConsole({ e, ee, 'msg': `RESPOSTA SENDO ESPERADA:\n${JSON.stringify(body)}` });
         }
 
         if (!body.ret) { // ERRO AO EXECUTAR AÇÃO
-            logConsole({ e, ee, 'write': true, 'msg': `${JSON.stringify(body, null, 2)}`, });
+            logConsole({ e, ee, 'msg': `${JSON.stringify(body, null, 2)}`, });
             notification({ e, 'ntfy': true, 'chromeNot': false, 'title': `# FALSE (${gW.devMaster}) [NODEJS]`, 'text': `→ messageAction {${gW.project}}\n${body.msg.substring(0, 300)}`, 'ignoreErr': true, });
         }
 

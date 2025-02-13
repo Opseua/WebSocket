@@ -1,6 +1,6 @@
 // let retPerformanceDev = await performanceDev(); console.log(retPerformanceDev);
 
-let e = import.meta.url, ee = e;
+let e = import.meta.url, ee = e; let oldCpu = 0; let oldRam = 0;
 async function performanceDev(inf = {}) {
     let ret = { 'ret': false, }; e = inf && inf.e ? inf.e : e;
     try {
@@ -10,22 +10,27 @@ async function performanceDev(inf = {}) {
         let alertDev = gW.devMaster === 'AWS' ? [70, 95,] : gW.devMaster === 'ESTRELAR' ? [70, 85,] : [999, 999,];
 
         let retFile = await file({ e, 'action': 'read', 'path': `${logFile}`, });
-        if (!retFile.ret) { return retFile; }; retFile = retFile.res;
+        if (!retFile.ret || (retFile.res && (!retFile.res.includes('CPU') || !retFile.res.includes('RAM')))) { return retFile; }; retFile = retFile.res;
 
         retFile = retFile.split('\n').reverse().filter((l, i, a) => l && !a.slice(0, i).some(x => x.includes(l.includes('CPU') ? 'CPU' : 'RAM')));
         retFile = { 'cpu': parseInt(retFile.find(l => l.includes('CPU')).split(',')[3]), 'ram': parseInt(retFile.find(l => l.includes('RAM')).split(',')[3]), };
 
-        let msg = `CPU: ${retFile.cpu}% | RAM: ${retFile.ram}%`;
-        logConsole({ e, ee, 'write': true, 'msg': msg, });
+        let cpu = retFile.cpu; let ram = retFile.ram;
+
+        let msg = `CPU: ${cpu}% | RAM: ${ram}%`;
+        logConsole({ e, ee, 'msg': msg, });
         await file({ e, 'action': 'del', 'path': `${logFile}`, });
 
-        if (retFile.cpu > alertDev[0] || retFile.ram > alertDev[1]) {
+        if ((cpu > alertDev[0] && oldCpu > alertDev[0]) || (ram > alertDev[1] && oldRam > alertDev[1])) {
             await notification({ e, 'ntfy': true, 'title': `# ALERTA | (${gW.devMaster}) [NODEJS]`, 'text': msg, 'ignoreErr': true, });
         };
 
-        ret['res'] = retFile;
+        ret['res'] = { 'cpu': cpu, 'oldCpu': oldCpu, 'ram': ram, 'oldRam': oldRam, };
         ret['msg'] = `PERFORMANCE: OK`;
         ret['ret'] = true;
+
+        // MANTER NO FIM
+        oldCpu = cpu; oldRam = ram;
 
     } catch (catchErr) {
         let retRegexE = await regexE({ 'inf': inf, 'e': catchErr, }); ret['msg'] = retRegexE.res; ret['ret'] = false; delete ret['res'];
