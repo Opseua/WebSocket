@@ -35,7 +35,7 @@ async function serverRun(inf = {}) {
         }; setInterval(() => { lastMessageReceived(); }, (secPing * 2) * 1000);
 
         // ############# SERVIDOR HTTP | SERVIDOR: INICIAR | ERROS SERVIDOR (ERROS QUE NÃO SEJAM DO DESLIGAMENTO DO SNIFFER)
-        async function serverErr(err) { let errString = err.toString(); if (errString.includes('EADDRINUSE') || !errString.includes('ECONNRESET')) { await regexE({ 'inf': inf, 'e': err, }); process.exit(1); } };
+        async function serverErr(err) { let errString = err.toString(); if (errString.includes('EADDRINUSE') || !errString.includes('ECONNRESET')) { await regexE({ inf, 'e': err, }); process.exit(1); } };
         serverHttp.listen((gW.portLoc), () => {
             // SERVIDOR WEBSOCKET | ### ON CONNECTION
             let wss = new _WebSocketServer({ 'server': serverHttp, }); wss.on('connection', async (ws, res) => {
@@ -49,14 +49,14 @@ async function serverRun(inf = {}) {
                     let message = data.toString('utf-8'); if (message.length === 0) { ws.send(`WEBSCOKET: ERRO | MENSAGEM VAZIA ${locWeb} '${room}'`); } else {
                         let pingPong = message === `ping` ? 1 : message === `pong` ? 2 : 0; ws['lastMessage'] = ws.lastMessage || pingPong > 0 ? Number(dateHour().res.tim) : false; // ÚLTIMA MENSAGEM RECEBIDA
                         if (pingPong > 0) { if (pingPong === 2) { return; }; ws.send('pong'); /* RECEBIDO: 'PING' ENVIAR 'PONG' */ } else {
-                            try { message = JSON.parse(message); } catch (catchErr) { message = { 'message': message, }; regexE({ 'inf': message, 'e': catchErr, }); };
-                            if (!message.message) { message = { 'message': message, }; logConsole({ e, ee, 'msg': `ERRO M2`, }); }; if (ws.lastMessage) { ws.send(`pong`); };
+                            try { message = JSON.parse(message); } catch (catchErr) { message = { message, }; regexE({ 'inf': message, 'e': catchErr, }); };
+                            if (!message.message) { message = { message, }; logConsole({ e, ee, 'msg': `ERRO M2`, }); }; if (ws.lastMessage) { ws.send(`pong`); };
                             function processMes() { messageReceived({ ...message, host, room, 'resWs': ws, wsClients, }); }; if (!(typeof message.message === 'object' && !message.buffer)) { processMes(); } else {
                                 let text = false; if (!(message.message.fun && Array.isArray(message.message.fun))) { text = `SERVER WS: ERRO | CHAVE 'fun' NÃO ENCONTRADA/NÃO É ARRAY\n\n→ ${ws.hostRoom}`; }
                                 else if (!message.message.fun.every(item => item.securityPass === gW.securityPass)) { text = `SERVER WS: ERRO | SECURITY PASS INVÁLIDO\n\n→ ${ws.hostRoom}`; }
                                 if (!text) { processMes(); /* PROCESSAR MENSAGEM RECEBIDA */ } else {
                                     ws.send(JSON.stringify({ 'ret': false, 'msg': text, })); logConsole({ e, ee, 'msg': `${text}\n\n${data.toString('utf-8')}`, });
-                                    notification({ 'keepOld': true, 'ntfy': true, 'title': `# WS (${gW.devMaster}) [NODEJS]`, text, 'ignoreErr': true, }); // ALERTAR SOBRE O ERRO
+                                    notification({ 'keepOld': true, 'title': `# WS (${gW.devMaster}) [NODEJS]`, text, 'ignoreErr': true, }); // ALERTAR SOBRE O ERRO
                                 }
                             }
                         }
@@ -73,8 +73,8 @@ async function serverRun(inf = {}) {
             let locWeb = host.includes('127.0.0') ? `[LOC]` : `[WEB]`; ws['host'] = host; ws['room'] = room; ws['hostRoom'] = hostRoom; ws['locWeb'] = locWeb; ws['method'] = 'WEBSOCKET'; wsClientLoc = ws;
             ws.on('error', (data) => { logConsole({ e, ee, 'msg': `CLIENT LOC | ERRO\n${JSON.stringify(data.toString('utf-8'))}`, }); }); ws.on('message', async (data) => {
                 let message = data.toString('utf-8'); let pingPong = message === `ping` ? 1 : message === `pong` ? 2 : 0;
-                if (pingPong > 0) { return; }; try { message = JSON.parse(message); } catch (catchErr) { esLintIgnore = catchErr; message = { 'message': message, }; };
-                if (!message.message) { message = { 'message': message, }; }; messageReceived({ ...message, host, room, 'resWs': ws, }); // PROCESSAR MENSAGEM RECEBIDA
+                if (pingPong > 0) { return; }; try { message = JSON.parse(message); } catch (catchErr) { esLintIgnore = catchErr; message = { message, }; };
+                if (!message.message) { message = { message, }; }; messageReceived({ ...message, host, room, 'resWs': ws, }); // PROCESSAR MENSAGEM RECEBIDA
             }); // -------------------------------------------------------------------------------------------------------------
 
             // CLIENT (NÃO POR COMO 'await'!!!) [MANTER NO FINAL]
@@ -83,8 +83,7 @@ async function serverRun(inf = {}) {
             // ACTION LOOP [SOMENTE SE FOR NO AWS (08H<>23H)] PARA TODOS OS '*-NODEJS-*'
             setInterval(async () => {
                 let time = dateHour().res; if (gW.devMaster === 'AWS' && Number(time.hou) > 7 && Number(time.hou) < 24) {
-                    logConsole({ e, ee, 'msg': `ACTION: LOOP`, });
-                    await messageAction({ host, 'room': '*-NODEJS-*', 'destination': '*-NODEJS-*', 'action': gW.par10, 'message': '', 'resWs': false, wsClients, wsClientLoc, });
+                    logConsole({ e, ee, 'msg': `ACTION: LOOP`, }); await messageAction({ host, 'room': '*-NODEJS-*', 'destination': '*-NODEJS-*', 'action': gW.par10, 'message': '', 'resWs': false, wsClients, wsClientLoc, });
                 }
             }, (gW.secLoop * 1000));
         }).on('error', (err) => { serverErr(err); });
@@ -96,7 +95,7 @@ async function serverRun(inf = {}) {
         ret['msg'] = `SERVER: OK`;
 
     } catch (catchErr) {
-        let retRegexE = await regexE({ 'inf': inf, 'e': catchErr, }); ret['msg'] = retRegexE.res; ret['ret'] = false; delete ret['res'];
+        let retRegexE = await regexE({ inf, 'e': catchErr, }); ret['msg'] = retRegexE.res; ret['ret'] = false; delete ret['res'];
     };
 
     return { ...({ 'ret': ret.ret, }), ...(ret.msg && { 'msg': ret.msg, }), ...(ret.res && { 'res': ret.res, }), };

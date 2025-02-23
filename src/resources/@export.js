@@ -24,10 +24,10 @@ let qtd1 = 0; async function funImport(infOk) { let { path, inf, } = infOk; qtd1
 async function funGeneric(infOk) { let { path, inf, } = infOk; let name = funFile(path); let retDevAndFun = await devFun({ 'e': import.meta.url, 'enc': true, 'data': { name, 'par': inf, }, }); return retDevAndFun; };
 
 // FUNÇÕES DESSE PROJETO
-gloWin['html'] = (inf) => { let fun = (!eng) ? funImport : funGeneric; return fun({ 'path': './html.js', 'inf': inf, }); };
-gloWin['logsDelOld'] = (inf) => { let fun = (!eng) ? funImport : funGeneric; return fun({ 'path': './logsDelOld.js', 'inf': inf, }); };
-gloWin['messageAction'] = (inf) => { let fun = (!eng) ? funImport : funGeneric; return fun({ 'path': './messageAction.js', 'inf': inf, }); };
-gloWin['performanceDev'] = (inf) => { let fun = (!eng) ? funImport : funGeneric; return fun({ 'path': './performanceDev.js', 'inf': inf, }); };
-gloWin['roomParams'] = (inf) => { let fun = (!eng) ? funImport : funGeneric; return fun({ 'path': './roomParams.js', 'inf': inf, }); };
+gloWin['html'] = (inf) => { let fun = (!eng) ? funImport : funGeneric; return fun({ 'path': './html.js', inf, }); };
+gloWin['logsDelOld'] = (inf) => { let fun = (!eng) ? funImport : funGeneric; return fun({ 'path': './logsDelOld.js', inf, }); };
+gloWin['messageAction'] = (inf) => { let fun = (!eng) ? funImport : funGeneric; return fun({ 'path': './messageAction.js', inf, }); };
+gloWin['performanceDev'] = (inf) => { let fun = (!eng) ? funImport : funGeneric; return fun({ 'path': './performanceDev.js', inf, }); };
+gloWin['roomParams'] = (inf) => { let fun = (!eng) ? funImport : funGeneric; return fun({ 'path': './roomParams.js', inf, }); };
 
 

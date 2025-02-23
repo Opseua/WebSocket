@@ -20,11 +20,11 @@ async function messageAction(inf = {}) {
             } catch (catchErr) { esLintIgnore = catchErr; body['msg'] = `CLIENTS: ERRO | AO PEGAR CLIENTES`; };
         } else if (action.toLowerCase() === gW.par3.toLowerCase()) {
             // ### (ACTION) RESTART (+AnyDesk) [→ TODA A SALA]
-            infAdd.type = 'obj'; infAdd.title = `Restart (Server's + AnyDesk)`; message = {
-                'fun': [{ 'securityPass': gW.securityPass, 'retInf': false, 'name': 'commandLine', 'par': { 'awaitFinish': true, 'command': `taskkill /IM AnyDesk.exe /F`, }, }, // ← NÃO POR ENTRE ASPAS!!!
-                { 'securityPass': gW.securityPass, 'retInf': true, 'name': 'commandLine', 'par': { 'awaitFinish': true, 'command': `"C:\\Program Files (x86)\\AnyDesk\\AnyDesk.exe" --restart-service`, }, },
-                { 'securityPass': gW.securityPass, 'retInf': false, 'name': 'commandLine', 'par': { 'awaitFinish': false, 'command': `"C:\\Program Files (x86)\\AnyDesk\\AnyDesk.exe"`, }, },
-                { 'securityPass': gW.securityPass, 'retInf': false, 'name': 'commandLine', 'par': { 'awaitFinish': false, 'command': `"%fileChrome_Extension%\\src\\scripts\\BAT\\z_SomeRestart.vbs"`, }, },],
+            infAdd.type = 'obj'; infAdd.title = `Restart (Server's + AnyDesk)`; let securityPass = gW.securityPass; message = {
+                'fun': [{ securityPass, 'name': 'commandLine', 'par': { 'awaitFinish': true, 'command': `taskkill /IM AnyDesk.exe /F`, }, }, // ← NÃO POR ENTRE ASPAS!!!
+                { securityPass, 'retInf': true, 'name': 'commandLine', 'par': { 'awaitFinish': true, 'command': `"C:\\Program Files (x86)\\AnyDesk\\AnyDesk.exe" --restart-service`, }, },
+                { securityPass, 'name': 'commandLine', 'par': { 'command': `"C:\\Program Files (x86)\\AnyDesk\\AnyDesk.exe"`, }, },
+                { securityPass, 'name': 'commandLine', 'par': { 'command': `%fileWindows%\\BAT\\RECORRENTES\\zz_RUN_ADM.vbs %fileChrome_Extension%\\src\\scripts\\BAT\\zz_COMMANDS.bat ATALHO_RESTART_`, }, },],
             };
         } else if (action.toLowerCase() === gW.par4.toLowerCase()) {
             // ### (ACTION) CHAT
@@ -85,16 +85,16 @@ async function messageAction(inf = {}) {
 
         if (!body.ret) { // ERRO AO EXECUTAR AÇÃO
             logConsole({ e, ee, 'msg': `${JSON.stringify(body, null, 2)}`, });
-            notification({ e, 'ntfy': true, 'chromeNot': false, 'title': `# FALSE (${gW.devMaster}) [NODEJS]`, 'text': `→ messageAction {${gW.project}}\n${body.msg.substring(0, 300)}`, 'ignoreErr': true, });
+            notification({ e, 'title': `# FALSE (${gW.devMaster}) [NODEJS]`, 'text': `→ messageAction {${gW.project}}\n${body.msg.substring(0, 300)}`, 'ignoreErr': true, });
         }
 
-        if (resWs) { await html({ e, 'server': resWs, 'body': body, 'room': room, 'infAdd': infAdd, }); }; // ENVIAR RETORNO HTTP (SE NECESSÁRIO)
+        if (resWs) { await html({ e, 'server': resWs, body, room, infAdd, }); }; // ENVIAR RETORNO HTTP (SE NECESSÁRIO)
 
         ret['ret'] = true;
         ret['msg'] = `ACTIONS: OK`;
 
     } catch (catchErr) {
-        let retRegexE = await regexE({ 'inf': inf, 'e': catchErr, }); ret['msg'] = retRegexE.res; ret['ret'] = false; delete ret['res'];
+        let retRegexE = await regexE({ inf, 'e': catchErr, }); ret['msg'] = retRegexE.res; ret['ret'] = false; delete ret['res'];
     };
 
     return { ...({ 'ret': ret.ret, }), ...(ret.msg && { 'msg': ret.msg, }), ...(ret.res && { 'res': ret.res, }), };

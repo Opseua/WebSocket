@@ -71,19 +71,19 @@ async function roomParams(inf = {}) {
         ret['ret'] = title ? ret.ret : true;
         ret['msg'] = title ? ret.msg : 'ROOM PARAMS: OK';
         ret['res'] = {
-            'method': method,
-            'host': host,
+            method,
+            host,
             'room': room || '',
-            'hostRoom': hostRoom,
-            'locWeb': locWeb,
+            hostRoom,
+            locWeb,
             'action': action || '',
             'message': message || '',
             'headers': headers || {},
-            'title': title,
+            title,
         };
 
     } catch (catchErr) {
-        let retRegexE = await regexE({ 'inf': inf, 'e': catchErr, }); ret['msg'] = retRegexE.res; ret['ret'] = false; delete ret['res'];
+        let retRegexE = await regexE({ inf, 'e': catchErr, }); ret['msg'] = retRegexE.res; ret['ret'] = false; delete ret['res'];
     };
 
     return { ...({ 'ret': ret.ret, }), ...(ret.msg && { 'msg': ret.msg, }), ...(ret.res && { 'res': ret.res, }), };

@@ -37,8 +37,8 @@ async function html(inf = {}) {
         if (headers.raw && infAdd.type !== 'download') {
             // ### [RAW]
             if (['obj', 'arr',].includes(infAdd.type)) { // (OBJ/ARR) # [FALSE] | (TXT) | (IMG)
-                let loc = infAdd.path; let type = (loc && loc.includes('/src/') && loc.includes('.jsonAAA')) ? 'txt' : infAdd.type; resBody({ 'type': type, 'body': type === 'txt' ? 'ARQUIVO PROTEGIDO!' : body, });
-            } else if (body.ret === false) { resBody({ 'type': 'obj', 'body': body, }); } else if (!body.res) { resBody({ 'type': 'txt', 'body': 'Ação executada com sucesso!', }); }
+                let loc = infAdd.path; let type = (loc && loc.includes('/src/') && loc.includes('.jsonAAA')) ? 'txt' : infAdd.type; resBody({ type, 'body': type === 'txt' ? 'ARQUIVO PROTEGIDO!' : body, });
+            } else if (body.ret === false) { resBody({ 'type': 'obj', body, }); } else if (!body.res) { resBody({ 'type': 'txt', 'body': 'Ação executada com sucesso!', }); }
             else if (['txt',].includes(infAdd.type)) { resBody({ 'type': 'txt', 'body': body.res, }); } else if (['img',].includes(infAdd.type)) { resBody({ 'type': 'img', 'body': body.res, }); }
         } else {
             // ### [RENDERIZAR]
@@ -93,7 +93,7 @@ async function html(inf = {}) {
         ret['msg'] = `HTML: OK`;
 
     } catch (catchErr) {
-        let retRegexE = await regexE({ 'inf': inf, 'e': catchErr, }); ret['msg'] = retRegexE.res; ret['ret'] = false; delete ret['res'];
+        let retRegexE = await regexE({ inf, 'e': catchErr, }); ret['msg'] = retRegexE.res; ret['ret'] = false; delete ret['res'];
     };
 
     return { ...({ 'ret': ret.ret, }), ...(ret.msg && { 'msg': ret.msg, }), ...(ret.res && { 'res': ret.res, }), };

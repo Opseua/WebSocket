@@ -18,7 +18,7 @@ async function logsDelOld(inf = {}) {
         let pathsToDel = [
 
             // [WINDOWS] BAT
-            { 'daysKeep': 7, 'path': `${fileWindows}/BAT/z_log`, },
+            { 'daysKeep': 7, 'path': `${fileWindows}/BAT/z_logs`, },
 
             // [PROJETOS] Chat_Python
             { 'daysKeep': daysKeep[0], 'path': `${fileProjetos}/Chat_Python/log/JavaScript`, },
@@ -83,7 +83,7 @@ async function logsDelOld(inf = {}) {
         ret['ret'] = true;
 
     } catch (catchErr) {
-        let retRegexE = await regexE({ 'inf': inf, 'e': catchErr, }); ret['msg'] = retRegexE.res; ret['ret'] = false; delete ret['res'];
+        let retRegexE = await regexE({ inf, 'e': catchErr, }); ret['msg'] = retRegexE.res; ret['ret'] = false; delete ret['res'];
     };
 
     return { ...({ 'ret': ret.ret, }), ...(ret.msg && { 'msg': ret.msg, }), ...(ret.res && { 'res': ret.res, }), };

@@ -18,14 +18,14 @@ async function performanceDev(inf = {}) {
         let cpu = retFile.cpu; let ram = retFile.ram;
 
         let msg = `CPU: ${cpu}% | RAM: ${ram}%`;
-        logConsole({ e, ee, 'msg': msg, });
+        logConsole({ e, ee, msg, });
         await file({ e, 'action': 'del', 'path': `${logFile}`, });
 
         if ((cpu > alertDev[0] && oldCpu > alertDev[0]) || (ram > alertDev[1] && oldRam > alertDev[1])) {
-            await notification({ e, 'ntfy': true, 'title': `# ALERTA | (${gW.devMaster}) [NODEJS]`, 'text': msg, 'ignoreErr': true, });
+            await notification({ e, 'title': `# ALERTA | (${gW.devMaster}) [NODEJS]`, 'text': msg, 'ignoreErr': true, });
         };
 
-        ret['res'] = { 'cpu': cpu, 'oldCpu': oldCpu, 'ram': ram, 'oldRam': oldRam, };
+        ret['res'] = { cpu, oldCpu, ram, oldRam, };
         ret['msg'] = `PERFORMANCE: OK`;
         ret['ret'] = true;
 
@@ -33,7 +33,7 @@ async function performanceDev(inf = {}) {
         oldCpu = cpu; oldRam = ram;
 
     } catch (catchErr) {
-        let retRegexE = await regexE({ 'inf': inf, 'e': catchErr, }); ret['msg'] = retRegexE.res; ret['ret'] = false; delete ret['res'];
+        let retRegexE = await regexE({ inf, 'e': catchErr, }); ret['msg'] = retRegexE.res; ret['ret'] = false; delete ret['res'];
     };
 
     return { ...({ 'ret': ret.ret, }), ...(ret.msg && { 'msg': ret.msg, }), ...(ret.res && { 'res': ret.res, }), };
