@@ -10,7 +10,7 @@ async function performanceDev(inf = {}) {
         let alertDev = gW.devMaster === 'AWS' ? [70, 95,] : gW.devMaster === 'ESTRELAR' ? [70, 85,] : [999, 999,];
 
         let retFile = await file({ e, 'action': 'read', 'path': `${logFile}`, });
-        if (!retFile.ret || (retFile.res && (!retFile.res.includes('CPU') || !retFile.res.includes('RAM')))) { return retFile; }; retFile = retFile.res;
+        if (!retFile.ret || (retFile.res && (!retFile.res.includes('CPU') || !retFile.res.includes('RAM')))) { return retFile; } retFile = retFile.res;
 
         retFile = retFile.split('\n').reverse().filter((l, i, a) => l && !a.slice(0, i).some(x => x.includes(l.includes('CPU') ? 'CPU' : 'RAM')));
         retFile = { 'cpu': parseInt(retFile.find(l => l.includes('CPU')).split(',')[3]), 'ram': parseInt(retFile.find(l => l.includes('RAM')).split(',')[3]), };
@@ -23,7 +23,7 @@ async function performanceDev(inf = {}) {
 
         if ((cpu > alertDev[0] && oldCpu > alertDev[0]) || (ram > alertDev[1] && oldRam > alertDev[1])) {
             await notification({ e, 'title': `# ALERTA | (${gW.devMaster}) [NODEJS]`, 'text': msg, 'ignoreErr': true, });
-        };
+        }
 
         ret['res'] = { cpu, oldCpu, ram, oldRam, };
         ret['msg'] = `PERFORMANCE: OK`;
@@ -34,10 +34,10 @@ async function performanceDev(inf = {}) {
 
     } catch (catchErr) {
         let retRegexE = await regexE({ inf, 'e': catchErr, }); ret['msg'] = retRegexE.res; ret['ret'] = false; delete ret['res'];
-    };
+    }
 
     return { ...({ 'ret': ret.ret, }), ...(ret.msg && { 'msg': ret.msg, }), ...(ret.res && { 'res': ret.res, }), };
-};
+}
 
 // CHROME | NODEJS
 (eng ? window : global)['performanceDev'] = performanceDev;

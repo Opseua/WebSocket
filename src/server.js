@@ -1,4 +1,4 @@
-function startupFun(b, c) { let a = c - b; let s = Math.floor(a / 1000); let m = a % 1000; let f = m.toString().padStart(3, '0'); return `${s}.${f}`; }; let startup = new Date();
+function startupFun(b, c) { let a = c - b; let s = Math.floor(a / 1000); let m = a % 1000; let f = m.toString().padStart(3, '0'); return `${s}.${f}`; } let startup = new Date();
 await import('./resources/@export.js'); let e = import.meta.url, ee = e;
 
 let rateHttp = rateLimiter({ 'max': 20, 'sec': 10, }); let rateWs = rateLimiter({ 'max': 20, 'sec': 10, }); let ico = `${fileWindows}/BAT/z_ICONES/websocket.ico`, s = 'Access-Control-Allow-';
@@ -8,16 +8,16 @@ async function serverRun(inf = {}) {
         logConsole({ e, ee, 'msg': `**************** SERVER **************** [${startupFun(startup, new Date())}]`, });
 
         // IMPORTAR BIBLIOTECA [NODEJS]
-        if (typeof _WebSocket === 'undefined') { await funLibrary({ 'lib': '_WebSocket', }); }; if (typeof _WebSocketServer === 'undefined') { await funLibrary({ 'lib': '_WebSocketServer', }); };
-        if (typeof _http === 'undefined') { await funLibrary({ 'lib': '_http', }); };
+        if (typeof _WebSocket === 'undefined') { await funLibrary({ 'lib': '_WebSocket', }); } if (typeof _WebSocketServer === 'undefined') { await funLibrary({ 'lib': '_WebSocketServer', }); }
+        if (typeof _http === 'undefined') { await funLibrary({ 'lib': '_http', }); }
 
         // ############# SERVIDOR HTTP
         let wsClients = { 'rooms': {}, }, wsClientLoc; let serverHttp = _http.createServer(async (req, res) => { // EVITAR LOOP INFINITO | PRÉ-CONFIGURAÇÕES HTTP
-            function resEnd(d) { res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', }).end(JSON.stringify({ ret: !!d.ret, msg: `SERVER [WS]: ERRO | ${d.msg || '*'}`, })); };
+            function resEnd(d) { res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', }).end(JSON.stringify({ ret: !!d.ret, msg: `SERVER [WS]: ERRO | ${d.msg || '*'}`, })); }
             if (req.url === '/favicon.ico') { let c = await _fs.promises.readFile(ico); res.writeHead(200, { 'Content-Type': 'image/x-icon', }).end(c); return; } if (!['GET', 'POST',].includes(req.method)) {
                 res.setHeader(`${s}Origin`, '*').setHeader(`${s}Methods`, '*').setHeader(`${s}Headers`, '*').setHeader(`${s}Credentials`, 'true'); resEnd({ 'msg': `APENAS 'GET' ou 'POST'`, }); return;
-            }; if (!rateHttp.check()) { resEnd({ 'msg': `MUITAS REQUISICOES`, }); return; }; /* SALA E PARAMETROS | PROCESSAR AÇÃO/MENSAGEM RECEBIDA */  let r = await roomParams({ e, 'server': req, });
-            if (!r.ret || r.stop) { resEnd({ 'ret': r.ret, 'msg': r.msg, }); return; }; let { host, room, hostRoom, locWeb, action, message, method, headers, } = r.res; res['host'] = host; res['room'] = room;
+            } if (!rateHttp.check()) { resEnd({ 'msg': `MUITAS REQUISICOES`, }); return; } /* SALA E PARAMETROS | PROCESSAR AÇÃO/MENSAGEM RECEBIDA */  let r = await roomParams({ e, 'server': req, });
+            if (!r.ret || r.stop) { resEnd({ 'ret': r.ret, 'msg': r.msg, }); return; } let { host, room, hostRoom, locWeb, action, message, method, headers, } = r.res; res['host'] = host; res['room'] = room;
             res['hostRoom'] = hostRoom; res['locWeb'] = locWeb; res['method'] = method; res['headers'] = headers; messageAction({ host, room, action, message, 'resWs': res, wsClients, wsClientLoc, });
         });
 
@@ -28,30 +28,30 @@ async function serverRun(inf = {}) {
         let secPing = gW.secPing; function lastMessageReceived() {
             for (let clientSet of Object.values(wsClients.rooms)) {
                 for (let value of clientSet) {
-                    function check(inf = {}) { let { lastMessage, locWeb, room, } = inf; return { 'dif': lastMessage ? Number(dateHour().res.tim) - lastMessage : -99, locWeb, room, }; }; let retCheck = check(value);
-                    if (retCheck.dif > ((secPing * 2) - 1)) { logConsole({ e, ee, 'msg': `DESCONECTAR [PING ${retCheck.dif}] ${retCheck.locWeb} '${retCheck.room}'`, }); value.close(); };
+                    function check(inf = {}) { let { lastMessage, locWeb, room, } = inf; return { 'dif': lastMessage ? Number(dateHour().res.tim) - lastMessage : -99, locWeb, room, }; } let retCheck = check(value);
+                    if (retCheck.dif > ((secPing * 2) - 1)) { logConsole({ e, ee, 'msg': `DESCONECTAR [PING ${retCheck.dif}] ${retCheck.locWeb} '${retCheck.room}'`, }); value.close(); }
                 }
-            };
-        }; setInterval(() => { lastMessageReceived(); }, (secPing * 2) * 1000);
+            }
+        } setInterval(() => { lastMessageReceived(); }, (secPing * 2) * 1000);
 
         // ############# SERVIDOR HTTP | SERVIDOR: INICIAR | ERROS SERVIDOR (ERROS QUE NÃO SEJAM DO DESLIGAMENTO DO SNIFFER)
-        async function serverErr(err) { let errString = err.toString(); if (errString.includes('EADDRINUSE') || !errString.includes('ECONNRESET')) { await regexE({ inf, 'e': err, }); process.exit(1); } };
+        async function serverErr(err) { let errString = err.toString(); if (errString.includes('EADDRINUSE') || !errString.includes('ECONNRESET')) { await regexE({ inf, 'e': err, }); process.exit(1); } }
         serverHttp.listen((gW.portLoc), () => {
             // SERVIDOR WEBSOCKET | ### ON CONNECTION
             let wss = new _WebSocketServer({ 'server': serverHttp, }); wss.on('connection', async (ws, res) => {
                 // SALA PARAMETROS E [ADICIONAR] | ENVIAR PING DE INÍCIO DE CONEXÃO | EVITAR LOOP INFINITO
-                if (!rateWs.check()) { return; } let rRP = await roomParams({ e, 'server': res, }); if (!rRP.ret) { ws.send(JSON.stringify({ 'ret': rRP.ret, 'msg': rRP.msg || 'ERRO', })); ws.terminate(); return; };
+                if (!rateWs.check()) { return; } let rRP = await roomParams({ e, 'server': res, }); if (!rRP.ret) { ws.send(JSON.stringify({ 'ret': rRP.ret, 'msg': rRP.msg || 'ERRO', })); ws.terminate(); return; }
                 let { host, room, hostRoom, locWeb, method, } = rRP.res; ws['host'] = host; ws['room'] = room; ws['hostRoom'] = hostRoom; ws['locWeb'] = locWeb; ws['method'] = method; let t = dateHour().res;
-                t = `${t.day}/${t.mon}/${t.yea} ${t.hou}:${t.min}:${t.sec}.${t.mil}`; ws['dateHour'] = t; if (!wsClients.rooms[hostRoom]) { wsClients.rooms[hostRoom] = new Set(); }; wsClients.rooms[hostRoom].add(ws);
+                t = `${t.day}/${t.mon}/${t.yea} ${t.hou}:${t.min}:${t.sec}.${t.mil}`; ws['dateHour'] = t; if (!wsClients.rooms[hostRoom]) { wsClients.rooms[hostRoom] = new Set(); } wsClients.rooms[hostRoom].add(ws);
 
                 // ### ON MESSAGE
                 ws.on('message', async (data) => {
                     let message = data.toString('utf-8'); if (message.length === 0) { ws.send(`WEBSCOKET: ERRO | MENSAGEM VAZIA ${locWeb} '${room}'`); } else {
                         let pingPong = message === `ping` ? 1 : message === `pong` ? 2 : 0; ws['lastMessage'] = ws.lastMessage || pingPong > 0 ? Number(dateHour().res.tim) : false; // ÚLTIMA MENSAGEM RECEBIDA
-                        if (pingPong > 0) { if (pingPong === 2) { return; }; ws.send('pong'); /* RECEBIDO: 'PING' ENVIAR 'PONG' */ } else {
-                            try { message = JSON.parse(message); } catch (catchErr) { message = { message, }; regexE({ 'inf': message, 'e': catchErr, }); };
-                            if (!message.message) { message = { message, }; logConsole({ e, ee, 'msg': `ERRO M2`, }); }; if (ws.lastMessage) { ws.send(`pong`); };
-                            function processMes() { messageReceived({ ...message, host, room, 'resWs': ws, wsClients, }); }; if (!(typeof message.message === 'object' && !message.buffer)) { processMes(); } else {
+                        if (pingPong > 0) { if (pingPong === 2) { return; } ws.send('pong'); /* RECEBIDO: 'PING' ENVIAR 'PONG' */ } else {
+                            try { message = JSON.parse(message); } catch (catchErr) { message = { message, }; regexE({ 'inf': message, 'e': catchErr, }); }
+                            if (!message.message) { message = { message, }; logConsole({ e, ee, 'msg': `ERRO M2`, }); } if (ws.lastMessage) { ws.send(`pong`); }
+                            function processMes() { messageReceived({ ...message, host, room, 'resWs': ws, wsClients, }); } if (!(typeof message.message === 'object' && !message.buffer)) { processMes(); } else {
                                 let text = false; if (!(message.message.fun && Array.isArray(message.message.fun))) { text = `SERVER WS: ERRO | CHAVE 'fun' NÃO ENCONTRADA/NÃO É ARRAY\n\n→ ${ws.hostRoom}`; }
                                 else if (!message.message.fun.every(item => item.securityPass === gW.securityPass)) { text = `SERVER WS: ERRO | SECURITY PASS INVÁLIDO\n\n→ ${ws.hostRoom}`; }
                                 if (!text) { processMes(); /* PROCESSAR MENSAGEM RECEBIDA */ } else {
@@ -73,8 +73,8 @@ async function serverRun(inf = {}) {
             let locWeb = host.includes('127.0.0') ? `[LOC]` : `[WEB]`; ws['host'] = host; ws['room'] = room; ws['hostRoom'] = hostRoom; ws['locWeb'] = locWeb; ws['method'] = 'WEBSOCKET'; wsClientLoc = ws;
             ws.on('error', (data) => { logConsole({ e, ee, 'msg': `CLIENT LOC | ERRO\n${JSON.stringify(data.toString('utf-8'))}`, }); }); ws.on('message', async (data) => {
                 let message = data.toString('utf-8'); let pingPong = message === `ping` ? 1 : message === `pong` ? 2 : 0;
-                if (pingPong > 0) { return; }; try { message = JSON.parse(message); } catch (catchErr) { esLintIgnore = catchErr; message = { message, }; };
-                if (!message.message) { message = { message, }; }; messageReceived({ ...message, host, room, 'resWs': ws, }); // PROCESSAR MENSAGEM RECEBIDA
+                if (pingPong > 0) { return; } try { message = JSON.parse(message); } catch (catchErr) { message = { message, }; }
+                if (!message.message) { message = { message, }; } messageReceived({ ...message, host, room, 'resWs': ws, }); // PROCESSAR MENSAGEM RECEBIDA
             }); // -------------------------------------------------------------------------------------------------------------
 
             // CLIENT (NÃO POR COMO 'await'!!!) [MANTER NO FINAL]
@@ -96,7 +96,7 @@ async function serverRun(inf = {}) {
 
     } catch (catchErr) {
         let retRegexE = await regexE({ inf, 'e': catchErr, }); ret['msg'] = retRegexE.res; ret['ret'] = false; delete ret['res'];
-    };
+    }
 
     return { ...({ 'ret': ret.ret, }), ...(ret.msg && { 'msg': ret.msg, }), ...(ret.res && { 'res': ret.res, }), };
 }

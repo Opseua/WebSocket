@@ -18,33 +18,33 @@ async function logsDelOld(inf = {}) {
         let pathsToDel = [
 
             // [WINDOWS] BAT
-            { 'daysKeep': 7, 'path': `${fileWindows}/BAT/z_logs`, },
+            { 'daysKeep': 7, 'path': `${fileWindows}/BAT/z_log`, },
 
             // [PROJETOS] Chat_Python
-            { 'daysKeep': daysKeep[0], 'path': `${fileProjetos}/Chat_Python/log/JavaScript`, },
-            { 'daysKeep': daysKeep[1], 'path': `${fileProjetos}/Chat_Python/log/Registros`, },
-            { 'daysKeep': daysKeep[0], 'path': `${fileProjetos}/Chat_Python/log/Python`, },
+            { 'daysKeep': daysKeep[0], 'path': `${fileProjetos}/Chat_Python/logs/JavaScript`, },
+            { 'daysKeep': daysKeep[1], 'path': `${fileProjetos}/Chat_Python/logs/Registros`, },
+            { 'daysKeep': daysKeep[0], 'path': `${fileProjetos}/Chat_Python/logs/Python`, },
 
             // [PROJETOS] Chrome_Extension
-            { 'daysKeep': daysKeep[0], 'path': `${fileProjetos}/Chrome_Extension/log/JavaScript`, },
-            { 'daysKeep': daysKeep[1], 'path': `${fileProjetos}/Chrome_Extension/log/Registros`, },
+            { 'daysKeep': daysKeep[0], 'path': `${fileProjetos}/Chrome_Extension/logs/JavaScript`, },
+            { 'daysKeep': daysKeep[1], 'path': `${fileProjetos}/Chrome_Extension/logs/Registros`, },
 
             // [PROJETOS] Sniffer_Python
-            { 'daysKeep': daysKeep[0], 'path': `${fileProjetos}/Sniffer_Python/log/JavaScript`, },
-            { 'daysKeep': daysKeep[1], 'path': `${fileProjetos}/Sniffer_Python/log/Registros`, },
-            { 'daysKeep': daysKeep[0], 'path': `${fileProjetos}/Sniffer_Python/log/Python`, },
+            { 'daysKeep': daysKeep[0], 'path': `${fileProjetos}/Sniffer_Python/logs/JavaScript`, },
+            { 'daysKeep': daysKeep[1], 'path': `${fileProjetos}/Sniffer_Python/logs/Registros`, },
+            { 'daysKeep': daysKeep[0], 'path': `${fileProjetos}/Sniffer_Python/logs/Python`, },
 
             // [PROJETOS] URA_Reversa
-            { 'daysKeep': daysKeep[0], 'path': `${fileProjetos}/URA_Reversa/log/JavaScript`, },
-            { 'daysKeep': daysKeep[1], 'path': `${fileProjetos}/URA_Reversa/log/Registros`, },
+            { 'daysKeep': daysKeep[0], 'path': `${fileProjetos}/URA_Reversa/logs/JavaScript`, },
+            { 'daysKeep': daysKeep[1], 'path': `${fileProjetos}/URA_Reversa/logs/Registros`, },
 
             // [PROJETOS] WebScraper
-            { 'daysKeep': daysKeep[0], 'path': `${fileProjetos}/WebScraper/log/JavaScript`, },
-            { 'daysKeep': daysKeep[1], 'path': `${fileProjetos}/WebScraper/log/Registros`, },
+            { 'daysKeep': daysKeep[0], 'path': `${fileProjetos}/WebScraper/logs/JavaScript`, },
+            { 'daysKeep': daysKeep[1], 'path': `${fileProjetos}/WebScraper/logs/Registros`, },
 
             // [PROJETOS] WebSocket
-            { 'daysKeep': daysKeep[0], 'path': `${fileProjetos}/WebSocket/log/JavaScript`, },
-            { 'daysKeep': daysKeep[1], 'path': `${fileProjetos}/WebSocket/log/Registros`, },
+            { 'daysKeep': daysKeep[0], 'path': `${fileProjetos}/WebSocket/logs/JavaScript`, },
+            { 'daysKeep': daysKeep[1], 'path': `${fileProjetos}/WebSocket/logs/Registros`, },
 
         ];
 
@@ -64,14 +64,14 @@ async function logsDelOld(inf = {}) {
                     }
                 }
             }
-        };
+        }
 
         // DEFINIR PASTAS/ARQUIVOS PARA SEREM EXCLUÍDOS
-        for (let [index, value,] of filesDelOrNot.entries()) { retDelOrNot = await delOrNot(value); if (retDelOrNot) { pathsDel.push({ 'path': value.path, }); } };
+        for (let [index, value,] of filesDelOrNot.entries()) { retDelOrNot = await delOrNot(value); if (retDelOrNot) { pathsDel.push({ 'path': value.path, }); } }
 
         if (pathsDel.length > 0) {
             // APAGAR PASTAS/ARQUIVOS
-            for (let [index, value,] of pathsDel.entries()) { await file({ e, 'action': 'del', 'path': value.path, }); };
+            for (let [index, value,] of pathsDel.entries()) { await file({ e, 'action': 'del', 'path': value.path, }); }
             logConsole({ e, ee, 'msg': `LOGS APAGADOS\n${JSON.stringify(pathsDel, null, 2)}`, });
         }
 
@@ -84,10 +84,10 @@ async function logsDelOld(inf = {}) {
 
     } catch (catchErr) {
         let retRegexE = await regexE({ inf, 'e': catchErr, }); ret['msg'] = retRegexE.res; ret['ret'] = false; delete ret['res'];
-    };
+    }
 
     return { ...({ 'ret': ret.ret, }), ...(ret.msg && { 'msg': ret.msg, }), ...(ret.res && { 'res': ret.res, }), };
-};
+}
 
 // CHROME | NODEJS
 (eng ? window : global)['logsDelOld'] = logsDelOld;

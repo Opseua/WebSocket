@@ -14,9 +14,9 @@ async function html(inf = {}) {
 
         // DEFINIR PÁGINAS DINÂMICAS
         if (!gW.pages) {
-            let retFile; retFile = await file({ e, 'action': 'list', 'path': './src/pages', 'max': 10, }); if (!retFile.ret) { retFile['res'] = []; }; let retFileNew = [];
-            for (let [index, v,] of retFile.res.entries()) { if (v.path.includes('.html')) { retFile = await file({ e, 'action': 'read', 'path': v.path, }); if (retFile.ret) { retFileNew.push(retFile.res); } } };
-            if (retFileNew.length > 0) { gW.pages = retFileNew; };
+            let retFile; retFile = await file({ e, 'action': 'list', 'path': './src/pages', 'max': 10, }); if (!retFile.ret) { retFile['res'] = []; } let retFileNew = [];
+            for (let [index, v,] of retFile.res.entries()) { if (v.path.includes('.html')) { retFile = await file({ e, 'action': 'read', 'path': v.path, }); if (retFile.ret) { retFileNew.push(retFile.res); } } }
+            if (retFileNew.length > 0) { gW.pages = retFileNew; }
         }
 
         // HTML | PERMITIR CORS
@@ -27,11 +27,11 @@ async function html(inf = {}) {
 
         function resBody(inf = {}) {
             let { body, type, pathFile, } = inf; let p = pathFile; let writeHead = {};
-            if (['txt', 'download',].includes(type)) { if (['download',].includes(type)) { writeHead['Content-Disposition'] = `attachment; filename="${p || 'arquivo.txt'}"`; }; type = 'text/html; charset=utf-8'; }
+            if (['txt', 'download',].includes(type)) { if (['download',].includes(type)) { writeHead['Content-Disposition'] = `attachment; filename="${p || 'arquivo.txt'}"`; } type = 'text/html; charset=utf-8'; }
             else if (['obj', 'arr',].includes(type)) { type = 'application/json'; body = JSON.stringify(body, null, 2); }
             else if (['img',].includes(type)) { type = 'image/jpeg'; body = Buffer.from(body); } else if (['base64',].includes(type)) {
                 type = false; body = bodyHtml.replace('###REPLACE###', `<img src="data:image/png;base64,${Buffer.from({ 'type': 'Buffer', 'data': body, }).toString('base64')}" alt="Imagem">`).replace('WebSocket', `${p}`);
-            } else { type = false; }; if (type) { writeHead['Content-Type'] = type; res.writeHead(200, writeHead); }; res.end(body);
+            } else { type = false; } if (type) { writeHead['Content-Type'] = type; res.writeHead(200, writeHead); } res.end(body);
         }
 
         if (headers.raw && infAdd.type !== 'download') {
@@ -53,7 +53,7 @@ async function html(inf = {}) {
                 } else { resBody({ 'type': 'txt', 'body': bodyHtml.replace('###REPLACE###', `<pre>${body.res}</pre>`).replace('WebSocket', `${infAdd.title}`), }); }
             } else if (['arr', 'img',].includes(infAdd.type)) { // (ARR)
                 let retFile = body.res; let path = infAdd.path; let pathFile;
-                if (path) { if (path.length > 3) { pathFile = path.lastIndexOf('/'); pathFile = path.substring(pathFile + 1); } else { pathFile = path.replace('/', ''); } }; if (Array.isArray(retFile)) {
+                if (path) { if (path.length > 3) { pathFile = path.lastIndexOf('/'); pathFile = path.substring(pathFile + 1); } else { pathFile = path.replace('/', ''); } } if (Array.isArray(retFile)) {
                     try {
                         let tableHtml = '', link = '', tipoEstilo = ''; let qtdFolder = 0, qtdFile = 0; for (let item of retFile) { if (item.isFolder) { qtdFolder++; } else { qtdFile++; } }
                         tableHtml += '<table border="1" id="fileTable" style="margin-bottom: 50px;"><tr>'; tableHtml += `<th style="width: 125px; text-align: center; cursor: pointer;" onclick="sortTable(0)">TAMANHO</th>`;
@@ -74,8 +74,8 @@ async function html(inf = {}) {
                             tableHtml += `<tr>`; tableHtml += `<td style="text-align: center;">${item.size || ''}</td>`; tableHtml += `<td style="text-align: center;">${dataFormatada}</td>`;
                             tableHtml += `<td style="text-align: center;">${item.md5 || ''}</td>`; tableHtml += `<td style="text-align: center; ${tipoEstilo}">${item.isFolder ? 'PASTA' : 'ARQUIVO'}</td>`;
                             tableHtml += `<td style="text-align: left;">${link}&nbsp;&nbsp;&nbsp;${item.name || ''}&nbsp;</td>`; tableHtml += `</tr>`;
-                        }; tableHtml += '</table>'; resBody({ 'type': 'txt', 'body': bodyHtml.replace('###REPLACE###', tableHtml).replace('WebSocket', `${pathFile}`), });
-                    } catch (catchErr) { resBody({ 'type': 'txt', 'body': bodyHtml.replace('###REPLACE###', `<pre>Erro ao listar arquivos: ${catchErr.message}</pre>`), }); };
+                        } tableHtml += '</table>'; resBody({ 'type': 'txt', 'body': bodyHtml.replace('###REPLACE###', tableHtml).replace('WebSocket', `${pathFile}`), });
+                    } catch (catchErr) { resBody({ 'type': 'txt', 'body': bodyHtml.replace('###REPLACE###', `<pre>Erro ao listar arquivos: ${catchErr.message}</pre>`), }); }
                 } else {
                     try {
                         if (path && path.includes('/src/') && path.includes('.jsonAAA')) { resBody({ 'type': 'txt', 'body': bodyHtml.replace('###REPLACE###', `<pre>ARQUIVO PROTEGIDO!</pre>`), }); } else {
@@ -84,7 +84,7 @@ async function html(inf = {}) {
                                 resBody({ 'type': 'txt', 'body': bodyHtml.replace('###REPLACE###', `<pre>${resultado}</pre>`).replace('WebSocket', `${pathFile}`), });
                             }
                         }
-                    } catch (catchErr) { resBody({ 'type': 'txt', 'body': bodyHtml.replace('###REPLACE###', `<pre>Erro ao exibir arquivo: ${catchErr.message}</pre>`), }); esLintIgnore = catchErr; }
+                    } catch (catchErr) { resBody({ 'type': 'txt', 'body': bodyHtml.replace('###REPLACE###', `<pre>Erro ao exibir arquivo: ${catchErr.message}</pre>`), }); }
                 }
             } else if (['download',].includes(infAdd.type)) { resBody({ 'type': 'download', 'body': body.res, 'pathFile': infAdd.title, }); } // (DOWNLOAD)
         }
@@ -94,10 +94,10 @@ async function html(inf = {}) {
 
     } catch (catchErr) {
         let retRegexE = await regexE({ inf, 'e': catchErr, }); ret['msg'] = retRegexE.res; ret['ret'] = false; delete ret['res'];
-    };
+    }
 
     return { ...({ 'ret': ret.ret, }), ...(ret.msg && { 'msg': ret.msg, }), ...(ret.res && { 'res': ret.res, }), };
-};
+}
 
 // CHROME | NODEJS
 (eng ? window : global)['html'] = html;
