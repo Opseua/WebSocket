@@ -1,4 +1,5 @@
-let eng = (typeof window !== 'undefined'); (eng ? window : global)['eng'] = eng; let gloWin = eng ? window : global; // [true] CHROME | [false] NODEJS
+globalThis.eng = (typeof globalThis.alert !== 'undefined'); // [true] CHROME | [false] NODEJS
+
 // DEFINIR O 'devChildren' → [CHROME] EMAIL DO USUÁRIO | [NODEJS] PRIMEIRO ARQUIVO A SER EXECUTADO (NA MAIORIA DOS CASOS 'server')
 let devC = new Error().stack.split('\n'); devC = devC[devC.length - 1]; let devChildren = devC.includes('.js:') ? devC.match(/\/([^/]+)\.[^/]+$/)[1] : false;
 if (eng) { devChildren = await new Promise((resolve) => { chrome.identity.getProfileUserInfo(function (u) { resolve(u.email); }); }); }
@@ -18,16 +19,16 @@ await getPath({ 'e': new Error(), devChildren, });
 function funFile(txt) { return txt.match(/([^\\/]+)(?=\.[^\\.]+$)/)[0]; }
 
 // IMPORTAR FUNÇÕES DINAMICAMENTE QUANDO NECESSÁRIO 
-let qtd1 = 0; async function funImport(infOk) { let { path, inf, } = infOk; qtd1++; let name = funFile(path); if (qtd1 > 30) { console.log('IMPORTANDO...', name); } await import(`${path}`); return await gloWin[name](inf); }
+let qtd1 = 0; async function funImport(infOk) { let { path, inf, } = infOk; qtd1++; let name = funFile(path); if (qtd1 > 30) { console.log('IMPORTANDO...', name); } await import(`${path}`); return await globalThis[name](inf); }
 
 // FUNÇÃO GENÉRICA (QUANDO O ENGINE ESTIVER ERRADO) | ENCAMINHAR PARA DEVICE
 async function funGeneric(infOk) { let { path, inf, } = infOk; let name = funFile(path); let retDevAndFun = await devFun({ 'e': import.meta.url, 'enc': true, 'data': { name, 'par': inf, }, }); return retDevAndFun; }
 
 // FUNÇÕES DESSE PROJETO
-gloWin['html'] = (inf) => { let fun = (!eng) ? funImport : funGeneric; return fun({ 'path': './html.js', inf, }); };
-gloWin['logsDelOld'] = (inf) => { let fun = (!eng) ? funImport : funGeneric; return fun({ 'path': './logsDelOld.js', inf, }); };
-gloWin['messageAction'] = (inf) => { let fun = (!eng) ? funImport : funGeneric; return fun({ 'path': './messageAction.js', inf, }); };
-gloWin['performanceDev'] = (inf) => { let fun = (!eng) ? funImport : funGeneric; return fun({ 'path': './performanceDev.js', inf, }); };
-gloWin['roomParams'] = (inf) => { let fun = (!eng) ? funImport : funGeneric; return fun({ 'path': './roomParams.js', inf, }); };
+globalThis['html'] = (inf) => { let fun = (!eng) ? funImport : funGeneric; return fun({ 'path': './html.js', inf, }); };
+globalThis['logsDelOld'] = (inf) => { let fun = (!eng) ? funImport : funGeneric; return fun({ 'path': './logsDelOld.js', inf, }); };
+globalThis['messageAction'] = (inf) => { let fun = (!eng) ? funImport : funGeneric; return fun({ 'path': './messageAction.js', inf, }); };
+globalThis['performanceDev'] = (inf) => { let fun = (!eng) ? funImport : funGeneric; return fun({ 'path': './performanceDev.js', inf, }); };
+globalThis['roomParams'] = (inf) => { let fun = (!eng) ? funImport : funGeneric; return fun({ 'path': './roomParams.js', inf, }); };
 
 

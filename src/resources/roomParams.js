@@ -4,14 +4,14 @@
 
 // http://127.0.0.1:1234/?act=PasswordAqui-screenshot&roo=SalaAqui&mes=MensagemAqui
 
-let e = import.meta.url, ee = e;
+let e = import.meta.url, ee = e; let libs = false;
 async function roomParams(inf = {}) {
     let ret = { 'ret': false, }; e = inf && inf.e ? inf.e : e;
     try {
-        let { server, } = inf;
-
         // IMPORTAR BIBLIOTECA [NODEJS]
-        if (typeof _parse === 'undefined') { await funLibrary({ 'lib': '_parse', }); }
+        if (!libs) { await importLibs(['_parse',]); libs = true; }
+
+        let { server, } = inf;
 
         let headers = server.headers || {}; let url = server.url, h = headers.host || '', room = false, locWeb, action = false, message = false, pass = false, mesTem, title = false, sendAlert = false;
         let method = server.upgrade ? 'WEBSOCKET' : server.method; let host = h.includes('192.168.') ? `127.0.0.1:${h.split(':')[1]}` : h; locWeb = host.includes('127.0.0') ? `[LOC]` : `[WEB]`;
@@ -90,6 +90,6 @@ async function roomParams(inf = {}) {
 }
 
 // CHROME | NODEJS
-(eng ? window : global)['roomParams'] = roomParams;
+globalThis['roomParams'] = roomParams;
 
 

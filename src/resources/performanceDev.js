@@ -40,6 +40,6 @@ async function performanceDev(inf = {}) {
 }
 
 // CHROME | NODEJS
-(eng ? window : global)['performanceDev'] = performanceDev;
+globalThis['performanceDev'] = performanceDev;
 
 

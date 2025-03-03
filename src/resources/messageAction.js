@@ -101,6 +101,6 @@ async function messageAction(inf = {}) {
 }
 
 // CHROME | NODEJS
-(eng ? window : global)['messageAction'] = messageAction;
+globalThis['messageAction'] = messageAction;
 
 

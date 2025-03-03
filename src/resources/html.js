@@ -21,7 +21,7 @@ async function html(inf = {}) {
 
         // HTML | PERMITIR CORS
         let bodyHtml = ` <!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> 
-        <style> body { background-color: #17191A; color: white; } a:link, a:visited, a:hover, a:active { color: #66b2ff; text-decoration: none}</style><meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+        <style> body { background-color: #17191A; color: white; font-size: 13.5px; } a:link, a:visited, a:hover, a:active { color: #66b2ff; text-decoration: none}</style><meta name="viewport" content="width=device-width, initial-scale=1.0"> 
         <title>WebSocket</title> </head> <body> ###REPLACE### <script> document.addEventListener('keydown', function (event)  {if (event.key === 'Escape') { history.back(); history.back() } } ) </script> </body> </html>`;
         res.setHeader('Access-Control-Allow-Origin', '*'); res.setHeader('Access-Control-Allow-Methods', '*'); res.setHeader('Access-Control-Allow-Headers', '*'); res.setHeader('Access-Control-Allow-Credentials', 'true');
 
@@ -56,11 +56,12 @@ async function html(inf = {}) {
                 if (path) { if (path.length > 3) { pathFile = path.lastIndexOf('/'); pathFile = path.substring(pathFile + 1); } else { pathFile = path.replace('/', ''); } } if (Array.isArray(retFile)) {
                     try {
                         let tableHtml = '', link = '', tipoEstilo = ''; let qtdFolder = 0, qtdFile = 0; for (let item of retFile) { if (item.isFolder) { qtdFolder++; } else { qtdFile++; } }
-                        tableHtml += '<table border="1" id="fileTable" style="margin-bottom: 50px;"><tr>'; tableHtml += `<th style="width: 125px; text-align: center; cursor: pointer;" onclick="sortTable(0)">TAMANHO</th>`;
-                        tableHtml += `<th style="width: 160px; text-align: center; cursor: pointer;" onclick="sortTable(1)">MODIFICAÇÃO</th>`;
-                        tableHtml += `<th style="width: 270px; text-align: center; cursor: pointer;" onclick="sortTable(2)">MD5</th>`;
-                        tableHtml += `<th style="width: 80px; text-align: center; cursor: pointer;" onclick="sortTable(3)">TIPO</th>`;
-                        tableHtml += `<th style="width: 62%; text-align: center; cursor: pointer;" onclick="sortTable(4)">PATH [pastas: ${qtdFolder} | arquivos: ${qtdFile} | total: ${retFile.length}]</th>`;
+                        tableHtml += '<table border="1" id="fileTable" style="white-space: nowrap; margin-bottom: 50px;"><tr>';
+                        tableHtml += `<th style="text-align: center; cursor: pointer; padding: 0 5px;" onclick="sortTable(0)">TAMANHO</th>`;
+                        tableHtml += `<th style="text-align: center; cursor: pointer; padding: 0 13px;" onclick="sortTable(1)">MODIFICAÇÃO</th>`;
+                        tableHtml += `<th style="text-align: center; cursor: pointer; padding: 0 96px;" onclick="sortTable(2)">MD5</th>`;
+                        tableHtml += `<th style="text-align: center; cursor: pointer; padding: 0 19px;" onclick="sortTable(3)">TIPO</th>`;
+                        tableHtml += `<th style="text-align: center; cursor: pointer; width: 100%;" onclick="sortTable(4)">PATH [pastas: ${qtdFolder} | arquivos: ${qtdFile} | total: ${retFile.length}]</th>`;
                         tableHtml += '</tr>'; tableHtml += `<script> let currentSort = {};
                         function parseSize(size) { if (!size || size.trim() === "" || size.toLowerCase().includes("pasta")) { return 0; }; let value = parseFloat(size); if (size.includes("KB")) { return value * 1024; } 
                         else if (size.includes("MB")) { return value * 1024 * 1024; } else if (size.includes("GB")) { return value * 1024 * 1024 * 1024; } else { return value;  } }; function sortTable(columnIndex) {
@@ -100,6 +101,6 @@ async function html(inf = {}) {
 }
 
 // CHROME | NODEJS
-(eng ? window : global)['html'] = html;
+globalThis['html'] = html;
 
 
