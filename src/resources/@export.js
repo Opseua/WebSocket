@@ -15,20 +15,11 @@ await getPath({ 'e': new Error(), devChildren, });
 // console.log(`devMaster: ${gW.devMaster}\ndevSlave: ${gW.devSlave}\ndevChildren: ${gW.devChildren}`); console.log(`devSend:\n${gW.devSend}`);
 // console.log(`devGet:\n${gW.devGet[0]}\n${gW.devGet[1]}`); console.log('conf:', gW.conf); console.log('root:', gW.root); console.log('functions:', gW.functions); console.log('project:', gW.project);
 
-// PEGAR O NOME DO ARQUIVO(SEM EXTENSÃO)
-function funFile(txt) { return txt.match(/([^\\/]+)(?=\.[^\\.]+$)/)[0]; }
-
-// IMPORTAR FUNÇÕES DINAMICAMENTE QUANDO NECESSÁRIO 
-let qtd1 = 0; async function funImport(infOk) { let { path, inf, } = infOk; qtd1++; let name = funFile(path); if (qtd1 > 30) { console.log('IMPORTANDO...', name); } await import(`${path}`); return await globalThis[name](inf); }
-
-// FUNÇÃO GENÉRICA (QUANDO O ENGINE ESTIVER ERRADO) | ENCAMINHAR PARA DEVICE
-async function funGeneric(infOk) { let { path, inf, } = infOk; let name = funFile(path); let retDevAndFun = await devFun({ 'e': import.meta.url, 'enc': true, 'data': { name, 'par': inf, }, }); return retDevAndFun; }
-
-// FUNÇÕES DESSE PROJETO
-globalThis['html'] = (inf) => { let fun = (!eng) ? funImport : funGeneric; return fun({ 'path': './html.js', inf, }); };
-globalThis['logsDelOld'] = (inf) => { let fun = (!eng) ? funImport : funGeneric; return fun({ 'path': './logsDelOld.js', inf, }); };
-globalThis['messageAction'] = (inf) => { let fun = (!eng) ? funImport : funGeneric; return fun({ 'path': './messageAction.js', inf, }); };
-globalThis['performanceDev'] = (inf) => { let fun = (!eng) ? funImport : funGeneric; return fun({ 'path': './performanceDev.js', inf, }); };
-globalThis['roomParams'] = (inf) => { let fun = (!eng) ? funImport : funGeneric; return fun({ 'path': './roomParams.js', inf, }); };
+/* FUNÇÕES DESSE PROJETO */ let project = gW.project;
+globalThis['html'] = (inf) => { return importFun({ 'importOk': (!eng), 'path': `./src/resources/html.js`, inf, project, }); };
+globalThis['logsDelOld'] = (inf) => { return importFun({ 'importOk': (!eng), 'path': `./src/resources/logsDelOld.js`, inf, project, }); };
+globalThis['messageAction'] = (inf) => { return importFun({ 'importOk': (!eng), 'path': `./src/resources/messageAction.js`, inf, project, }); };
+globalThis['performanceDev'] = (inf) => { return importFun({ 'importOk': (!eng), 'path': `./src/resources/performanceDev.js`, inf, project, }); };
+globalThis['roomParams'] = (inf) => { return importFun({ 'importOk': (!eng), 'path': `./src/resources/roomParams.js`, inf, project, }); };
 
 
