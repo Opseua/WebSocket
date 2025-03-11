@@ -33,7 +33,7 @@ async function serverRun(inf = {}) {
 
         // ############# SERVIDOR HTTP | SERVIDOR: INICIAR | ERROS SERVIDOR (ERROS QUE NÃO SEJAM DO DESLIGAMENTO DO SNIFFER)
         async function serverErr(err) { let errString = err.toString(); if (errString.includes('EADDRINUSE') || !errString.includes('ECONNRESET')) { await regexE({ inf, 'e': err, }); process.exit(1); } }
-        serverHttp.listen((gW.portLoc), () => {
+        serverHttp.listen((gW.portLoc), async () => {
             // SERVIDOR WEBSOCKET | ### ON CONNECTION
             let wss = new _WebSocketServer({ 'server': serverHttp, }); wss.on('connection', async (ws, res) => {
                 // SALA PARAMETROS E [ADICIONAR] | ENVIAR PING DE INÍCIO DE CONEXÃO | EVITAR LOOP INFINITO
@@ -75,7 +75,7 @@ async function serverRun(inf = {}) {
             }); // -------------------------------------------------------------------------------------------------------------
 
             // CLIENT (NÃO POR COMO 'await'!!!) [MANTER NO FINAL]
-            client({ e, });
+            await new Promise(resolve => { setTimeout(resolve, 50); }); client({ e, }); await new Promise(resolve => { setTimeout(resolve, 500); });
 
             // ACTION LOOP [SOMENTE SE FOR NO AWS (08H<>23H)] PARA TODOS OS '*-NODEJS-*'
             setInterval(async () => {

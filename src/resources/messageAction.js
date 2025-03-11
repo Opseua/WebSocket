@@ -49,13 +49,13 @@ async function messageAction(inf = {}) {
             message = { 'fun': [{ 'securityPass': gW.securityPass, 'retInf': true, 'name': 'file', 'par': { 'action': 'isFolder', 'max': 1000, path, 'listRead': true, }, },], };
         } else if (action.toLowerCase() === gW.par9.toLowerCase()) {
             // ### (ACTION) SCREENSHOT [→ TODA A SALA] path.match(/\.(jpg|jpeg|png|ico)$/)
-            infAdd.type = 'img'; infAdd.title = `screenshot`; let path = `${fileProjetos}/WebSocket/logs/screenshot.png`.replace(new RegExp(`${letter}:`, 'g'), `!letter!:`); message = {
+            infAdd.type = 'img'; infAdd.title = `screenshot`; let path = `${fileProjetos}/${gW.project}/logs/screenshot.png`.replace(new RegExp(`${letter}:`, 'g'), `!letter!:`); message = {
                 'fun': [{ 'securityPass': gW.securityPass, 'retInf': false, 'name': 'commandLine', 'par': { 'awaitFinish': true, 'command': `%nircmd% savescreenshot "${path}"`, }, },
                 { 'securityPass': gW.securityPass, 'retInf': true, 'name': 'file', 'par': { 'action': 'read', path, }, },],
             };
         } else if (action.toLowerCase() === gW.par10.toLowerCase()) {
             // ### (ACTION) LOOP [→ TODA A SALA '...-NODEJS-...'] | CRIAR PADRÃO DE PASTA | SCREENSHOT (MANTER awaitFinish 'true' DO CONTRÁRIO O NIRCMD ABRE O POPUP)
-            infAdd.type = 'obj'; infAdd.title = `Loop`; let path = `${fileProjetos}/WebSocket/logs/Registros/${time1}/${time.hou}.00-${time.hou}.59`.replace(new RegExp(`${letter}:`, 'g'), `!letter!:`); message = {
+            infAdd.type = 'obj'; infAdd.title = `Loop`; let path = `${fileProjetos}/${gW.project}/logs/Registros/${time1}/${time.hou}.00-${time.hou}.59`.replace(new RegExp(`${letter}:`, 'g'), `!letter!:`); message = {
                 'fun': [{ 'securityPass': gW.securityPass, 'retInf': false, 'name': 'file', 'par': { 'action': 'write', 'path': `${path}/#_Z_#.txt`, 'text': `${time2}\n`, }, },
                 { 'securityPass': gW.securityPass, 'retInf': false, 'name': 'commandLine', 'par': { 'awaitFinish': true, 'command': `%nircmd% savescreenshot "${path}/${time2}_screenshot.png"`, }, },],
             };
@@ -69,7 +69,7 @@ async function messageAction(inf = {}) {
             else { body['msg'] = `PAGE: ERRO | AÇÃO PERMITIDA APENAS NA '[LOC]'`; }
         } else if (action.toLowerCase() === gW.par13.toLowerCase()) {
             // ### (ACTION) GET FILE PAC (DOWNLOAD)
-            infAdd.type = 'download'; infAdd.title = `proxy.pac`; let retFile = await file({ e, 'action': 'read', 'path': `!letter!:/${gW.root}/Sniffer_Python/src/scripts/BAT/proxy.pac`, });
+            infAdd.type = 'download'; infAdd.title = `proxy.pac`; let retFile = await file({ e, 'action': 'read', 'path': `${fileProjetos}/Sniffer_Python/src/scripts/BAT/proxy.pac`, });
             if (!retFile.ret) { body['msg'] = `GET FILE [PAC]: ERRO | AO LER O ARQUIVO`; } else { body['ret'] = true; body['msg'] = `GET FILE [PAC]: OK`; body['res'] = retFile.res; }
         } else {
             // ### (MENSAGEM) OUTRO TIPO DE AÇÃO/MENSAGEM 
