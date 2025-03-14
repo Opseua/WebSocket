@@ -1,12 +1,12 @@
-let startup = new Date(); await import('./resources/@export.js'); let e = import.meta.url, ee = e; let libs = ['WebSocket', 'WebSocketServer', 'http',];
+let startup = new Date(); await import('./resources/@export.js'); let e = import.meta.url, ee = e; let libs = { 'ws': {}, 'http': {}, };
 let rateHttp = rateLimiter({ 'max': 20, 'sec': 10, }); let rateWs = rateLimiter({ 'max': 20, 'sec': 10, }); let ico = `${fileWindows}/BAT/z_ICONES/websocket.ico`, s = 'Access-Control-Allow-';
 
 async function serverRun(inf = {}) {
     let ret = { 'ret': false, }; e = inf && inf.e ? inf.e : e;
     try {
-        /* IMPORTAR BIBLIOTECA [NODEJS] */ if (libs.length > 0) { libs = await importLibs(libs, [{ 'm': 'ws', 'l': ['WebSocket', 'WebSocketServer',], }, { 'm': 'http', 'l': ['http',], },]); }
-
         logConsole({ e, ee, 'msg': `**************** SERVER **************** [${startupTime(startup, new Date())}]`, });
+
+        /* IMPORTAR BIBLIOTECA [NODEJS] */ if (libs['ws']) { libs['ws'] = { 'WebSocket': 1, 'WebSocketServer': 1, }; libs['http']['http'] = 1; libs = await importLibs(libs, 'serverRun [WebSocket]'); }
 
         // ############# SERVIDOR HTTP
         let wsClients = { 'rooms': {}, }, wsClientLoc; let serverHttp = _http.createServer(async (req, res) => { // EVITAR LOOP INFINITO | PRÉ-CONFIGURAÇÕES HTTP

@@ -71,8 +71,7 @@ async function logsDelOld(inf = {}) {
 
         if (pathsDel.length > 0) {
             // APAGAR PASTAS/ARQUIVOS
-            for (let [index, value,] of pathsDel.entries()) { await file({ e, 'action': 'del', 'path': value.path, }); }
-            logConsole({ e, ee, 'msg': `LOGS APAGADOS\n${JSON.stringify(pathsDel, null, 2)}`, });
+            for (let [index, value,] of pathsDel.entries()) { await file({ e, 'action': 'del', 'path': value.path, }); } logConsole({ e, ee, 'msg': `LOGS APAGADOS\n${JSON.stringify(pathsDel, null, 2)}`, });
         }
 
         // LIMPAR PASTA 'Temp'

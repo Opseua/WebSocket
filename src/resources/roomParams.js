@@ -4,11 +4,11 @@
 
 // http://127.0.0.1:1234/?act=PasswordAqui-screenshot&roo=SalaAqui&mes=MensagemAqui
 
-let e = import.meta.url, ee = e; let libs = ['parse',];
+let e = import.meta.url, ee = e; let libs = { 'url': {}, };
 async function roomParams(inf = {}) {
     let ret = { 'ret': false, }; e = inf && inf.e ? inf.e : e;
     try {
-        /* IMPORTAR BIBLIOTECA [NODEJS] */ if (libs.length > 0) { libs = await importLibs(libs, [{ 'm': 'url', 'l': ['parse',], },]); }
+        /* IMPORTAR BIBLIOTECA [NODEJS] */ if (libs['url']) { libs['url']['parse'] = 1; libs = await importLibs(libs, 'roomParams'); }
 
         let { server, } = inf;
 
