@@ -16,10 +16,10 @@ await getPath({ 'e': new Error(), devChildren, });
 // console.log(`devGet:\n${gW.devGet[0]}\n${gW.devGet[1]}`); console.log('conf:', gW.conf); console.log('root:', gW.root); console.log('functions:', gW.functions); console.log('project:', gW.project);
 
 /* FUNÇÕES DESSE PROJETO */ let project = gW.project;
-globalThis['html'] = (inf) => { return importFun({ 'importOk': (!eng), 'path': `./src/resources/html.js`, inf, project, }); };
-globalThis['logsDelOld'] = (inf) => { return importFun({ 'importOk': (!eng), 'path': `./src/resources/logsDelOld.js`, inf, project, }); };
-globalThis['messageAction'] = (inf) => { return importFun({ 'importOk': (!eng), 'path': `./src/resources/messageAction.js`, inf, project, }); };
-globalThis['performanceDev'] = (inf) => { return importFun({ 'importOk': (!eng), 'path': `./src/resources/performanceDev.js`, inf, project, }); };
-globalThis['roomParams'] = (inf) => { return importFun({ 'importOk': (!eng), 'path': `./src/resources/roomParams.js`, inf, project, }); };
+globalThis['html'] = (inf) => { return importFun({ 'engOk': (!eng), 'path': `./src/resources/html.js`, inf, project, }); };
+globalThis['logsDelOld'] = (inf) => { return importFun({ 'engOk': (!eng), 'path': `./src/resources/logsDelOld.js`, inf, project, }); };
+globalThis['messageAction'] = (inf) => { return importFun({ 'engOk': (!eng), 'path': `./src/resources/messageAction.js`, inf, project, }); };
+globalThis['performanceDev'] = (inf) => { return importFun({ 'engOk': (!eng), 'path': `./src/resources/performanceDev.js`, inf, project, }); };
+globalThis['roomParams'] = (inf) => { return importFun({ 'engOk': (!eng), 'path': `./src/resources/roomParams.js`, inf, project, }); };
 
 
