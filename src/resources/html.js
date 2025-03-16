@@ -56,12 +56,12 @@ async function html(inf = {}) {
                 if (path) { if (path.length > 3) { pathFile = path.lastIndexOf('/'); pathFile = path.substring(pathFile + 1); } else { pathFile = path.replace('/', ''); } } if (Array.isArray(retFile)) {
                     try {
                         let tableHtml = '', link = '', tipoEstilo = ''; let qtdFolder = 0, qtdFile = 0; for (let item of retFile) { if (item.isFolder) { qtdFolder++; } else { qtdFile++; } }
-                        tableHtml += '<table border="1" id="fileTable" style="white-space: nowrap; margin-bottom: 50px;"><tr>';
-                        tableHtml += `<th style="text-align: center; cursor: pointer; padding: 0 5px;" onclick="sortTable(0)">TAMANHO</th>`;
-                        tableHtml += `<th style="text-align: center; cursor: pointer; padding: 0 13px;" onclick="sortTable(1)">MODIFICAÇÃO</th>`;
-                        tableHtml += `<th style="text-align: center; cursor: pointer; padding: 0 96px;" onclick="sortTable(2)">MD5</th>`;
-                        tableHtml += `<th style="text-align: center; cursor: pointer; padding: 0 19px;" onclick="sortTable(3)">TIPO</th>`;
-                        tableHtml += `<th style="text-align: center; cursor: pointer; width: 100%;" onclick="sortTable(4)">PATH [pastas: ${qtdFolder} | arquivos: ${qtdFile} | total: ${retFile.length}]</th>`;
+                        let bacCol = `background-color: #3C3C3C`; tableHtml += '<table border="1" id="fileTable" style="white-space: nowrap; margin-bottom: 50px;"><tr>';
+                        tableHtml += `<th style="text-align: center; cursor: pointer; ${bacCol}; padding: 0 5px;" onclick="sortTable(0)">TAMANHO</th>`;
+                        tableHtml += `<th style="text-align: center; cursor: pointer; ${bacCol}; padding: 0 13px;" onclick="sortTable(1)">MODIFICAÇÃO</th>`;
+                        tableHtml += `<th style="text-align: center; cursor: pointer; ${bacCol}; padding: 0 96px;" onclick="sortTable(2)">MD5</th>`;
+                        tableHtml += `<th style="text-align: center; cursor: pointer; ${bacCol}; padding: 0 19px;" onclick="sortTable(3)">TIPO</th>`;
+                        tableHtml += `<th style="text-align: center; cursor: pointer; ${bacCol}; width: 100%;" onclick="sortTable(4)">PATH [pastas: ${qtdFolder} | arquivos: ${qtdFile} | total: ${retFile.length}]</th>`;
                         tableHtml += '</tr>'; tableHtml += `<script> let currentSort = {};
                         function parseSize(size) { if (!size || size.trim() === "" || size.toLowerCase().includes("pasta")) { return 0; }; let value = parseFloat(size); if (size.includes("KB")) { return value * 1024; } 
                         else if (size.includes("MB")) { return value * 1024 * 1024; } else if (size.includes("GB")) { return value * 1024 * 1024 * 1024; } else { return value;  } }; function sortTable(columnIndex) {
@@ -74,7 +74,7 @@ async function html(inf = {}) {
                             tipoEstilo = item.isFolder ? 'background-color: #1bcf45; color: #ffffff;' : 'background-color: #db3434; color: #ffffff;'; let dataFormatada = item.edit ? setData(item.edit) : '';
                             tableHtml += `<tr>`; tableHtml += `<td style="text-align: center;">${item.size || ''}</td>`; tableHtml += `<td style="text-align: center;">${dataFormatada}</td>`;
                             tableHtml += `<td style="text-align: center;">${item.md5 || ''}</td>`; tableHtml += `<td style="text-align: center; ${tipoEstilo}">${item.isFolder ? 'PASTA' : 'ARQUIVO'}</td>`;
-                            tableHtml += `<td style="text-align: left;">${link}&nbsp;&nbsp;&nbsp;${item.name || ''}&nbsp;</td>`; tableHtml += `</tr>`;
+                            tableHtml += `<td style="text-align: left;">&nbsp;&nbsp;${link}&nbsp;&nbsp;&nbsp;${item.name || ''}&nbsp;&nbsp;</td>`; tableHtml += `</tr>`;
                         } tableHtml += '</table>'; resBody({ 'type': 'txt', 'body': bodyHtml.replace('###REPLACE###', tableHtml).replace('WebSocket', `${pathFile}`), });
                     } catch (catchErr) { resBody({ 'type': 'txt', 'body': bodyHtml.replace('###REPLACE###', `<pre>Erro ao listar arquivos: ${catchErr.message}</pre>`), }); }
                 } else {

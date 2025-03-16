@@ -6,7 +6,7 @@ async function serverRun(inf = {}) {
     try {
         logConsole({ e, ee, 'msg': `**************** SERVER **************** [${startupTime(startup, new Date())}]`, });
 
-        /* IMPORTAR BIBLIOTECA [NODEJS] */ if (libs['ws']) { libs['ws'] = { 'WebSocket': 1, 'WebSocketServer': 1, }; libs['http']['http'] = 1; libs = await importLibs(libs, 'serverRun [WebSocket]'); }
+        /* IMPORTAR BIBLIOTECA [NODEJS] */ if (libs['ws']) { libs['ws'] = { 'WebSocket': 1, 'WebSocketServer': 1, 'pro': true, }; libs['http']['http'] = 1; libs = await importLibs(libs, 'serverRun [WebSocket]'); }
 
         // ############# SERVIDOR HTTP
         let wsClients = { 'rooms': {}, }, wsClientLoc; let serverHttp = _http.createServer(async (req, res) => { // EVITAR LOOP INFINITO | PRÉ-CONFIGURAÇÕES HTTP
@@ -80,7 +80,7 @@ async function serverRun(inf = {}) {
             // ACTION LOOP [SOMENTE SE FOR NO AWS (08H<>23H)] PARA TODOS OS '*-NODEJS-*'
             setInterval(async () => {
                 let time = dateHour().res; if (gW.devMaster === 'AWS' && Number(time.hou) > 7 && Number(time.hou) < 24) {
-                    logConsole({ e, ee, 'msg': `ACTION: LOOP`, }); await messageAction({ host, 'room': '*-NODEJS-*', 'destination': '*-NODEJS-*', 'action': gW.par10, 'message': '', 'resWs': false, wsClients, wsClientLoc, });
+                    logConsole({ e, ee, 'msg': `ACTION: LOOP`, }); await messageAction({ host, room: '*-NODEJS-*', destination: '*-NODEJS-*', action: gW.par10, message: '', resWs: false, wsClients, wsClientLoc, });
                 }
             }, (gW.secLoop * 1000));
         }).on('error', (err) => { serverErr(err); });
