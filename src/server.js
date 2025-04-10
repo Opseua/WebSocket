@@ -1,10 +1,10 @@
-let startup = new Date(); await import('./resources/@export.js'); let e = import.meta.url, ee = e; let libs = { 'ws': {}, 'http': {}, };
-let rateHttp = rateLimiter({ 'max': 20, 'sec': 10, }); let rateWs = rateLimiter({ 'max': 20, 'sec': 10, }); let ico = `${fileWindows}/BAT/z_ICONES/websocket.ico`, s = 'Access-Control-Allow-';
+let startup = new Date(); globalThis['sP'] = import.meta.url; await import('./resources/@export.js'); let e = sP, ee = e; let libs = { 'ws': {}, 'http': {}, };
+let rateHttp = rateLimiter({ 'max': 20, 'sec': 10, }); let rateWs = rateLimiter({ 'max': 20, 'sec': 10, }); let ico = `${fileWindows}/BAT/z_ICONES/websocket.ico`, h = 'Access-Control-Allow-';
 
 async function serverRun(inf = {}) {
     let ret = { 'ret': false, }; e = inf && inf.e ? inf.e : e;
     try {
-        logConsole({ e, ee, 'msg': `**************** SERVER **************** [${startupTime(startup, new Date())}]`, });
+        logConsole({ e, ee, 'txt': `**************** SERVER **************** [${startupTime(startup, new Date())}]`, });
 
         /* IMPORTAR BIBLIOTECA [NODEJS] */ if (libs['ws']) { libs['ws'] = { 'WebSocket': 1, 'WebSocketServer': 1, 'pro': true, }; libs['http']['http'] = 1; libs = await importLibs(libs, 'serverRun [WebSocket]'); }
 
@@ -12,7 +12,7 @@ async function serverRun(inf = {}) {
         let wsClients = { 'rooms': {}, }, wsClientLoc; let serverHttp = _http.createServer(async (req, res) => { // EVITAR LOOP INFINITO | PRÉ-CONFIGURAÇÕES HTTP
             function resEnd(d) { res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', }).end(JSON.stringify({ ret: !!d.ret, msg: `SERVER [WS]: ERRO | ${d.msg || '*'}`, })); }
             if (req.url === '/favicon.ico') { let c = await _fs.promises.readFile(ico); res.writeHead(200, { 'Content-Type': 'image/x-icon', }).end(c); return; } if (!['GET', 'POST',].includes(req.method)) {
-                res.setHeader(`${s}Origin`, '*').setHeader(`${s}Methods`, '*').setHeader(`${s}Headers`, '*').setHeader(`${s}Credentials`, 'true'); resEnd({ 'msg': `APENAS 'GET' ou 'POST'`, }); return;
+                res.setHeader(`${h}Origin`, '*').setHeader(`${h}Methods`, '*').setHeader(`${h}Headers`, '*').setHeader(`${h}Credentials`, 'true'); resEnd({ 'msg': `APENAS 'GET' ou 'POST'`, }); return;
             } if (!rateHttp.check()) { resEnd({ 'msg': `MUITAS REQUISICOES`, }); return; } /* SALA E PARAMETROS | PROCESSAR AÇÃO/MENSAGEM RECEBIDA */  let r = await roomParams({ e, 'server': req, });
             if (!r.ret || r.stop) { resEnd({ 'ret': r.ret, 'msg': r.msg, }); return; } let { host, room, hostRoom, locWeb, action, message, method, headers, } = r.res; res['host'] = host; res['room'] = room;
             res['hostRoom'] = hostRoom; res['locWeb'] = locWeb; res['method'] = method; res['headers'] = headers; messageAction({ host, room, action, message, 'resWs': res, wsClients, wsClientLoc, });
@@ -26,7 +26,7 @@ async function serverRun(inf = {}) {
             for (let clientSet of Object.values(wsClients.rooms)) {
                 for (let value of clientSet) {
                     function check(inf = {}) { let { lastMessage, locWeb, room, } = inf; return { 'dif': lastMessage ? Number(dateHour().res.tim) - lastMessage : -99, locWeb, room, }; } let retCheck = check(value);
-                    if (retCheck.dif > ((secPing * 2) - 1)) { logConsole({ e, ee, 'msg': `DESCONECTAR [PING ${retCheck.dif}] ${retCheck.locWeb} '${retCheck.room}'`, }); value.close(); }
+                    if (retCheck.dif > ((secPing * 2) - 1)) { logConsole({ e, ee, 'txt': `DESCONECTAR [PING ${retCheck.dif}] ${retCheck.locWeb} '${retCheck.room}'`, }); value.close(); }
                 }
             }
         } setInterval(() => { lastMessageReceived(); }, (secPing * 2) * 1000);
@@ -47,12 +47,12 @@ async function serverRun(inf = {}) {
                         let pingPong = message === `ping` ? 1 : message === `pong` ? 2 : 0; ws['lastMessage'] = ws.lastMessage || pingPong > 0 ? Number(dateHour().res.tim) : false; // ÚLTIMA MENSAGEM RECEBIDA
                         if (pingPong > 0) { if (pingPong === 2) { return; } ws.send('pong'); /* RECEBIDO: 'PING' ENVIAR 'PONG' */ } else {
                             try { message = JSON.parse(message); } catch (catchErr) { message = { message, }; regexE({ 'inf': message, 'e': catchErr, }); }
-                            if (!message.message) { message = { message, }; logConsole({ e, ee, 'msg': `ERRO M2`, }); } if (ws.lastMessage) { ws.send(`pong`); }
+                            if (!message.message) { message = { message, }; logConsole({ e, ee, 'txt': `ERRO M2`, }); } if (ws.lastMessage) { ws.send(`pong`); }
                             function processMes() { messageReceived({ ...message, host, room, 'resWs': ws, wsClients, }); } if (!(typeof message.message === 'object' && !message.buffer)) { processMes(); } else {
                                 let text = false; if (!(message.message.fun && Array.isArray(message.message.fun))) { text = `SERVER WS: ERRO | CHAVE 'fun' NÃO ENCONTRADA/NÃO É ARRAY\n\n→ ${ws.hostRoom}`; }
                                 else if (!message.message.fun.every(item => item.securityPass === gW.securityPass)) { text = `SERVER WS: ERRO | SECURITY PASS INVÁLIDO\n\n→ ${ws.hostRoom}`; }
                                 if (!text) { processMes(); /* PROCESSAR MENSAGEM RECEBIDA */ } else {
-                                    ws.send(JSON.stringify({ 'ret': false, 'msg': text, })); logConsole({ e, ee, 'msg': `${text}\n\n${data.toString('utf-8')}`, });
+                                    ws.send(JSON.stringify({ 'ret': false, 'msg': text, })); logConsole({ e, ee, 'txt': `${text}\n\n${data.toString('utf-8')}`, });
                                     notification({ 'keepOld': true, 'title': `# WS (${gW.devMaster}) [NODEJS]`, text, 'ignoreErr': true, }); // ALERTAR SOBRE O ERRO
                                 }
                             }
@@ -68,25 +68,25 @@ async function serverRun(inf = {}) {
             let ws = new _WebSocket(`ws://${gW.devMaster === 'AWS' ? gW.serverWeb : '127.0.0.1'}:${gW.portLoc}/?roo=${gW.devMaster}-${gW.par2}`);
             let url = ws._url ? ws._url : ws.url; let host = url.replace('ws://', '').split('/')[0]; let room = url.split(`${host}/`)[1].replace('?roo=', ''); let hostRoom = url.replace('ws://', '');
             let locWeb = host.includes('127.0.0') ? `[LOC]` : `[WEB]`; ws['host'] = host; ws['room'] = room; ws['hostRoom'] = hostRoom; ws['locWeb'] = locWeb; ws['method'] = 'WEBSOCKET'; wsClientLoc = ws;
-            ws.on('error', (data) => { logConsole({ e, ee, 'msg': `CLIENT LOC | ERRO\n${JSON.stringify(data.toString('utf-8'))}`, }); }); ws.on('message', async (data) => {
+            ws.on('error', (data) => { logConsole({ e, ee, 'txt': `CLIENT LOC | ERRO\n${JSON.stringify(data.toString('utf-8'))}`, }); }); ws.on('message', async (data) => {
                 let message = data.toString('utf-8'); let pingPong = message === `ping` ? 1 : message === `pong` ? 2 : 0;
                 if (pingPong > 0) { return; } try { message = JSON.parse(message); } catch (catchErr) { message = { message, }; }
                 if (!message.message) { message = { message, }; } messageReceived({ ...message, host, room, 'resWs': ws, }); // PROCESSAR MENSAGEM RECEBIDA
             }); // -------------------------------------------------------------------------------------------------------------
 
             // CLIENT (NÃO POR COMO 'await'!!!) [MANTER NO FINAL]
-            await new Promise(resolve => { setTimeout(resolve, 50); }); client({ e, }); await new Promise(resolve => { setTimeout(resolve, 500); });
+            await new Promise(r => { setTimeout(r, 50); }); client({ e, }); await new Promise(r => { setTimeout(r, 500); });
 
             // ACTION LOOP [SOMENTE SE FOR NO AWS (08H<>23H)] PARA TODOS OS '*-NODEJS-*'
             setInterval(async () => {
                 let time = dateHour().res; if (gW.devMaster === 'AWS' && Number(time.hou) > 7 && Number(time.hou) < 24) {
-                    logConsole({ e, ee, 'msg': `ACTION: LOOP`, }); await messageAction({ host, room: '*-NODEJS-*', destination: '*-NODEJS-*', action: gW.par10, message: '', resWs: false, wsClients, wsClientLoc, });
+                    logConsole({ e, ee, 'txt': `ACTION: LOOP`, }); await messageAction({ host, room: '*-NODEJS-*', destination: '*-NODEJS-*', action: gW.par10, message: '', resWs: false, wsClients, wsClientLoc, });
                 }
             }, (gW.secLoop * 1000));
         }).on('error', (err) => { serverErr(err); });
 
         // 60 SEGUNDOS APÓS INICIAR → APAGAR LOGS/TEMP ANTIGOS (A CADA x HORAS) | CONSUMO DE CPU e MÉMORIA RAM (A CADA x MINUTOS)
-        await new Promise(resolve => { setTimeout(resolve, 60 * 1000); }); logsDelOld(); setInterval(() => { logsDelOld(); }, 25 * 3600000); setInterval(() => { performanceDev(); }, 15 * 60000);
+        await new Promise(r => { setTimeout(r, 60 * 1000); }); logsDel(); setInterval(() => { logsDel(); }, 25 * 3600000); setInterval(() => { performanceDev(); }, 15 * 60000);
 
         ret['ret'] = true;
         ret['msg'] = `SERVER: OK`;

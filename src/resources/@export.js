@@ -17,7 +17,7 @@ await getPath({ 'e': new Error(), devChildren, });
 
 /* FUNÇÕES DESSE PROJETO */ let project = gW.project;
 globalThis['html'] = (inf) => { return importFun({ 'engOk': (!eng), 'path': `./src/resources/html.js`, inf, project, }); };
-globalThis['logsDelOld'] = (inf) => { return importFun({ 'engOk': (!eng), 'path': `./src/resources/logsDelOld.js`, inf, project, }); };
+globalThis['logsDel'] = (inf) => { return importFun({ 'engOk': (!eng), 'path': `./src/resources/logsDel.js`, inf, project, }); };
 globalThis['messageAction'] = (inf) => { return importFun({ 'engOk': (!eng), 'path': `./src/resources/messageAction.js`, inf, project, }); };
 globalThis['performanceDev'] = (inf) => { return importFun({ 'engOk': (!eng), 'path': `./src/resources/performanceDev.js`, inf, project, }); };
 globalThis['roomParams'] = (inf) => { return importFun({ 'engOk': (!eng), 'path': `./src/resources/roomParams.js`, inf, project, }); };

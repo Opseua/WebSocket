@@ -62,7 +62,7 @@ async function roomParams(inf = {}) {
         // ALERTAR SOBRE O ERRO
         if (ret.msg && !title) {
             if (sendAlert) {
-                let text = `→ {${method}} ${ret.msg}\n🔗 ${locWeb} ${url}`; logConsole({ e, ee, 'msg': `${text}\n\nHEADERS:\n${JSON.stringify(headers)}\n\nMENSAGEM/BODY:\n${message || ''}`, });
+                let text = `→ {${method}} ${ret.msg}\n🔗 ${locWeb} ${url}`; logConsole({ e, ee, 'txt': `${text}\n\nHEADERS:\n${JSON.stringify(headers)}\n\nMENSAGEM/BODY:\n${message || ''}`, });
                 notification({ 'keepOld': true, 'ntfy': true, 'title': `# SERVER (${gW.devMaster}) [NODEJS]`, text, 'ignoreErr': true, });
             } ret['stop'] = true; return ret;
         }

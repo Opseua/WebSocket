@@ -7,7 +7,7 @@ async function performanceDev(inf = {}) {
         let logFile = '!fileWindows!/PORTABLE_System_Informer/z_OUTROS/PORTABLE_HWiNFO/HWiNFO_AlertLog.txt';
 
         //                                      CPU | RAM                                 CPU | RAM    CPU | RAM
-        let alertDev = gW.devMaster === 'AWS' ? [70, 95,] : gW.devMaster === 'ESTRELAR' ? [70, 85,] : [999, 999,];
+        let alertDev = gW.devMaster === 'AWS' ? [70, 95,] : gW.devMaster === 'ESTRELAR' ? [80, 85,] : [999, 999,];
 
         let retFile = await file({ e, 'action': 'read', 'path': `${logFile}`, });
         if (!retFile.ret || (retFile.res && (!retFile.res.includes('CPU') || !retFile.res.includes('RAM')))) { return retFile; } retFile = retFile.res;
@@ -18,14 +18,19 @@ async function performanceDev(inf = {}) {
         let cpu = retFile.cpu; let ram = retFile.ram;
 
         let msg = `CPU: ${cpu}% | RAM: ${ram}%`;
-        logConsole({ e, ee, msg, });
+        logConsole({ e, ee, 'txt': msg, });
         await file({ e, 'action': 'del', 'path': `${logFile}`, });
 
         if ((cpu > alertDev[0] && oldCpu > alertDev[0]) || (ram > alertDev[1] && oldRam > alertDev[1])) {
             await notification({ e, 'title': `# ALERTA | (${gW.devMaster}) [NODEJS]`, 'text': msg, 'ignoreErr': true, });
         }
 
-        ret['res'] = { cpu, oldCpu, ram, oldRam, };
+        ret['res'] = {
+            cpu,
+            oldCpu,
+            ram,
+            oldRam,
+        };
         ret['msg'] = `PERFORMANCE: OK`;
         ret['ret'] = true;
 

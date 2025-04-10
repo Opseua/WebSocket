@@ -80,11 +80,11 @@ async function messageAction(inf = {}) {
         }
 
         if (typeof message === 'object') { // ENVIAR COMANDO(s)
-            body = await messageSend({ destination, message, 'resWs': wsClientLoc, }); // logConsole({ e, ee, 'msg': `RESPOSTA SENDO ESPERADA:\n${JSON.stringify(body)}` });
+            body = await messageSend({ destination, message, 'resWs': wsClientLoc, }); // logConsole({ e, ee, 'txt': `RESPOSTA SENDO ESPERADA:\n${JSON.stringify(body)}` });
         }
 
         if (!body.ret) { // ERRO AO EXECUTAR AÇÃO
-            logConsole({ e, ee, 'msg': `${JSON.stringify(body, null, 2)}`, });
+            logConsole({ e, ee, 'txt': `${JSON.stringify(body, null, 2)}`, });
             notification({ e, 'title': `# FALSE (${gW.devMaster}) [NODEJS]`, 'text': `→ messageAction {${gW.project}}\n${body.msg.substring(0, 300)}`, 'ignoreErr': true, });
         }
 
