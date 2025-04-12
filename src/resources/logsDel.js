@@ -48,7 +48,7 @@ async function logsDel(inf = {}) {
             { 'daysKeep': daysKeep[0], 'path': `${fileProjetos}/WebSocket/logs/JavaScript`, },
             { 'daysKeep': daysKeep[1], 'path': `${fileProjetos}/WebSocket/logs/Registros`, },
 
-            // [PROJETOS] Program Files/Program Files (x86)
+            // [PROJETOS] Program Files / Program Files (x86)
             { 'daysKeep': 1, 'path': `C:/Program Files`, 'onlyPattern': [`*chrome_BITS_*`, `*chrome_url_fetcher_*`,], },
             { 'daysKeep': 1, 'path': `C:/Program Files (x86)`, 'onlyPattern': [`*chrome_BITS_*`, `*chrome_url_fetcher_*`,], },
 
@@ -56,10 +56,10 @@ async function logsDel(inf = {}) {
 
         // LISTAR PASTAS E ARQUIVOS
         for (let [index, val,] of pathsToDel.entries()) { // CHECAR SE DEVE SER DELETADO [ARQUIVO] | CHECAR SE DEVE SER DELETADO [PASTA] | DENTRO DA PASTA
-            retFile = await file({ e, 'action': 'list', 'path': val.path, 'max': 50, }); retFile = retFile.ret ? retFile.res : []; for (let [index1, val1,] of retFile.entries()) {
+            retFile = await file({ e, 'action': 'list', 'path': val.path, 'max': 500, }); retFile = retFile.ret ? retFile.res : []; for (let [index1, val1,] of retFile.entries()) {
                 if (val.onlyPattern) { if (val.onlyPattern.some(v => regex({ simple: true, pattern: v, 'text': val1.path, }))) { filesDelOrNot.push({ daysKeep: val.daysKeep, path: val1.path, edit: val1.edit, }); } }
                 else if (!val1.isFolder) { filesDelOrNot.push({ 'daysKeep': val.daysKeep, 'path': val1.path, 'edit': val1.edit, }); } else {
-                    retFile = await file({ e, 'action': 'list', 'path': val1.path, 'max': 50, }); retFile = retFile.ret ? retFile.res : []; if (retFile.length === 0) { pathsDel.push({ 'path': val1.path, }); }
+                    retFile = await file({ e, 'action': 'list', 'path': val1.path, 'max': 500, }); retFile = retFile.ret ? retFile.res : []; if (retFile.length === 0) { pathsDel.push({ 'path': val1.path, }); }
                     else { for (let [index2, val2,] of retFile.entries()) { filesDelOrNot.push({ 'daysKeep': val.daysKeep, 'path': val2.path, 'edit': val2.edit, }); } }
                 }
             }

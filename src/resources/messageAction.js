@@ -56,7 +56,7 @@ async function messageAction(inf = {}) {
         } else if (action.toLowerCase() === gW.par10.toLowerCase()) {
             // ### (ACTION) LOOP [→ TODA A SALA '...-NODEJS-...'] | CRIAR PADRÃO DE PASTA | SCREENSHOT (MANTER awaitFinish 'true' DO CONTRÁRIO O NIRCMD ABRE O POPUP)
             infAdd.type = 'obj'; infAdd.title = `Loop`; let path = `${fileProjetos}/${gW.project}/logs/Registros/${time1}/${time.hou}.00-${time.hou}.59`.replace(new RegExp(`${letter}:`, 'g'), `!letter!:`); message = {
-                'fun': [{ 'securityPass': gW.securityPass, 'retInf': false, 'name': 'file', 'par': { 'action': 'write', 'path': `${path}/#_Z_#.txt`, 'text': `${time2}\n`, }, },
+                'fun': [{ 'securityPass': gW.securityPass, 'retInf': false, 'name': 'file', 'par': { 'action': 'write', 'path': `${path}/#_Z_#.txt`, 'text': path, 'add': true, }, },
                 { 'securityPass': gW.securityPass, 'retInf': false, 'name': 'commandLine', 'par': { 'awaitFinish': true, 'command': `%nircmd% savescreenshot "${path}/${time2}_screenshot.png"`, }, },],
             };
         } else if (action.toLowerCase() === gW.par11.toLowerCase()) {
