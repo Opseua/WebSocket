@@ -4,9 +4,9 @@ let rateHttp = rateLimiter({ 'max': 20, 'sec': 10, }); let rateWs = rateLimiter(
 async function serverRun(inf = {}) {
     let ret = { 'ret': false, }; e = inf && inf.e ? inf.e : e;
     try {
-        logConsole({ e, ee, 'txt': `**************** SERVER **************** [${startupTime(startup, new Date())}]`, });
+        /* IMPORTAR BIBLIOTECA [NODEJS] */ libs['ws'] = { 'WebSocket': 1, 'WebSocketServer': 1, 'pro': true, }; libs['http']['http'] = 1; libs = await importLibs(libs, 'serverRun [WebSocket]');
 
-        /* IMPORTAR BIBLIOTECA [NODEJS] */ if (libs['ws']) { libs['ws'] = { 'WebSocket': 1, 'WebSocketServer': 1, 'pro': true, }; libs['http']['http'] = 1; libs = await importLibs(libs, 'serverRun [WebSocket]'); }
+        logConsole({ e, ee, 'txt': `**************** SERVER **************** [${startupTime(startup, new Date())}]`, });
 
         // ############# SERVIDOR HTTP
         let wsClients = { 'rooms': {}, }, wsClientLoc; let serverHttp = _http.createServer(async (req, res) => { // EVITAR LOOP INFINITO | PRÉ-CONFIGURAÇÕES HTTP

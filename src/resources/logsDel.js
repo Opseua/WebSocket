@@ -11,7 +11,7 @@ async function logsDel(inf = {}) {
                 let regexMon = parseInt(path.match(/MES_(\d{2})/)[1]) - 1; let regexDay = parseInt(path.match(/DIA_(\d{2})/)[1]); let today = new Date();
                 let targetDate = new Date(today.getFullYear(), regexMon, regexDay); let dif = Math.abs(Math.ceil((targetDate - today) / (1000 * 60 * 60 * 24))); return dif > daysKeep;
             }
-        } let daysKeep = gW.devMaster === 'AWS' ? [30, 3,] : [30, 7,];
+        } let daysKeep = gW.devMaster === 'AWS' ? [30, 3,] : [30, 30,];
 
         let pathsToDel = [
 
