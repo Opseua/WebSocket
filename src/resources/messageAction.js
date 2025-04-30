@@ -40,7 +40,7 @@ async function messageAction(inf = {}) {
             // ### (ACTION) API
             infAdd.type = 'obj'; infAdd.title = `API`; try {
                 if (message !== '') { let retApi = await api({ e, 'object': true, ...JSON.parse(message), }); body = retApi; }
-                else { body['msg'] = `API: ERRO | INFORMAR OS PARAMETROS\n\n→ &mes={"method":"POST","url":"https://www.google.com","headers":{"Content-Type":"application/json"},"body":{"aaa":"bbb"},"max":10}`; }
+                else { body['msg'] = `API: ERRO | INFORMAR OS PARAMETROS\n\n→ &mes={"method":"POST","url":"https://www.google.com","headers":{"Content-Type":"application/json"},"body":{"aaa":"bbb"},"maxConnect":10}`; }
             } catch (catchErr) { body['msg'] = `API: ERRO | AO FAZER PARSE`; }
         } else if (action.toLowerCase() === gW.par8.toLowerCase()) {
             // ### (ACTION) WEBFILE [→ TODA A SALA]
