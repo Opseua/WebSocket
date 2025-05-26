@@ -8,7 +8,7 @@ let e = import.meta.url, ee = e; let libs = { 'url': {}, };
 async function roomParams(inf = {}) {
     let ret = { 'ret': false, }; e = inf && inf.e ? inf.e : e;
     try {
-        /* IMPORTAR BIBLIOTECA [NODEJS] */ if (libs['url']) { libs['url']['parse'] = 1; libs = await importLibs(libs, 'roomParams'); }
+        /* IMPORTAR BIBLIOTECA [NODE] */ if (libs['url']) { libs['url']['parse'] = 1; libs = await importLibs(libs, 'roomParams'); }
 
         let { server, } = inf;
 
@@ -63,7 +63,7 @@ async function roomParams(inf = {}) {
         if (ret.msg && !title) {
             if (sendAlert) {
                 let text = `→ {${method}} ${ret.msg}\n🔗 ${locWeb} ${url}`; logConsole({ e, ee, 'txt': `${text}\n\nHEADERS:\n${JSON.stringify(headers)}\n\nMENSAGEM/BODY:\n${message || ''}`, });
-                notification({ 'keepOld': true, 'ntfy': true, 'title': `# SERVER (${gW.devMaster}) [NODEJS]`, text, 'ignoreErr': true, });
+                notification({ 'keepOld': true, 'ntfy': true, 'title': `# SERVER (${gW.devMaster}) [NODE]`, text, 'ignoreErr': true, });
             } ret['stop'] = true; return ret;
         }
 
@@ -88,7 +88,7 @@ async function roomParams(inf = {}) {
     return { ...({ 'ret': ret.ret, }), ...(ret.msg && { 'msg': ret.msg, }), ...(ret.res && { 'res': ret.res, }), };
 }
 
-// CHROME | NODEJS
+// CHROME | NODE
 globalThis['roomParams'] = roomParams;
 
 

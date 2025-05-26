@@ -4,7 +4,7 @@ let rateHttp = rateLimiter({ 'max': 20, 'sec': 10, }); let rateWs = rateLimiter(
 async function serverRun(inf = {}) {
     let ret = { 'ret': false, }; e = inf && inf.e ? inf.e : e;
     try {
-        /* IMPORTAR BIBLIOTECA [NODEJS] */ libs['ws'] = { 'WebSocket': 1, 'WebSocketServer': 1, 'pro': true, }; libs['http']['http'] = 1; libs = await importLibs(libs, 'serverRun [WebSocket]');
+        /* IMPORTAR BIBLIOTECA [NODE] */ libs['ws'] = { 'WebSocket': 1, 'WebSocketServer': 1, 'pro': true, }; libs['http']['http'] = 1; libs = await importLibs(libs, 'serverRun [WebSocket]');
 
         await logConsole({ e, ee, 'txt': `**************** SERVER **************** [${startupTime(startup, new Date())}]`, });
 
@@ -53,7 +53,7 @@ async function serverRun(inf = {}) {
                                 else if (!message.message.fun.every(item => item.securityPass === gW.securityPass)) { text = `SERVER WS: ERRO | SECURITY PASS INVÁLIDO\n\n→ ${ws.hostRoom}`; }
                                 if (!text) { processMes(); /* PROCESSAR MENSAGEM RECEBIDA */ } else {
                                     ws.send(JSON.stringify({ 'ret': false, 'msg': text, })); logConsole({ e, ee, 'txt': `${text}\n\n${data.toString('utf-8')}`, });
-                                    notification({ 'keepOld': true, 'title': `# WS (${gW.devMaster}) [NODEJS]`, text, 'ignoreErr': true, }); // ALERTAR SOBRE O ERRO
+                                    notification({ 'keepOld': true, 'title': `# WS (${gW.devMaster}) [NODE]`, text, 'ignoreErr': true, }); // ALERTAR SOBRE O ERRO
                                 }
                             }
                         }
@@ -77,16 +77,16 @@ async function serverRun(inf = {}) {
             // CLIENT (NÃO POR COMO 'await'!!!) [MANTER NO FINAL]
             await new Promise(r => { setTimeout(r, 50); }); client({ e, }); await new Promise(r => { setTimeout(r, 500); });
 
-            // ACTION LOOP [SOMENTE SE FOR NO AWS (08H<>23H)] PARA TODOS OS '*-NODEJS-*'
+            // ACTION LOOP [SOMENTE SE FOR NO AWS (08H<>23H)] PARA TODOS OS '*-NODE-*'
             setInterval(async () => {
                 let time = dateHour().res; if (gW.devMaster === 'AWS' && Number(time.hou) > 7 && Number(time.hou) < 24) {
-                    logConsole({ e, ee, 'txt': `ACTION: LOOP`, }); await messageAction({ host, room: '*-NODEJS-*', destination: '*-NODEJS-*', action: gW.par10, message: '', resWs: false, wsClients, wsClientLoc, });
+                    logConsole({ e, ee, 'txt': `ACTION: LOOP`, }); await messageAction({ host, room: '*-NODE-*', destination: '*-NODE-*', action: gW.par10, message: '', resWs: false, wsClients, wsClientLoc, });
                 }
             }, (gW.secLoop * 1000));
         }).on('error', (err) => { serverErr(err); });
 
-        // 60 SEGUNDOS APÓS INICIAR → APAGAR LOGS/TEMP ANTIGOS (A CADA x HORAS) | CONSUMO DE CPU e MÉMORIA RAM (A CADA x MINUTOS)
-        await new Promise(r => { setTimeout(r, 60 * 1000); }); logsDel(); setInterval(() => { logsDel(); }, 25 * 3600000); setInterval(() => { performanceDev(); }, 15 * 60000);
+        //            60 SEGUNDOS APÓS INICIAR →                       APAGAR LOGS/TEMP ANTIGOS (APÓS INICIAR E A CADA x HORAS)                CONSUMO DE CPU e MÉMORIA RAM (APÓS INICIAR E A CADA x MINUTOS)
+        await new Promise(r => { setTimeout(r, 60 * 1000); }); /*#*/ logsDel(); setInterval(() => { logsDel(); }, 25 * 3600000); /*#*/ performanceDev({ 'min': 1, }); setInterval(() => { performanceDev(); }, 5 * 60000);
 
         ret['ret'] = true;
         ret['msg'] = `SERVER: OK`;
