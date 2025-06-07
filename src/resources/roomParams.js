@@ -4,7 +4,7 @@
 
 // http://127.0.0.1:1234/?act=PasswordAqui-screenshot&roo=SalaAqui&mes=MensagemAqui
 
-let e = import.meta.url, ee = e; let libs = { 'url': {}, };
+let e = currentFile(), ee = e; let libs = { 'url': {}, };
 async function roomParams(inf = {}) {
     let ret = { 'ret': false, }; e = inf && inf.e ? inf.e : e;
     try {
@@ -12,9 +12,8 @@ async function roomParams(inf = {}) {
 
         let { server, } = inf;
 
-        let headers = server.headers || {}; let url = server.url, h = headers.host || '', room = false, locWeb, action = false, message = false, pass = false, mesTem, title = false, sendAlert = false;
+        let headers = server.headers || {}, url = server.url, h = headers.host || '', room = false, locWeb, action = false, message = false, pass = false, mesTem, title = false, sendAlert = false, urlParams;
         let method = server.upgrade ? 'WEBSOCKET' : server.method; let host = h.includes('192.168.') ? `127.0.0.1:${h.split(':')[1]}` : h; locWeb = host.includes('127.0.0') ? `[LOC]` : `[WEB]`;
-
         // CAPTURAR URL/PARÂMETROS/MENSAGEM|BODY
         try {
             function scapeNotEncode(input) { // CORRIGIR PRAMENTROS COM JSON BRUTO
@@ -23,9 +22,8 @@ async function roomParams(inf = {}) {
                     ['/', '%2F',], ['#', '%23',], ['`', '%60',], ['@', '%40',], ['=', '%3D',], ['&', '%26',], ['?', '%3F',],
                 ]; return substituicoes.reduce((str, [antigo, novo,]) => { return str.replace(new RegExp(antigo.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), novo); }, input);
             } if (url && (url.includes('{') || url.includes('['))) { url = `/${scapeNotEncode(url.replace('/', ''))}`; }
-
-            url = decodeURIComponent(url); let { query, } = _parse(url, true); let urlParams = Object.keys(query).length === 0 ? false : query;
-            if (urlParams) { action = urlParams.act || false; room = urlParams.roo || false; if (method === 'GET') { message = urlParams.mes || false; } } if (method === 'POST') {
+            url = decodeURIComponent(url); let { query, } = _parse(url, true); urlParams = {}; for (let k in query) { urlParams[k] = Array.isArray(query[k]) ? query[k].at(-1) : query[k]; }
+            if (Object.keys(query).length > 0) { action = urlParams.act || false; room = urlParams.roo || false; if (method === 'GET') { message = urlParams.mes || false; } } if (method === 'POST') {
                 message = await new Promise((resolve) => {
                     let b = ''; server.on('data', (c) => { if (c) { b += c.toString(); } }); server.on('end', () => { if (b) { resolve(b); } else { resolve(null); } }); server.on('error', () => { resolve(null); });
                 });
@@ -34,7 +32,7 @@ async function roomParams(inf = {}) {
 
         // VALIDAÇÕES INICIAIS
         if (!ret.msg && method !== 'WEBSOCKET' && (action || message)) {
-            let { par1, par3, par4, par5, par8, par9, par10, par11, par12, par13, } = gW; let arrActMes = [par1, par3, par4, par5, par8, par9, par10, par11, par12, par13, message,];
+            let { par1, par3, par4, par5, par8, par9, par10, par11, } = gW; let arrActMes = [par1, par3, par4, par5, par8, par9, par10, par11, message,];
             for (let [index, v,] of arrActMes.entries()) { // ACTION | MESSAGE
                 if (index + 1 < arrActMes.length) { if (action && v.toLowerCase() === action.toLowerCase()) { pass = true; break; } } else if (message) {
                     try {
@@ -79,6 +77,7 @@ async function roomParams(inf = {}) {
             'message': message || '',
             'headers': headers || {},
             title,
+            'urlParams': urlParams || {},
         };
 
     } catch (catchErr) {

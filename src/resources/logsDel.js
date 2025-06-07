@@ -1,6 +1,6 @@
 // let retLogsDel = await logsDel(); console.log(retLogsDel);
 
-let e = import.meta.url, ee = e;
+let e = currentFile(), ee = e;
 async function logsDel(inf = {}) {
     let ret = { 'ret': false, }; e = inf && inf.e ? inf.e : e;
     try {

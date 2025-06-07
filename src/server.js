@@ -1,5 +1,6 @@
-let startup = new Date(); globalThis['sP'] = import.meta.url; await import('./resources/@export.js'); let e = sP, ee = e; let libs = { 'ws': {}, 'http': {}, };
-let rateHttp = rateLimiter({ 'max': 20, 'sec': 10, }); let rateWs = rateLimiter({ 'max': 20, 'sec': 10, }); let ico = `${fileWindows}/BAT/z_ICONES/websocket.ico`, h = 'Access-Control-Allow-';
+globalThis['currentFile'] = function () { return new Error().stack.match(/([^ \n])*([a-z]*:\/\/\/?)*?[a-z0-9\/\\]*\.js/ig)?.[0].replace(/[()]/g, ''); }; globalThis['sP'] = currentFile(); let startup = new Date();
+await import('./resources/@export.js'); let e = sP, ee = e; let libs = { 'ws': {}, 'http': {}, }; let rateHttp = rateLimiter({ 'max': 200, 'sec': 10, });
+let rateWs = rateLimiter({ 'max': 20, 'sec': 10, }); let ico = `${fileWindows}/BAT/z_ICONES/websocket.ico`, h = 'Access-Control-Allow-';
 
 async function serverRun(inf = {}) {
     let ret = { 'ret': false, }; e = inf && inf.e ? inf.e : e;
@@ -13,9 +14,9 @@ async function serverRun(inf = {}) {
             function resEnd(d) { res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', }).end(JSON.stringify({ ret: !!d.ret, msg: `SERVER [WS]: ERRO | ${d.msg || '*'}`, })); }
             if (req.url === '/favicon.ico') { let c = await _fs.promises.readFile(ico); res.writeHead(200, { 'Content-Type': 'image/x-icon', }).end(c); return; } if (!['GET', 'POST',].includes(req.method)) {
                 res.setHeader(`${h}Origin`, '*').setHeader(`${h}Methods`, '*').setHeader(`${h}Headers`, '*').setHeader(`${h}Credentials`, 'true'); resEnd({ 'msg': `APENAS 'GET' ou 'POST'`, }); return;
-            } if (!rateHttp.check()) { resEnd({ 'msg': `MUITAS REQUISICOES`, }); return; } /* SALA E PARAMETROS | PROCESSAR AÇÃO/MENSAGEM RECEBIDA */  let r = await roomParams({ e, 'server': req, });
-            if (!r.ret || r.stop) { resEnd({ 'ret': r.ret, 'msg': r.msg, }); return; } let { host, room, hostRoom, locWeb, action, message, method, headers, } = r.res; res['host'] = host; res['room'] = room;
-            res['hostRoom'] = hostRoom; res['locWeb'] = locWeb; res['method'] = method; res['headers'] = headers; messageAction({ host, room, action, message, 'resWs': res, wsClients, wsClientLoc, });
+            } if (!rateHttp.check()) { resEnd({ 'msg': `MUITAS REQUISICOES`, }); return; } /* SALA E PARAMETROS | PROCESSAR AÇÃO/MENSAGEM RECEBIDA */ let r = await roomParams({ e, 'server': req, });
+            if (!r.ret || r.stop) { resEnd({ 'ret': r.ret, 'msg': r.msg, }); return; } let { host, room, hostRoom, locWeb, action, message, method, headers, urlParams, } = r.res;
+            Object.assign(res, { host, room, hostRoom, locWeb, action, message, method, headers, urlParams, }); messageAction({ host, room, action, message, 'resWs': res, wsClients, wsClientLoc, });
         });
 
         // REMOVER CLIENTE
@@ -38,7 +39,7 @@ async function serverRun(inf = {}) {
             let wss = new _WebSocketServer({ 'server': serverHttp, }); wss.on('connection', async (ws, res) => {
                 // SALA PARAMETROS E [ADICIONAR] | ENVIAR PING DE INÍCIO DE CONEXÃO | EVITAR LOOP INFINITO
                 if (!rateWs.check()) { return; } let rRP = await roomParams({ e, 'server': res, }); if (!rRP.ret) { ws.send(JSON.stringify({ 'ret': rRP.ret, 'msg': rRP.msg || 'ERRO', })); ws.terminate(); return; }
-                let { host, room, hostRoom, locWeb, method, } = rRP.res; ws['host'] = host; ws['room'] = room; ws['hostRoom'] = hostRoom; ws['locWeb'] = locWeb; ws['method'] = method; let t = dateHour().res;
+                let { host, room, hostRoom, locWeb, method, urlParams, } = rRP.res; Object.assign(ws, { host, room, hostRoom, locWeb, method, urlParams, }); let t = dateHour().res;
                 t = `${t.day}/${t.mon}/${t.yea} ${t.hou}:${t.min}:${t.sec}.${t.mil}`; ws['dateHour'] = t; if (!wsClients.rooms[hostRoom]) { wsClients.rooms[hostRoom] = new Set(); } wsClients.rooms[hostRoom].add(ws);
 
                 // ### ON MESSAGE

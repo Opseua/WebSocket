@@ -1,10 +1,10 @@
 // let retPerformanceDev = await performanceDev(); console.log(retPerformanceDev);
 
-let e = import.meta.url, ee = e; let historico = [];
+let e = currentFile(), ee = e; let historico = [];
 async function performanceDev(inf = {}) {
     let ret = { 'ret': false, }; e = inf && inf.e ? inf.e : e;
     try {
-        let { min = 3, } = inf;
+        let { min = 3, } = inf; // 'min' → MÍNIMO DE VERIFICAÇÕES
 
         // EXTRAIR CONSUMO DO CSV
         async function extrair(d, g) {

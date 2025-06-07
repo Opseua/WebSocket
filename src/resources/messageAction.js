@@ -2,7 +2,7 @@
 // infMessageAction = { 'host': host, 'room': room, 'action': action, 'message': message, 'resWs': res, 'wsClients': wsClients, 'wsClientLoc': wsClientLoc, };
 // retMessageAction = await messageAction(infMessageAction); console.log(retMessageAction);
 
-let e = import.meta.url, ee = e;
+let e = currentFile(), ee = e;
 async function messageAction(inf = {}) {
     let ret = { 'ret': false, }; e = inf && inf.e ? inf.e : e;
     try {
@@ -44,12 +44,11 @@ async function messageAction(inf = {}) {
             } catch (catchErr) { body['msg'] = `API: ERRO | AO FAZER PARSE`; }
         } else if (action.toLowerCase() === gW.par8.toLowerCase()) {
             // ### (ACTION) WEBFILE [→ TODA A SALA]
-            let path = message.length < 3 || (message.includes('!le') && message.length < 10) || message.includes('a/b/c/d') ? `!letter!:/` : message;
-            infAdd.type = path.match(/\.(jpg|jpeg|png|ico)$/) ? 'img' : 'arr'; infAdd.title = `WebFiles`; infAdd['path'] = path;
+            let path = message.length < 3 || (message.includes('!le') && message.length < 10) || message.includes('a/b/c/d') ? `!letter!:/` : message; infAdd.type = 'arr'; infAdd.title = `WebFiles`; infAdd['path'] = path;
             message = { 'fun': [{ 'securityPass': gW.securityPass, 'retInf': true, 'name': 'file', 'par': { 'action': 'isFolder', 'max': 1000, path, 'listRead': true, }, },], };
         } else if (action.toLowerCase() === gW.par9.toLowerCase()) {
-            // ### (ACTION) SCREENSHOT [→ TODA A SALA] path.match(/\.(jpg|jpeg|png|ico)$/)
-            infAdd.type = 'img'; infAdd.title = `screenshot`; let path = `${fileProjetos}/${gW.project}/logs/screenshot.png`.replace(new RegExp(`${letter}:`, 'g'), `!letter!:`); message = {
+            // ### (ACTION) SCREENSHOT [→ TODA A SALA]
+            infAdd.type = 'arr'; infAdd.title = `screenshot`; let path = `${fileProjetos}/${gW.project}/logs/screenshot.png`.replace(new RegExp(`${letter}:`, 'g'), `!letter!:`); infAdd['path'] = path; message = {
                 'fun': [{ 'securityPass': gW.securityPass, 'retInf': false, 'name': 'commandLine', 'par': { 'awaitFinish': true, 'command': `%nircmd% savescreenshot "${path}"`, }, },
                 { 'securityPass': gW.securityPass, 'retInf': true, 'name': 'file', 'par': { 'action': 'read', path, }, },],
             };
@@ -63,14 +62,6 @@ async function messageAction(inf = {}) {
             // ### (ACTION) GET SECURITYPASS (SOMENTE NO 'LOC')
             infAdd.type = 'obj'; infAdd.title = `GET Security Pass`; if (resWs.locWeb === '[LOC]') { body['ret'] = true; body['msg'] = `GET SECURITYPASS: OK`; body['res'] = gW.securityPass; }
             else { body['msg'] = `GET SECURITYPASS: ERRO | AÇÃO PERMITIDA APENAS NA '[LOC]'`; }
-        } else if (action.toLowerCase() === gW.par12.toLowerCase()) {
-            // ### (ACTION) PAGE
-            infAdd.type = 'txt'; infAdd.title = `Page`; if (resWs.locWeb === '[LOC]') { body['ret'] = true; body['msg'] = `PAGE: OK`; body['res'] = `page${message}.html`; }
-            else { body['msg'] = `PAGE: ERRO | AÇÃO PERMITIDA APENAS NA '[LOC]'`; }
-        } else if (action.toLowerCase() === gW.par13.toLowerCase()) {
-            // ### (ACTION) GET FILE PAC (DOWNLOAD)
-            infAdd.type = 'download'; infAdd.title = `proxy.pac`; let retFile = await file({ e, 'action': 'read', 'path': `${fileProjetos}/Sniffer_Python/src/scripts/BAT/proxy.pac`, });
-            if (!retFile.ret) { body['msg'] = `GET FILE [PAC]: ERRO | AO LER O ARQUIVO`; } else { body['ret'] = true; body['msg'] = `GET FILE [PAC]: OK`; body['res'] = retFile.res; }
         } else {
             // ### (MENSAGEM) OUTRO TIPO DE AÇÃO/MENSAGEM 
             infAdd.type = 'obj'; infAdd.title = `Outro tipo de ação/mensagem`; try {
@@ -80,7 +71,7 @@ async function messageAction(inf = {}) {
         }
 
         if (typeof message === 'object') { // ENVIAR COMANDO(s)
-            body = await messageSend({ destination, message, 'resWs': wsClientLoc, }); // logConsole({ e, ee, 'txt': `RESPOSTA SENDO ESPERADA:\n${JSON.stringify(body)}` });
+            body = await messageSend({ destination, message, 'resWs': wsClientLoc, });
         }
 
         if (!body.ret) { // ERRO AO EXECUTAR AÇÃO
