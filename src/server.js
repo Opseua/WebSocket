@@ -1,5 +1,5 @@
 globalThis['currentFile'] = function () { return new Error().stack.match(/([^ \n])*([a-z]*:\/\/\/?)*?[a-z0-9\/\\]*\.js/ig)?.[0].replace(/[()]/g, ''); }; globalThis['sP'] = currentFile(); let startup = new Date();
-await import('./resources/@export.js'); let e = sP, ee = e; let libs = { 'ws': {}, 'http': {}, }; let rateHttp = rateLimiter({ 'max': 200, 'sec': 10, });
+await import('./resources/@export.js'); let e = sP, ee = e; let libs = { 'ws': {}, 'http': {}, }; let rateHttp = rateLimiter({ 'max': 40, 'sec': 10, });
 let rateWs = rateLimiter({ 'max': 20, 'sec': 10, }); let ico = `${fileWindows}/BAT/z_ICONES/websocket.ico`, h = 'Access-Control-Allow-';
 
 async function serverRun(inf = {}) {
