@@ -23,14 +23,16 @@ async function performanceDev(inf = {}) {
         async function monitorar(inf = {}) {
             let { pLog, minCheck, alertThis, clearRam, ...nomesMaximos } = inf; let n = Object.keys(nomesMaximos); let r = await extrair(pLog, n); if (r.file === undefined) { return; }
             let res = { file: r.file, ...Object.fromEntries(Object.entries(r).filter(([k,]) => k !== 'file').map(([k, v,]) => [k, v[v.length - 1],])), };
-            historico.push(res); if (historico.length > minCheck) { historico.shift(); } let l = historico[historico.length - 1];
+            historico.push(res); if (historico.length > minCheck) { historico.shift(); } let l = historico[historico.length - 1]; let cpuUsage = l.CPU_Total; let ramUsage = l.RAM_Total;
 
-            let msg = `CPU: ${String(l.CPU_Total).padStart(2, '0')}% | RAM: ${String(l.RAM_Total).padStart(2, '0')}%`;
+            let msg = `CPU: ${String(cpuUsage).padStart(2, '0')}% | RAM: ${String(ramUsage).padStart(2, '0')}%`;
 
             if (historico.length === minCheck) {
-                let acima = historico.every(r => n.some(n => r[n] > nomesMaximos[n]));
-                if (acima) {
-                    if (clearRam === 'SIM') {
+                let cpuUsageHigh = historico.every(r => r.CPU_Total > nomesMaximos.CPU_Total);
+                let ramUsageHigh = historico.every(r => r.RAM_Total > nomesMaximos.RAM_Total);
+
+                if (cpuUsageHigh || ramUsageHigh) {
+                    if (clearRam === 'SIM' && ramUsageHigh) {
                         // LIMPAR A RAM
                         commandLine({ e, 'command': `${fileWindows}/BAT/EmptyStandbyList.exe workingsets`, }); msg = `${msg} ✅ LIMPA`;
                     }

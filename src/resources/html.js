@@ -1,6 +1,3 @@
-// let infHtml, retHtml, infAdd = { 'title': 'Erro', 'type': '', };
-// retHtml = await html({ e, 'server': 'resWs/res', 'body': body, 'room': room, 'infAdd': infAdd, }); console.log(retHtml);
-
 // → CONTEUDO: ENVIAR BRUTO (RESPOSTA EM JSON)
 // {'mode': 'raw }
 // &mode=raw
@@ -19,7 +16,7 @@ async function html(inf = {}) {
     try {
         let { room, infAdd = {}, body, server, } = inf;
 
-        let { type, path, } = infAdd; let res = server, mode; function htmlWithPre(b, n) { return bodyHtml.replace('_REP_LACE_', n ? b : `<pre>${b}</pre>`).replace('_Web_Socket_', title); }
+        let { type, path, } = infAdd; let res = server, mode; function htmlWithPre(b, pre) { return bodyHtml.replace('_REP_LACE_', pre ? `<pre>${b}</pre>` : b).replace('_Web_Socket_', title); }
         let headersUrlParams = { ...res.headers || {}, ...res.urlParams, }, title = path ? path.split('/').reverse()[0] : infAdd.title || 'download.txt'; type = path?.match(/\.(jpg|jpeg|png|ico)$/) ? 'img' : type;
         function setData(txt) { return txt.substring(8, 10) + '/' + txt.substring(5, 7) + '/' + txt.substring(0, 4) + ' ' + txt.substring(11, 13) + ':' + txt.substring(14, 16) + ':' + txt.substring(17, 19); }
 
@@ -38,7 +35,7 @@ async function html(inf = {}) {
                     } else if (type === 'img') {
                         body = `<img src="data:image/png;base64,${Buffer.from(body.res).toString('base64')}" alt="Imagem">`;
                     }
-                    writeHead['Content-Type'] = `${path?.endsWith('.js') ? 'application/javascript' : 'text/html'}; charset=utf-8`;
+                    writeHead['Content-Type'] = `${path?.endsWith('.js') && mode === 'htm' ? 'application/javascript' : 'text/html'}; charset=utf-8`;
                 } else if (mode === 'raw') {
                     // === BRUTO ===
                     if (type === 'obj' || type === 'arr') {
@@ -58,7 +55,7 @@ async function html(inf = {}) {
                     writeHead['Content-Disposition'] = `attachment; filename="${title}"`;
                 }
             } catch (err) { res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8', }); res.end(JSON.stringify({ 'ret': false, 'msg': `HTML: ERRO | ${err.message}`, })); }
-            res.writeHead(200, writeHead); res.end(mode === 'ren' ? htmlWithPre(body, body.includes('<')) : body);
+            res.writeHead(200, writeHead); res.end(mode === 'ren' ? htmlWithPre(body, (type === 'obj' || (type === 'arr' && !body.includes('<tr>#<th'.replace('#', ''))))) : body);
         }
 
         function tableFile() {
