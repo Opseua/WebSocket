@@ -54,7 +54,7 @@ async function performanceDev(inf = {}) {
         } else if (gW.devMaster === 'ESTRELAR') {
             alertDev = [80, 80, 'SIM', 'SIM',];
         } else if (gW.devMaster === 'OPSEUA') {
-            alertDev = [999, 85, 'NAO', 'SIM',];
+            alertDev = [999, 80, 'NAO', 'SIM',];
         }
 
         await monitorar({
