@@ -88,7 +88,7 @@ async function html(inf = {}) {
             } catch (err) { resOk = { 'ret': false, 'msg': `{TABLE/VIEW}: ERRO | '${path}' → ${err.message}`, }; } return resOk;
         }
 
-        let h = headersUrlParams; mode = h.raw === 'true' ? 'raw' : h.download === 'true' ? 'dow' : h.html === 'true' ? 'htm' : h.mode; mode = ['raw', 'dow', 'htm',].includes(mode) ? mode : 'ren'; resBody();
+        mode = ['raw', 'dow', 'htm',].includes(headersUrlParams.mode) ? headersUrlParams.mode : 'ren'; resBody();
 
         ret['ret'] = true;
         ret['msg'] = `HTML: OK`;

@@ -12,11 +12,11 @@ async function logsDel(inf = {}) {
                 let targetDate = new Date(today.getFullYear(), regexMon, regexDay); let dif = Math.abs(Math.ceil((targetDate - today) / (1000 * 60 * 60 * 24))); return dif > daysKeep;
             }
         }//                                                               [JavaScript/Python | Registros]
-        let logsLight = 30, logsHeavy = gW.devMaster === 'AWS' ? 3 : 5; let log1 = logsLight, log2 = logsHeavy;
+        let logsLight = 30, logsHeavy = gW.devMaster === 'AWS' ? 3 : 7; let log1 = logsLight, log2 = logsHeavy;
         let pathsToDel = [
 
             // [WINDOWS] BAT
-            { 'daysKeep': logsLight, 'path': `${fileWindows}/BAT/z_logs`, },
+            { 'daysKeep': 7, 'path': `${fileWindows}/BAT/z_logs`, },
 
             // [PROJETOS] Chat_Python
             { 'daysKeep': log1, 'path': `${fileProjetos}/Chat_Python/logs/JavaScript`, },
