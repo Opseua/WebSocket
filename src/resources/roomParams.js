@@ -32,7 +32,7 @@ async function roomParams(inf = {}) {
 
         // VALIDAÇÕES INICIAIS
         if (!ret.msg && method !== 'WEBSOCKET' && (action || message)) {
-            let { par1, par3, par4, par5, par8, par9, par10, par11, } = gW; let arrActMes = [par1, par3, par4, par5, par8, par9, par10, par11, message,];
+            let { par1, par3, par4, par5, par6, par7, par8, par9, } = gW; let arrActMes = [par1, par3, par4, par5, par6, par7, par8, par9, message,];
             for (let [index, v,] of arrActMes.entries()) { // ACTION | MESSAGE
                 if (index + 1 < arrActMes.length) { if (action && v.toLowerCase() === action.toLowerCase()) { pass = true; break; } } else if (message) {
                     try {

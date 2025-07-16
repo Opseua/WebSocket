@@ -14,7 +14,7 @@ async function serverRun(inf = {}) {
             function resEnd(d) { res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', }).end(JSON.stringify({ ret: !!d.ret, msg: `SERVER [WS]: ERRO | ${d.msg || '*'}`, })); }
             if (req.url === '/favicon.ico') { let c = await _fs.promises.readFile(ico); res.writeHead(200, { 'Content-Type': 'image/x-icon', }).end(c); return; } if (!['GET', 'POST',].includes(req.method)) {
                 res.setHeader(`${h}Origin`, '*').setHeader(`${h}Methods`, '*').setHeader(`${h}Headers`, '*').setHeader(`${h}Credentials`, 'true'); resEnd({ 'msg': `APENAS 'GET' ou 'POST'`, }); return;
-            } if (!rateHttp.check()) { resEnd({ 'msg': `MUITAS REQUISICOES`, }); return; } /* SALA E PARAMETROS | PROCESSAR AÇÃO/MENSAGEM RECEBIDA */ let r = await roomParams({ e, 'server': req, });
+            } if (!rateHttp.check().ret) { resEnd({ 'msg': `MUITAS REQUISICOES`, }); return; } /* SALA E PARAMETROS | PROCESSAR AÇÃO/MENSAGEM RECEBIDA */ let r = await roomParams({ e, 'server': req, });
             if (!r.ret || r.stop) { resEnd({ 'ret': r.ret, 'msg': r.msg, }); return; } let { host, room, hostRoom, locWeb, action, message, method, headers, urlParams, } = r.res;
             Object.assign(res, { host, room, hostRoom, locWeb, action, message, method, headers, urlParams, }); messageAction({ host, room, action, message, 'resWs': res, wsClients, wsClientLoc, });
         });
@@ -38,7 +38,7 @@ async function serverRun(inf = {}) {
             // SERVIDOR WEBSOCKET | ### ON CONNECTION
             let wss = new _WebSocketServer({ 'server': serverHttp, }); wss.on('connection', async (ws, res) => {
                 // SALA PARAMETROS E [ADICIONAR] | ENVIAR PING DE INÍCIO DE CONEXÃO | EVITAR LOOP INFINITO
-                if (!rateWs.check()) { return; } let rRP = await roomParams({ e, 'server': res, }); if (!rRP.ret) { ws.send(JSON.stringify({ 'ret': rRP.ret, 'msg': rRP.msg || 'ERRO', })); ws.terminate(); return; }
+                if (!rateWs.check().ret) { return; } let rRP = await roomParams({ e, 'server': res, }); if (!rRP.ret) { ws.send(JSON.stringify({ 'ret': rRP.ret, 'msg': rRP.msg || 'ERRO', })); ws.terminate(); return; }
                 let { host, room, hostRoom, locWeb, method, urlParams, } = rRP.res; Object.assign(ws, { host, room, hostRoom, locWeb, method, urlParams, }); let t = dateHour().res;
                 t = `${t.day}/${t.mon}/${t.yea} ${t.hou}:${t.min}:${t.sec}.${t.mil}`; ws['dateHour'] = t; if (!wsClients.rooms[hostRoom]) { wsClients.rooms[hostRoom] = new Set(); } wsClients.rooms[hostRoom].add(ws);
 
@@ -81,7 +81,7 @@ async function serverRun(inf = {}) {
             // ACTION LOOP [SOMENTE SE FOR NO AWS (08H<>23H)] PARA TODOS OS '*-NODE-*'
             setInterval(async () => {
                 let time = dateHour().res; if (gW.devMaster === 'AWS' && Number(time.hou) > 7 && Number(time.hou) < 24) {
-                    logConsole({ e, ee, 'txt': `ACTION: LOOP`, }); await messageAction({ host, room: '*-NODE-*', destination: '*-NODE-*', action: gW.par10, message: '', resWs: false, wsClients, wsClientLoc, });
+                    logConsole({ e, ee, 'txt': `ACTION: LOOP`, }); await messageAction({ host, room: '*-NODE-*', destination: '*-NODE-*', action: gW.par8, message: '', resWs: false, wsClients, wsClientLoc, });
                 }
             }, (gW.secLoop * 1000));
         }).on('error', (err) => { serverErr(err); });

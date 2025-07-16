@@ -42,23 +42,23 @@ async function messageAction(inf = {}) {
                 if (message !== '') { let retApi = await api({ e, 'object': true, ...JSON.parse(message), }); body = retApi; }
                 else { body['msg'] = `API: ERRO | INFORMAR OS PARAMETROS\n\n→ &mes={"method":"POST","url":"https://www.google.com","headers":{"Content-Type":"application/json"},"body":{"aaa":"bbb"},"maxConnect":10}`; }
             } catch (catchErr) { body['msg'] = `API: ERRO | AO FAZER PARSE`; }
-        } else if (action.toLowerCase() === gW.par8.toLowerCase()) {
+        } else if (action.toLowerCase() === gW.par6.toLowerCase()) {
             // ### (ACTION) WEBFILE [→ TODA A SALA]
             let path = message.length < 3 || (message.includes('!le') && message.length < 10) || message.includes('a/b/c/d') ? `!letter!:/` : message; infAdd.type = 'arr'; infAdd.title = `WebFiles`; infAdd['path'] = path;
             message = { 'fun': [{ 'securityPass': gW.securityPass, 'retInf': true, 'name': 'file', 'par': { 'action': 'isFolder', 'max': 1000, path, 'listRead': true, }, },], };
-        } else if (action.toLowerCase() === gW.par9.toLowerCase()) {
+        } else if (action.toLowerCase() === gW.par7.toLowerCase()) {
             // ### (ACTION) SCREENSHOT [→ TODA A SALA]
             infAdd.type = 'arr'; infAdd.title = `screenshot`; let path = `${fileProjetos}/${gW.project}/logs/screenshot.png`.replace(new RegExp(`${letter}:`, 'g'), `!letter!:`); infAdd['path'] = path; message = {
                 'fun': [{ 'securityPass': gW.securityPass, 'retInf': false, 'name': 'commandLine', 'par': { 'awaitFinish': true, 'command': `%nircmd% savescreenshot "${path}"`, }, },
                 { 'securityPass': gW.securityPass, 'retInf': true, 'name': 'file', 'par': { 'action': 'read', path, }, },],
             };
-        } else if (action.toLowerCase() === gW.par10.toLowerCase()) {
+        } else if (action.toLowerCase() === gW.par8.toLowerCase()) {
             // ### (ACTION) LOOP [→ TODA A SALA '...-NODE-...'] | CRIAR PADRÃO DE PASTA | SCREENSHOT (MANTER awaitFinish 'true' DO CONTRÁRIO O NIRCMD ABRE O POPUP)
             infAdd.type = 'obj'; infAdd.title = `Loop`; let path = `${fileProjetos}/${gW.project}/logs/Registros/${time1}/${time.hou}.00-${time.hou}.59`.replace(new RegExp(`${letter}:`, 'g'), `!letter!:`); message = {
                 'fun': [{ 'securityPass': gW.securityPass, 'retInf': false, 'name': 'file', 'par': { 'action': 'write', 'path': `${path}/#_Z_#.txt`, 'text': path, 'add': true, }, },
                 { 'securityPass': gW.securityPass, 'retInf': false, 'name': 'commandLine', 'par': { 'awaitFinish': true, 'command': `%nircmd% savescreenshot "${path}/${time2}_screenshot.png"`, }, },],
             };
-        } else if (action.toLowerCase() === gW.par11.toLowerCase()) {
+        } else if (action.toLowerCase() === gW.par9.toLowerCase()) {
             // ### (ACTION) GET SECURITYPASS (SOMENTE NO 'LOC')
             infAdd.type = 'obj'; infAdd.title = `GET Security Pass`; if (resWs.locWeb === '[LOC]') { body['ret'] = true; body['msg'] = `GET SECURITYPASS: OK`; body['res'] = gW.securityPass; }
             else { body['msg'] = `GET SECURITYPASS: ERRO | AÇÃO PERMITIDA APENAS NA '[LOC]'`; }

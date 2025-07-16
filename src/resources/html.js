@@ -72,7 +72,7 @@ async function html(inf = {}) {
                         return isAscending ? sizeA - sizeB : sizeB - sizeA;}; return isAscending ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA); }); rows.forEach(row => table.appendChild(row));
                         currentSort[columnIndex] = isAscending ? "asc" : "desc"; let headers = table.querySelectorAll("th"); headers.forEach((header, index) => { if (index === columnIndex) {
                         header.innerHTML = header.innerHTML.replace(/(▲|▼)?$/, isAscending ? " ▼" : " ▲");} else { header.innerHTML = header.innerHTML.replace(/(▲|▼)?$/, "");}});}</script>`; for (let item of body.res) {
-                        link = `<a href="/?act=${gW.par8}&roo=${room}&mes=${encodeURIComponent(encodeURIComponent(item.path))}">${item.path.replace(`/${item.name}`, '')}</a>`;
+                        link = `<a href="/?act=${gW.par6}&roo=${room}&mes=${encodeURIComponent(encodeURIComponent(item.path))}">${item.path.replace(`/${item.name}`, '')}</a>`;
                         tipoEstilo = item.isFolder ? 'background-color: #1bcf45; color: #ffffff;' : 'background-color: #db3434; color: #ffffff;'; let dataFormatada = item.edit ? setData(item.edit) : '';
                         resOk += `<tr>`; resOk += `<td style="text-align: center;">${item.size || ''}</td>`; resOk += `<td style="text-align: center;">${dataFormatada}</td>`;
                         resOk += `<td style="text-align: center;">${item.md5 || ''}</td>`; resOk += `<td style="text-align: center; ${tipoEstilo}">${item.isFolder ? 'PASTA' : 'ARQUIVO'}</td>`;
