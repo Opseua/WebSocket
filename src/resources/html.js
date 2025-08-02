@@ -27,7 +27,7 @@ async function html(inf = {}) {
         res.setHeader('Access-Control-Allow-Origin', '*'); res.setHeader('Access-Control-Allow-Methods', '*'); res.setHeader('Access-Control-Allow-Headers', '*'); res.setHeader('Access-Control-Allow-Credentials', 'true');
 
         function resBody() { // img → imagem | arr → webfile (LISTA/LENDO) | obj  → OBJETO
-            let writeHead = {}; try {
+            let writeHead = {}, resWriHeaEnd = false; try {
                 if (mode === 'ren' || mode === 'htm') {
                     // === RENDERIZAR ===
                     if (type === 'obj' || type === 'arr') {
@@ -54,8 +54,10 @@ async function html(inf = {}) {
                     }
                     writeHead['Content-Disposition'] = `attachment; filename="${title}"`;
                 }
-            } catch (err) { res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8', }); res.end(JSON.stringify({ 'ret': false, 'msg': `HTML: ERRO | ${err.message}`, })); }
-            res.writeHead(200, writeHead); res.end(mode === 'ren' ? htmlWithPre(body, (type === 'obj' || (type === 'arr' && !body.includes('<tr>#<th'.replace('#', ''))))) : body);
+            } catch (err) { resWriHeaEnd = err; } // REQ DEU ERRO: SIM/NÃO | ENVIAR RESPOSTA
+            if (resWriHeaEnd) { resWriHeaEnd = { 'writeHead': { 'Content-Type': 'text/plain; charset=utf-8', }, 'end': JSON.stringify({ 'ret': false, 'msg': `HTML: ERRO | ${resWriHeaEnd.message}`, }), }; }
+            else { resWriHeaEnd = { writeHead, 'end': mode === 'ren' ? htmlWithPre(body, (type === 'obj' || (type === 'arr' && !body.includes('<tr>#<th'.replace('#', ''))))) : body, }; }
+            res.writeHead(200, resWriHeaEnd.writeHead); res.end(resWriHeaEnd.end);
         }
 
         function tableFile() {
@@ -72,7 +74,7 @@ async function html(inf = {}) {
                         return isAscending ? sizeA - sizeB : sizeB - sizeA;}; return isAscending ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA); }); rows.forEach(row => table.appendChild(row));
                         currentSort[columnIndex] = isAscending ? "asc" : "desc"; let headers = table.querySelectorAll("th"); headers.forEach((header, index) => { if (index === columnIndex) {
                         header.innerHTML = header.innerHTML.replace(/(▲|▼)?$/, isAscending ? " ▼" : " ▲");} else { header.innerHTML = header.innerHTML.replace(/(▲|▼)?$/, "");}});}</script>`; for (let item of body.res) {
-                        link = `<a href="/?act=${gW.par6}&roo=${room}&mes=${encodeURIComponent(encodeURIComponent(item.path))}">${item.path.replace(`/${item.name}`, '')}</a>`;
+                        link = `<a href="/?act=${gW.par5}&roo=${room}&mes=${encodeURIComponent(encodeURIComponent(item.path))}">${item.path.replace(`/${item.name}`, '')}</a>`;
                         tipoEstilo = item.isFolder ? 'background-color: #1bcf45; color: #ffffff;' : 'background-color: #db3434; color: #ffffff;'; let dataFormatada = item.edit ? setData(item.edit) : '';
                         resOk += `<tr>`; resOk += `<td style="text-align: center;">${item.size || ''}</td>`; resOk += `<td style="text-align: center;">${dataFormatada}</td>`;
                         resOk += `<td style="text-align: center;">${item.md5 || ''}</td>`; resOk += `<td style="text-align: center; ${tipoEstilo}">${item.isFolder ? 'PASTA' : 'ARQUIVO'}</td>`;
@@ -97,7 +99,7 @@ async function html(inf = {}) {
         let retRegexE = await regexE({ inf, 'e': catchErr, }); ret['msg'] = retRegexE.res; ret['ret'] = false; delete ret['res'];
     }
 
-    return { ...({ 'ret': ret.ret, }), ...(ret.msg && { 'msg': ret.msg, }), ...(ret.res && { 'res': ret.res, }), };
+    return { ...({ 'ret': ret.ret, }), ...(ret.msg && { 'msg': ret.msg, }), ...(ret.hasOwnProperty('res') && { 'res': ret.res, }), };
 }
 
 // CHROME | NODE

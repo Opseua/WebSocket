@@ -32,7 +32,7 @@ async function roomParams(inf = {}) {
 
         // VALIDAÇÕES INICIAIS
         if (!ret.msg && method !== 'WEBSOCKET' && (action || message)) {
-            let { par1, par3, par4, par5, par6, par7, par8, par9, } = gW; let arrActMes = [par1, par3, par4, par5, par6, par7, par8, par9, message,];
+            let { par1, par2, par3, par4, par5, par6, par7, par8, } = gW; let arrActMes = [par1, par2, par3, par4, par5, par6, par7, par8, message,];
             for (let [index, v,] of arrActMes.entries()) { // ACTION | MESSAGE
                 if (index + 1 < arrActMes.length) { if (action && v.toLowerCase() === action.toLowerCase()) { pass = true; break; } } else if (message) {
                     try {
@@ -84,7 +84,7 @@ async function roomParams(inf = {}) {
         let retRegexE = await regexE({ inf, 'e': catchErr, }); ret['msg'] = retRegexE.res; ret['ret'] = false; delete ret['res'];
     }
 
-    return { ...({ 'ret': ret.ret, }), ...(ret.msg && { 'msg': ret.msg, }), ...(ret.res && { 'res': ret.res, }), };
+    return { ...({ 'ret': ret.ret, }), ...(ret.msg && { 'msg': ret.msg, }), ...(ret.hasOwnProperty('res') && { 'res': ret.res, }), };
 }
 
 // CHROME | NODE
