@@ -17,7 +17,7 @@ async function messageAction(inf = {}) {
                 let dH = dateHour().res; let resClients = [{ 'hour': `${dH.hou}:${dH.min}:${dH.sec}`, },]; resClients = [...resClients, ...Object.keys(wsClients.rooms).filter(sala => sala.includes(host))
                     .map(sala => ({ sala, ...Array.from(wsClients.rooms[sala]).reduce((acc, ws, index) => { acc[`_${index + 1}`] = `${ws.dateHour}`; return acc; }, {}), })),];
                 body['ret'] = true; body['msg'] = `CLIENTS: OK`; body['res'] = resClients;
-            } catch (catchErr) { body['msg'] = `CLIENTS: ERRO | AO PEGAR CLIENTES`; }
+            } catch { body['msg'] = `CLIENTS: ERRO | AO PEGAR CLIENTES`; }
         } else if (action.toLowerCase() === gW.par2.toLowerCase()) {
             // ### (ACTION) RESTART (+AnyDesk) [→ TODA A SALA]
             infAdd.type = 'obj'; infAdd.title = `Restart (Server's + AnyDesk)`; let securityPass = gW.securityPass; message = {
@@ -35,13 +35,13 @@ async function messageAction(inf = {}) {
                     provider → *PYTHON   [telegram]: gpt-4o   ###   [g4f]: gpt-4o   ###   [zukijourney]: gpt-4   ###   [naga]: gpt-4
                     &mes={"provider":"nextWay","model":"gpt-3.5-turbo","input":"Qual a idade de Saturno"} `;
                 }
-            } catch (catchErr) { body['msg'] = `CHAT: ERRO | AO FAZER PARSE`; }
+            } catch { body['msg'] = `CHAT: ERRO | AO FAZER PARSE`; }
         } else if (action.toLowerCase() === gW.par4.toLowerCase()) {
             // ### (ACTION) API
             infAdd.type = 'obj'; infAdd.title = `API`; try {
                 if (message !== '') { let retApi = await api({ e, 'object': true, ...JSON.parse(message), }); body = retApi; }
                 else { body['msg'] = `API: ERRO | INFORMAR OS PARAMETROS\n\n→ &mes={"method":"POST","url":"https://www.google.com","headers":{"Content-Type":"application/json"},"body":{"aaa":"bbb"},"maxConnect":10}`; }
-            } catch (catchErr) { body['msg'] = `API: ERRO | AO FAZER PARSE`; }
+            } catch { body['msg'] = `API: ERRO | AO FAZER PARSE`; }
         } else if (action.toLowerCase() === gW.par5.toLowerCase()) {
             // ### (ACTION) WEBFILE [→ TODA A SALA]
             let path = message.length < 3 || (message.includes('!le') && message.length < 10) || message.includes('a/b/c/d') ? `!letter!:/` : message; infAdd.type = 'arr'; infAdd.title = `WebFiles`; infAdd['path'] = path;
@@ -67,7 +67,7 @@ async function messageAction(inf = {}) {
             infAdd.type = 'obj'; infAdd.title = `Outro tipo de ação/mensagem`; try {
                 message = JSON.parse(message); message = message.message || message;
                 if (!(message.fun && Array.isArray(message.fun))) { body['msg'] = `OUTRO TIPO DE AÇÃO: ERRO | CHAVE 'fun' NÃO ENCONTRADA OU NÃO É ARRAY`; message = ''; }
-            } catch (catchErr) { body['msg'] = `OUTRO TIPO DE AÇÃO: ERRO | AO FAZER PARSE/MENSAGEM VAZIA`; message = ''; }
+            } catch { body['msg'] = `OUTRO TIPO DE AÇÃO: ERRO | AO FAZER PARSE/MENSAGEM VAZIA`; message = ''; }
         }
 
         if (typeof message === 'object') { // ENVIAR COMANDO(s)

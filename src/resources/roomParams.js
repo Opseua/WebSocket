@@ -28,7 +28,7 @@ async function roomParams(inf = {}) {
                     let b = ''; server.on('data', (c) => { if (c) { b += c.toString(); } }); server.on('end', () => { if (b) { resolve(b); } else { resolve(null); } }); server.on('error', () => { resolve(null); });
                 });
             }
-        } catch (catchErr) { ret['msg'] = `AO CAPTURAR URL/PARÂMETROS/MENSAGEM|BODY`; sendAlert = true; }
+        } catch { ret['msg'] = `AO CAPTURAR URL/PARÂMETROS/MENSAGEM|BODY`; sendAlert = true; }
 
         // VALIDAÇÕES INICIAIS
         if (!ret.msg && method !== 'WEBSOCKET' && (action || message)) {
@@ -39,7 +39,7 @@ async function roomParams(inf = {}) {
                         mesTem = JSON.parse(message); if (!(mesTem.fun && Array.isArray(mesTem.fun))) { ret['msg'] = `CHAVE 'fun' NÃO ENCONTRADA/NÃO É ARRAY`; sendAlert = true; }
                         else if (mesTem.fun.length === 0) { ret['msg'] = `CHAVE 'fun' VAZIA`; sendAlert = true; }
                         else if (!mesTem.fun.every(item => item.securityPass === gW.securityPass)) { ret['msg'] = `SECURITY PASS INVÁLIDO`; sendAlert = true; } else { pass = true; break; }
-                    } catch (catchErr) { ret['msg'] = `AO FAZER PARSE DA MENSAGEM`; if (room || method === 'GET') { sendAlert = true; } }
+                    } catch { ret['msg'] = `AO FAZER PARSE DA MENSAGEM`; if (room || method === 'GET') { sendAlert = true; } }
                 }
             } if (pass) { room = room || 'x'; } else if (!ret.msg && method === 'GET' && !room) { ret['msg'] = `NENHUMA AÇÃO VÁLIDA`; sendAlert = true; }
         }

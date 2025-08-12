@@ -71,7 +71,7 @@ async function serverRun(inf = {}) {
             let locWeb = host.includes('127.0.0') ? `[LOC]` : `[WEB]`; ws['host'] = host; ws['room'] = room; ws['hostRoom'] = hostRoom; ws['locWeb'] = locWeb; ws['method'] = 'WEBSOCKET'; wsClientLoc = ws;
             ws.on('error', (data) => { logConsole({ e, ee, 'txt': `CLIENT LOC | ERRO\n${JSON.stringify(data.toString('utf-8'))}`, }); }); ws.on('message', async (data) => {
                 let message = data.toString('utf-8'); let pingPong = message === `ping` ? 1 : message === `pong` ? 2 : 0;
-                if (pingPong > 0) { return; } try { message = JSON.parse(message); } catch (catchErr) { message = { message, }; }
+                if (pingPong > 0) { return; } try { message = JSON.parse(message); } catch { message = { message, }; }
                 if (!message.message) { message = { message, }; } messageReceived({ ...message, host, room, 'resWs': ws, }); // PROCESSAR MENSAGEM RECEBIDA
             }); // -------------------------------------------------------------------------------------------------------------
 
