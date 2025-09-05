@@ -1,18 +1,18 @@
 // let retLogsDel = await logsDel(); console.log(retLogsDel);
 
-let e = currentFile(), ee = e;
+let e = currentFile(new Error()), ee = e;
 async function logsDel(inf = {}) {
-    let ret = { 'ret': false, }; e = inf && inf.e ? inf.e : e;
+    let ret = { 'ret': false, }; e = inf.e || e;
     try {
         let retFile, pathsDel = [], filesDelOrNot = [], retDelOrNot;
 
         async function delOrNot(inf = {}) {
             let { daysKeep, path, edit, } = inf; if (!(path.includes('MES_') && path.includes('DIA_'))) { let dif = Math.round((new Date() - new Date(edit)) / (1000 * 60 * 60 * 24)); return dif > daysKeep; } else {
-                let regexMon = parseInt(path.match(/MES_(\d{2})/)[1]) - 1; let regexDay = parseInt(path.match(/DIA_(\d{2})/)[1]); let today = new Date();
-                let targetDate = new Date(today.getFullYear(), regexMon, regexDay); let dif = Math.abs(Math.ceil((targetDate - today) / (1000 * 60 * 60 * 24))); return dif > daysKeep;
+                let regexMon = parseInt(path.match(/MES_(\d{2})/)[1]) - 1, regexDay = parseInt(path.match(/DIA_(\d{2})/)[1]), today = new Date();
+                let targetDate = new Date(today.getFullYear(), regexMon, regexDay), dif = Math.abs(Math.ceil((targetDate - today) / (1000 * 60 * 60 * 24))); return dif > daysKeep;
             }
-        }//                                                               [JavaScript/Python | Registros]
-        let logsLight = 30, logsHeavy = gW.devMaster === 'AWS' ? 3 : 7; let log1 = logsLight, log2 = logsHeavy;
+        }//                                                           [JavaScript/Python | Registros]
+        let logsLight = 30, logsHeavy = gW.devMaster === 'AWS' ? 3 : 7, log1 = logsLight, log2 = logsHeavy;
         let pathsToDel = [
 
             // [WINDOWS] BAT

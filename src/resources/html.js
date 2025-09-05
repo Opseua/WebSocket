@@ -10,9 +10,9 @@
 // {'mode': 'htm }
 // &mode=htm
 
-let e = currentFile(), ee = e;
+let e = currentFile(new Error()), ee = e;
 async function html(inf = {}) {
-    let ret = { 'ret': false, }; e = inf && inf.e ? inf.e : e;
+    let ret = { 'ret': false, }; e = inf.e || e;
     try {
         let { room, infAdd = {}, body, server, } = inf;
 

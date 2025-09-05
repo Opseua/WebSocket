@@ -1,16 +1,15 @@
-globalThis['currentFile'] = function () { return new Error().stack.match(/([^ \n])*([a-z]*:\/\/\/?)*?[a-z0-9\/\\]*\.js/ig)?.[0].replace(/[()]/g, ''); }; globalThis['sP'] = currentFile(); let startup = new Date();
-await import('./resources/@export.js'); let e = sP, ee = e; let libs = { 'ws': {}, 'http': {}, }; let rateHttp = rateLimiter({ 'max': 40, 'sec': 10, });
-let rateWs = rateLimiter({ 'max': 20, 'sec': 10, }); let ico = `${fileWindows}/BAT/z_ICONES/websocket.ico`, h = 'Access-Control-Allow-';
+let startup = new Date(); globalThis['firstFileCall'] = new Error(); await import('./resources/@export.js'); let e = firstFileCall, ee = e;
+let rateHttp = rateLimiter({ max: 40, sec: 10, }), rateWs = rateLimiter({ max: 20, 'sec': 10, }); let ico = `${fileWindows}/BAT/z_ICONES/websocket.ico`, h = 'Access-Control-Allow-'; let libs = { 'ws': {}, 'http': {}, };
 
 async function serverRun(inf = {}) {
-    let ret = { 'ret': false, }; e = inf && inf.e ? inf.e : e;
+    let ret = { 'ret': false, }; e = inf.e || e;
     try {
         /* IMPORTAR BIBLIOTECA [NODE] */ libs['ws'] = { 'WebSocket': 1, 'WebSocketServer': 1, 'pro': true, }; libs['http']['http'] = 1; libs = await importLibs(libs, 'serverRun [WebSocket]');
 
         await logConsole({ e, ee, 'txt': `**************** SERVER **************** [${startupTime(startup, new Date())}]`, });
 
         // ############# SERVIDOR HTTP
-        let wsClients = { 'rooms': {}, }, wsClientLoc; let serverHttp = _http.createServer(async (req, res) => { // EVITAR LOOP INFINITO | PRÉ-CONFIGURAÇÕES HTTP
+        let devMaster = gW.devMaster, wsClients = { 'rooms': {}, }, wsClientLoc, serverHttp = _http.createServer(async (req, res) => { // EVITAR LOOP INFINITO | PRÉ-CONFIGURAÇÕES HTTP
             function resEnd(d) { res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', }).end(JSON.stringify({ ret: !!d.ret, msg: `SERVER [WS]: ERRO | ${d.msg || '*'}`, })); }
             if (req.url === '/favicon.ico') { let c = await _fs.promises.readFile(ico); res.writeHead(200, { 'Content-Type': 'image/x-icon', }).end(c); return; } if (!['GET', 'POST',].includes(req.method)) {
                 res.setHeader(`${h}Origin`, '*').setHeader(`${h}Methods`, '*').setHeader(`${h}Headers`, '*').setHeader(`${h}Credentials`, 'true'); resEnd({ 'msg': `APENAS 'GET' ou 'POST'`, }); return;
@@ -54,7 +53,7 @@ async function serverRun(inf = {}) {
                                 else if (!message.message.fun.every(item => item.securityPass === gW.securityPass)) { text = `SERVER WS: ERRO | SECURITY PASS INVÁLIDO\n\n→ ${ws.hostRoom}`; }
                                 if (!text) { processMes(); /* PROCESSAR MENSAGEM RECEBIDA */ } else {
                                     ws.send(JSON.stringify({ 'ret': false, 'msg': text, })); logConsole({ e, ee, 'txt': `${text}\n\n${data.toString('utf-8')}`, });
-                                    notification({ 'keepOld': true, 'title': `# WS (${gW.devMaster}) [NODE]`, text, 'ignoreErr': true, }); // ALERTAR SOBRE O ERRO
+                                    notification({ 'keepOld': true, 'title': `# WS (${devMaster}) [NODE]`, text, 'ignoreErr': true, }); // ALERTAR SOBRE O ERRO
                                 }
                             }
                         }
@@ -65,12 +64,12 @@ async function serverRun(inf = {}) {
                 ws.on('error', () => { runRemSerCli(); }); ws.on('close', () => { runRemSerCli(); }); function runRemSerCli() { remSerCli({ 'resWs': ws, host, room, hostRoom, }); }
             });
 
-            // WEBSOCKET [CLIENT LOC] (NAO USAR!!! ------------------------------------------------------------------------------------------
-            let ws = new _WebSocket(`ws://${gW.devMaster === 'AWS' ? gW.serverWeb : '127.0.0.1'}:${gW.portLoc}/?roo=${gW.devMaster}-${gW.par0}`);
-            let url = ws._url ? ws._url : ws.url; let host = url.replace('ws://', '').split('/')[0]; let room = url.split(`${host}/`)[1].replace('?roo=', ''); let hostRoom = url.replace('ws://', '');
+            // WEBSOCKET [CLIENT LOC] (NAO USAR!!!) ------------------------------------------------------------------------------------------
+            let ws = new _WebSocket(`ws://${devMaster === 'AWS' ? gW.serverWeb : devMaster === 'ESTRELAR' ? gW.serverWebEstrelar : '127.0.0.1'}:${gW.portLoc}/?roo=${devMaster}-${gW.par0}`);
+            let url = ws._url ? ws._url : ws.url, host = url.replace('ws://', '').split('/')[0], room = url.split(`${host}/`)[1].replace('?roo=', ''), hostRoom = url.replace('ws://', '');
             let locWeb = host.includes('127.0.0') ? `[LOC]` : `[WEB]`; ws['host'] = host; ws['room'] = room; ws['hostRoom'] = hostRoom; ws['locWeb'] = locWeb; ws['method'] = 'WEBSOCKET'; wsClientLoc = ws;
             ws.on('error', (data) => { logConsole({ e, ee, 'txt': `CLIENT LOC | ERRO\n${JSON.stringify(data.toString('utf-8'))}`, }); }); ws.on('message', async (data) => {
-                let message = data.toString('utf-8'); let pingPong = message === `ping` ? 1 : message === `pong` ? 2 : 0;
+                let message = data.toString('utf-8'), pingPong = message === `ping` ? 1 : message === `pong` ? 2 : 0;
                 if (pingPong > 0) { return; } try { message = JSON.parse(message); } catch { message = { message, }; }
                 if (!message.message) { message = { message, }; } messageReceived({ ...message, host, room, 'resWs': ws, }); // PROCESSAR MENSAGEM RECEBIDA
             }); // -------------------------------------------------------------------------------------------------------------
@@ -80,7 +79,7 @@ async function serverRun(inf = {}) {
 
             // ACTION LOOP [SOMENTE SE FOR NO AWS (08H<>23H)] PARA TODOS OS '*-NODE-*'
             setInterval(async () => {
-                let time = dateHour().res; if (gW.devMaster === 'AWS' && Number(time.hou) > 7 && Number(time.hou) < 24) {
+                let time = dateHour().res; if (devMaster === 'AWS' && Number(time.hou) > 7 && Number(time.hou) < 24) {
                     logConsole({ e, ee, 'txt': `ACTION: LOOP`, }); await messageAction({ host, room: '*-NODE-*', destination: '*-NODE-*', action: gW.par7, message: '', resWs: false, wsClients, wsClientLoc, });
                 }
             }, (gW.secLoop * 1000));

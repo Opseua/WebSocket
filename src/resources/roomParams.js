@@ -4,16 +4,16 @@
 
 // http://127.0.0.1:1234/?act=PasswordAqui-screenshot&roo=SalaAqui&mes=MensagemAqui
 
-let e = currentFile(), ee = e; let libs = { 'url': {}, };
+let e = currentFile(new Error()), ee = e; let libs = { 'url': {}, };
 async function roomParams(inf = {}) {
-    let ret = { 'ret': false, }; e = inf && inf.e ? inf.e : e;
+    let ret = { 'ret': false, }; e = inf.e || e;
     try {
         /* IMPORTAR BIBLIOTECA [NODE] */ if (libs['url']) { libs['url']['parse'] = 1; libs = await importLibs(libs, 'roomParams'); }
 
         let { server, } = inf;
 
         let headers = server.headers || {}, url = server.url, h = headers.host || '', room = false, locWeb, action = false, message = false, pass = false, mesTem, title = false, sendAlert = false, urlParams;
-        let method = server.upgrade ? 'WEBSOCKET' : server.method; let host = h.includes('192.168.') ? `127.0.0.1:${h.split(':')[1]}` : h; locWeb = host.includes('127.0.0') ? `[LOC]` : `[WEB]`;
+        let method = server.upgrade ? 'WEBSOCKET' : server.method, host = h.includes('192.168.') ? `127.0.0.1:${h.split(':')[1]}` : h; locWeb = host.includes('127.0.0') ? `[LOC]` : `[WEB]`;
         // CAPTURAR URL/PARÂMETROS/MENSAGEM|BODY
         try {
             function scapeNotEncode(input) { // CORRIGIR PRAMENTROS COM JSON BRUTO

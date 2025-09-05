@@ -2,19 +2,19 @@
 // infMessageAction = { 'host': host, 'room': room, 'action': action, 'message': message, 'resWs': res, 'wsClients': wsClients, 'wsClientLoc': wsClientLoc, };
 // retMessageAction = await messageAction(infMessageAction); console.log(retMessageAction);
 
-let e = currentFile(), ee = e;
+let e = currentFile(new Error()), ee = e;
 async function messageAction(inf = {}) {
-    let ret = { 'ret': false, }; e = inf && inf.e ? inf.e : e;
+    let ret = { 'ret': false, }; e = inf.e || e;
     try {
         let { host, room, action, message, resWs, wsClients, wsClientLoc, destination, } = inf;
 
-        let time = dateHour().res; let time1 = `MES_${time.mon}_${time.monNam}/DIA_${time.day}`; let time2 = `${time.hou}.${time.min}.${time.sec}.${time.mil}`;
-        let body = { 'ret': false, }; let infAdd = { 'title': 'Erro', 'type': '', }; destination = destination || `${host}/?roo=${room}`;
+        let time = dateHour().res, time1 = `MES_${time.mon}_${time.monNam}/DIA_${time.day}`, time2 = `${time.hou}.${time.min}.${time.sec}.${time.mil}`;
+        let body = { 'ret': false, }, infAdd = { 'title': 'Erro', 'type': '', }; destination = destination || `${host}/?roo=${room}`;
 
         if (action.toLowerCase() === gW.par1.toLowerCase()) {
             // ### (ACTION) WSCLIENTS
             infAdd.type = 'obj'; infAdd.title = `Clients`; try {
-                let dH = dateHour().res; let resClients = [{ 'hour': `${dH.hou}:${dH.min}:${dH.sec}`, },]; resClients = [...resClients, ...Object.keys(wsClients.rooms).filter(sala => sala.includes(host))
+                let dH = dateHour().res, resClients = [{ 'hour': `${dH.hou}:${dH.min}:${dH.sec}`, },]; resClients = [...resClients, ...Object.keys(wsClients.rooms).filter(sala => sala.includes(host))
                     .map(sala => ({ sala, ...Array.from(wsClients.rooms[sala]).reduce((acc, ws, index) => { acc[`_${index + 1}`] = `${ws.dateHour}`; return acc; }, {}), })),];
                 body['ret'] = true; body['msg'] = `CLIENTS: OK`; body['res'] = resClients;
             } catch { body['msg'] = `CLIENTS: ERRO | AO PEGAR CLIENTES`; }
