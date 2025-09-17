@@ -55,7 +55,7 @@ async function messageAction(inf = {}) {
         } else if (action.toLowerCase() === gW.par7.toLowerCase()) {
             // ### (ACTION) LOOP [→ TODA A SALA '...-NODE-...'] | CRIAR PADRÃO DE PASTA | SCREENSHOT (MANTER awaitFinish 'true' DO CONTRÁRIO O NIRCMD ABRE O POPUP)
             infAdd.type = 'obj'; infAdd.title = `Loop`; let path = `${fileProjetos}/${gW.project}/logs/Registros/${time1}/${time.hou}.00-${time.hou}.59`.replace(new RegExp(`${letter}:`, 'g'), `!letter!:`); message = {
-                'fun': [{ 'securityPass': gW.securityPass, 'retInf': false, 'name': 'file', 'par': { 'action': 'write', 'path': `${path}/#_Z_#.txt`, 'text': path, 'add': true, }, },
+                'fun': [{ 'securityPass': gW.securityPass, 'retInf': false, 'name': 'file', 'par': { 'action': 'write', 'path': `${path}/#_Z_#.txt`, 'content': path, 'add': true, }, },
                 { 'securityPass': gW.securityPass, 'retInf': false, 'name': 'commandLine', 'par': { 'awaitFinish': true, 'command': `%nircmd% savescreenshot "${path}/${time2}_screenshot.png"`, }, },],
             };
         } else if (action.toLowerCase() === gW.par8.toLowerCase()) {
@@ -74,9 +74,9 @@ async function messageAction(inf = {}) {
             body = await messageSend({ destination, message, 'resWs': wsClientLoc, });
         }
 
-        if (!body.ret) { // ERRO AO EXECUTAR AÇÃO
-            logConsole({ e, ee, 'txt': `${JSON.stringify(body, null, 2)}`, });
-            notification({ e, 'title': `# FALSE (${gW.devMaster}) [NODE]`, 'text': `→ messageAction {${gW.project}}\n${body.msg.substring(0, 300)}`, 'ignoreErr': true, });
+        if (!body.ret && !(resWs?.urlParams?.bypass === 'all')) { // ERRO AO EXECUTAR AÇÃO
+            logConsole({ e, ee, 'txt': `${JSON.stringify(body, null, 2)}`, });  // (NO URL)    &bypass=all → SEM ERRO NO LOG E NA NOTIFICAÇÃO | &bypass=not → SEM ERRO NA NOTIFICAÇÃO
+            if (!(resWs?.urlParams?.bypass === 'not')) { notification({ e, 'title': `# FALSE (${gW.devMaster}) [NODE]`, 'text': `→ messageAction {${gW.project}}\n${body.msg.substring(0, 300)}`, 'ignoreErr': true, }); }
         }
 
         if (resWs) { await html({ e, 'server': resWs, body, room, infAdd, }); } // ENVIAR RETORNO HTTP (SE NECESSÁRIO)

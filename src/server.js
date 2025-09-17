@@ -85,8 +85,8 @@ async function serverRun(inf = {}) {
             }, (gW.secLoop * 1000));
         }).on('error', (err) => { serverErr(err); });
 
-        //            60 SEGUNDOS APÓS INICIAR →                       APAGAR LOGS/TEMP ANTIGOS (APÓS INICIAR E A CADA x HORAS)                CONSUMO DE CPU e MÉMORIA RAM (APÓS INICIAR E A CADA x MINUTOS)
-        await new Promise(r => { setTimeout(r, 60 * 1000); }); /*#*/ logsDel(); setInterval(() => { logsDel(); }, 25 * 3600000); /*#*/ performanceDev({ 'min': 1, }); setInterval(() => { performanceDev(); }, 5 * 60000);
+        //            60 SEGUNDOS APÓS INICIAR →                          APAGAR LOGS/TEMP ANTIGOS (APÓS INICIAR E A CADA x HORAS)
+        await new Promise(r => { setTimeout(r, 60 * 1000); }); /*####*/ logsDel(); setInterval(() => { logsDel(); }, 25 * 3600000); /*###*/
 
         ret['ret'] = true;
         ret['msg'] = `SERVER: OK`;
