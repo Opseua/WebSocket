@@ -51,7 +51,7 @@ async function performanceDev(inf = {}) {
             if (hasLogs && (cpuHigh || ramHigh)) {
                 let msg = `CPU: ${String(recentLogs[0].CPU_Total).padStart(2, '0')}% | RAM: ${String(recentLogs[0].RAM_Total).padStart(2, '0')}%`;
                 if (ramClear && ramHigh) {
-                    commandLine({ e, command: `${fileWindows}/BAT/EmptyStandbyList.exe workingsets`, }); msg += ' ✅ LIMPA'; hasBeenOptimized = true;
+                    commandLine({ e, 'command': `${fileWindows}/BAT/EmptyStandbyList.exe workingsets`, }); msg += ' ✅ LIMPA'; hasBeenOptimized = true;
                 }
                 logConsole({ e, ee, 'txt': msg, });
             }

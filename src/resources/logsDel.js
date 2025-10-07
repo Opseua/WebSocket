@@ -1,6 +1,7 @@
 // let retLogsDel = await logsDel(); console.log(retLogsDel);
 
-let e = currentFile(new Error()), ee = e;
+let e, ee; if (process?.argv?.[1]?.includes('logsDel.js')) { globalThis['firstFileCall'] = new Error(); await import('../resources/@export.js'); e = firstFileCall, ee = e; await logsDel(); }
+
 async function logsDel(inf = {}) {
     let ret = { 'ret': false, }; e = inf.e || e;
     try {
@@ -16,7 +17,7 @@ async function logsDel(inf = {}) {
         let pathsToDel = [
 
             // [WINDOWS] BAT
-            { 'daysKeep': 7, 'path': `${fileWindows}/BAT/z_logs`, },
+            { 'daysKeep': 3, 'path': `${fileWindows}/BAT/z_logs`, },
 
             // [PROJETOS] Chat_Python
             { 'daysKeep': log1, 'path': `${fileProjetos}/Chat_Python/logs/JavaScript`, },
@@ -48,16 +49,19 @@ async function logsDel(inf = {}) {
             { 'daysKeep': log1, 'path': `${fileProjetos}/WebSocket/logs/JavaScript`, },
             { 'daysKeep': log2, 'path': `${fileProjetos}/WebSocket/logs/Registros`, },
 
-            // [PROJETOS] Program Files / Program Files (x86)
-            { 'daysKeep': 1, 'path': `C:/Program Files`, 'onlyPattern': [`*chrome_BITS_*`, `*chrome_url_fetcher_*`,], },
-            { 'daysKeep': 1, 'path': `C:/Program Files (x86)`, 'onlyPattern': [`*chrome_BITS_*`, `*chrome_url_fetcher_*`,], },
+            // [DISCO C] Program Files / Program Files (x86)
+            { 'daysKeep': 1, 'path': `C:/Program Files`, 'patterns': [`*chrome_BITS_*`, `*chrome_url_fetcher_*`,], },
+            { 'daysKeep': 1, 'path': `C:/Program Files (x86)`, 'patterns': [`*chrome_BITS_*`, `*chrome_url_fetcher_*`,], },
+
+            // [PROJETOS] PORTABLE_Libre_Hardware_Monitor
+            { 'daysKeep': 3, 'path': `${fileWindows}/PORTABLE_System_Informer/z_OUTROS/PORTABLE_Libre_Hardware_Monitor`, 'patterns': [`*LibreHardwareMonitorLog-*`,], },
 
         ];
 
         // LISTAR PASTAS E ARQUIVOS
         for (let [index, val,] of pathsToDel.entries()) { // CHECAR SE DEVE SER DELETADO [ARQUIVO] | CHECAR SE DEVE SER DELETADO [PASTA] | DENTRO DA PASTA
             retFile = await file({ e, 'action': 'list', 'path': val.path, 'max': 500, }); retFile = retFile.ret ? retFile.res : []; for (let [index1, val1,] of retFile.entries()) {
-                if (val.onlyPattern) { if (val.onlyPattern.some(v => regex({ simple: true, pattern: v, 'text': val1.path, }))) { filesDelOrNot.push({ daysKeep: val.daysKeep, path: val1.path, edit: val1.edit, }); } }
+                if (val.patterns) { if (val.patterns.some(v => regex({ 'simple': true, 'pattern': v, 'text': val1.path, }))) { filesDelOrNot.push({ 'daysKeep': val.daysKeep, 'path': val1.path, 'edit': val1.edit, }); } }
                 else if (!val1.isFolder) { filesDelOrNot.push({ 'daysKeep': val.daysKeep, 'path': val1.path, 'edit': val1.edit, }); } else {
                     retFile = await file({ e, 'action': 'list', 'path': val1.path, 'max': 500, }); retFile = retFile.ret ? retFile.res : []; if (retFile.length === 0) { pathsDel.push({ 'path': val1.path, }); }
                     else { for (let [index2, val2,] of retFile.entries()) { filesDelOrNot.push({ 'daysKeep': val.daysKeep, 'path': val2.path, 'edit': val2.edit, }); } }
@@ -67,7 +71,8 @@ async function logsDel(inf = {}) {
 
         // DEFINIR PASTAS/ARQUIVOS PARA SEREM EXCLUÍDOS | APAGAR PASTAS/ARQUIVOS
         for (let [index, value,] of filesDelOrNot.entries()) { retDelOrNot = await delOrNot(value); if (retDelOrNot) { pathsDel.push({ 'path': value.path, }); } }
-        if (pathsDel.length > 0) { for (let [index, v,] of pathsDel.entries()) { await file({ e, action: 'del', path: v.path, }); } logConsole({ e, ee, 'txt': `LOGS APAGADOS\n${JSON.stringify(pathsDel, null, 2)}`, }); }
+        if (pathsDel.length > 0) { for (let [index, v,] of pathsDel.entries()) { await file({ e, 'action': 'del', 'path': v.path, }); } }
+        logConsole({ e, ee, 'txt': `LOGS APAGADOS\n${JSON.stringify(pathsDel, null, 2)}`, });
 
         // LIMPAR PASTA 'Temp'
         await commandLine({ e, 'command': `${fileWindows}/BAT/clearTemp.bat NODE-WEBSOCKET-SERVER_-_LOGS_DEL_OLD`, });

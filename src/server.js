@@ -1,5 +1,5 @@
 let startup = new Date(); globalThis['firstFileCall'] = new Error(); await import('./resources/@export.js'); let e = firstFileCall, ee = e;
-let rateHttp = rateLimiter({ max: 40, sec: 10, }), rateWs = rateLimiter({ max: 20, 'sec': 10, }); let ico = `${fileWindows}/BAT/z_ICONES/websocket.ico`, h = 'Access-Control-Allow-'; let libs = { 'ws': {}, 'http': {}, };
+let rateHttp = rateLimiter({ 'max': 40, 'sec': 10, }), rateWs = rateLimiter({ 'max': 20, 'sec': 10, }), ico = `${fileWindows}/BAT/z_ICONES/websocket.ico`, h = 'Access-Control-Allow-'; let libs = { 'ws': {}, 'http': {}, };
 
 async function serverRun(inf = {}) {
     let ret = { 'ret': false, }; e = inf.e || e;
@@ -10,7 +10,7 @@ async function serverRun(inf = {}) {
 
         // ############# SERVIDOR HTTP
         let devMaster = gW.devMaster, wsClients = { 'rooms': {}, }, wsClientLoc, serverHttp = _http.createServer(async (req, res) => { // EVITAR LOOP INFINITO | PRÉ-CONFIGURAÇÕES HTTP
-            function resEnd(d) { res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', }).end(JSON.stringify({ ret: !!d.ret, msg: `SERVER [WS]: ERRO | ${d.msg || '*'}`, })); }
+            function resEnd(d) { res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', }).end(JSON.stringify({ 'ret': !!d.ret, 'msg': `SERVER [WS]: ERRO | ${d.msg || '*'}`, })); }
             if (req.url === '/favicon.ico') { let c = await _fs.promises.readFile(ico); res.writeHead(200, { 'Content-Type': 'image/x-icon', }).end(c); return; } if (!['GET', 'POST',].includes(req.method)) {
                 res.setHeader(`${h}Origin`, '*').setHeader(`${h}Methods`, '*').setHeader(`${h}Headers`, '*').setHeader(`${h}Credentials`, 'true'); resEnd({ 'msg': `APENAS 'GET' ou 'POST'`, }); return;
             } if (!rateHttp.check().ret) { resEnd({ 'msg': `MUITAS REQUISICOES`, }); return; } /* SALA E PARAMETROS | PROCESSAR AÇÃO/MENSAGEM RECEBIDA */ let r = await roomParams({ e, 'server': req, });
@@ -80,13 +80,25 @@ async function serverRun(inf = {}) {
             // ACTION LOOP [SOMENTE SE FOR NO AWS (08H<>23H)] PARA TODOS OS '*-NODE-*'
             setInterval(async () => {
                 let time = dateHour().res; if (devMaster === 'AWS' && Number(time.hou) > 7 && Number(time.hou) < 24) {
-                    logConsole({ e, ee, 'txt': `ACTION: LOOP`, }); await messageAction({ host, room: '*-NODE-*', destination: '*-NODE-*', action: gW.par7, message: '', resWs: false, wsClients, wsClientLoc, });
+                    logConsole({ e, ee, 'txt': `ACTION: LOOP`, }); await messageAction({ host, 'room': '*-NODE-*', 'destination': '*-NODE-*', 'action': gW.par7, 'message': '', 'resWs': false, wsClients, wsClientLoc, });
                 }
             }, (gW.secLoop * 1000));
         }).on('error', (err) => { serverErr(err); });
 
         //            60 SEGUNDOS APÓS INICIAR →                          APAGAR LOGS/TEMP ANTIGOS (APÓS INICIAR E A CADA x HORAS)
         await new Promise(r => { setTimeout(r, 60 * 1000); }); /*####*/ logsDel(); setInterval(() => { logsDel(); }, 25 * 3600000); /*###*/
+
+        // SINCRONIZAR PLANILHAS
+        if ((`${gW.devGet[0]}`).includes('ESTRELAR-')) {
+            logConsole({ e, ee, 'txt': `ACIONADO → SINCRONIZAR PLANILHAS`, });
+            setInterval(async () => {
+                let infGoogleSheets = {
+                    e, 'attempts': 1, 'action': 'syncRanges', 'linStart': 2, 'linEnd': 400,
+                    'idOrigin': '1UzSX3jUbmGxVT4UbrVIB70na3jJ5qYhsypUeDQsXmjc', 'tabOrigin': 'INDICAR_AUTOMATICO', 'colsOrigin': ['N', 'S',],
+                    'idDestination': '19itKQqFsvKp7Y8nlTycO1X5OqRz4r0ekHcg_FzTtz0Y', 'tabDestination': 'INDICACOES_STATUS', 'colsDestination': ['K', 'L',],
+                }; await googleSheets(infGoogleSheets);
+            }, 15 * 1000);
+        }
 
         ret['ret'] = true;
         ret['msg'] = `SERVER: OK`;
