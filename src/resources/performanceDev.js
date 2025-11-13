@@ -23,9 +23,9 @@ async function performanceDev(inf = {}) {
                 })); logsWithStats.sort((a, b) => b.fileEdit - a.fileEdit); logPaths = logsWithStats.map(l => ({ 'fileEdit': l.fileEdit, 'fileName': l.fileName, }));
 
                 // LOGS: CAPTURAR | ORDENAR DE MAIS RECENTE PARA MAIS ANTIGO E CONVERTER PARA 'DD/MM HH:MM:SS'
-                for (let log of logsWithStats) {
-                    let content = await _fs.promises.readFile(log.fullPath, 'utf-8'); let lines = content.trim().split('\n'); if (lines.length < 2) { continue; }
-                    let fileTag = log.fileName.replace(filePattern, ''); let header = lines[1].split(',').map(s => s.replace(/^"|"$/g, ''));
+                for (let logPath of logsWithStats) {
+                    let content = await _fs.promises.readFile(logPath.fullPath, 'utf-8'); let lines = content.trim().split('\n'); if (lines.length < 2) { continue; }
+                    let fileTag = logPath.fileName.replace(filePattern, ''); let header = lines[1].split(',').map(s => s.replace(/^"|"$/g, ''));
                     let indexes = Object.fromEntries(metrics.map(name => [name, header.indexOf(name),]));
                     for (let i = 2; i < lines.length; i++) {
                         let row = lines[i].split(','); let ts = new Date(row[0]).getTime(); let record = { 'data': ts, 'file': fileTag, };
@@ -42,8 +42,8 @@ async function performanceDev(inf = {}) {
             let cpuHigh = recentLogs.length > 0 && recentLogs.every(r => r.CPU_Total > cpuMax); let ramHigh = recentLogs.length > 0 && recentLogs.every(r => r.RAM_Total > ramMax); let hasBeenOptimized = false;
             // APAGAR LOGS
             if (logsClear && logPerformances.length >= minCheck) {
-                for (let log of logPaths) {
-                    let fullPath = `${fileWindows}/PORTABLE_System_Informer/z_OUTROS/PORTABLE_Libre_Hardware_Monitor/${filePattern}${log.fileName}`;
+                for (let logPath of logPaths) {
+                    let fullPath = `${fileWindows}/PORTABLE_System_Informer/z_OUTROS/PORTABLE_Libre_Hardware_Monitor/${filePattern}${logPath.fileName}`;
                     try { await _fs.promises.unlink(fullPath); } catch { }
                 }
             }

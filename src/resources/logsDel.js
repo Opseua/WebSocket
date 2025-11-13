@@ -13,11 +13,11 @@ async function logsDel(inf = {}) {
                 let targetDate = new Date(today.getFullYear(), regexMon, regexDay), dif = Math.abs(Math.ceil((targetDate - today) / (1000 * 60 * 60 * 24))); return dif > daysKeep;
             }
         }//                                                           [JavaScript/Python | Registros]
-        let logsLight = 30, logsHeavy = gW.devMaster === 'AWS' ? 3 : 7, log1 = logsLight, log2 = logsHeavy;
+        let logsLight = 15, logsHeavy = gW.devMaster === 'AWS' ? 3 : 7, log1 = logsLight, log2 = logsHeavy;
         let pathsToDel = [
 
             // [WINDOWS] BAT
-            { 'daysKeep': 3, 'path': `${fileWindows}/BAT/z_logs`, },
+            { 'daysKeep': 5, 'path': `${fileWindows}/BAT/z_logs`, }, // MÍNIMO DE 5 DIAS POR CAUSA DA RESTAURAÇÃO QUE É FEITA A CADA 3 DIAS
 
             // [PROJETOS] Chat_Python
             { 'daysKeep': log1, 'path': `${fileProjetos}/Chat_Python/logs/JavaScript`, },
@@ -50,11 +50,11 @@ async function logsDel(inf = {}) {
             { 'daysKeep': log2, 'path': `${fileProjetos}/WebSocket/logs/Registros`, },
 
             // [DISCO C] Program Files / Program Files (x86)
-            { 'daysKeep': 1, 'path': `C:/Program Files`, 'patterns': [`*chrome_BITS_*`, `*chrome_url_fetcher_*`,], },
-            { 'daysKeep': 1, 'path': `C:/Program Files (x86)`, 'patterns': [`*chrome_BITS_*`, `*chrome_url_fetcher_*`,], },
+            { 'daysKeep': 2, 'path': `C:/Program Files`, 'patterns': [`*chrome_BITS_*`, `*chrome_url_fetcher_*`,], },
+            { 'daysKeep': 2, 'path': `C:/Program Files (x86)`, 'patterns': [`*chrome_BITS_*`, `*chrome_url_fetcher_*`,], },
 
             // [PROJETOS] PORTABLE_Libre_Hardware_Monitor
-            { 'daysKeep': 3, 'path': `${fileWindows}/PORTABLE_System_Informer/z_OUTROS/PORTABLE_Libre_Hardware_Monitor`, 'patterns': [`*LibreHardwareMonitorLog-*`,], },
+            { 'daysKeep': 4, 'path': `${fileWindows}/PORTABLE_System_Informer/z_OUTROS/PORTABLE_Libre_Hardware_Monitor`, 'patterns': [`*LibreHardwareMonitorLog-*`,], },
 
         ];
 

@@ -1,10 +1,12 @@
 let startup = new Date(); globalThis['firstFileCall'] = new Error(); await import('./resources/@export.js'); let e = firstFileCall, ee = e;
-let rateHttp = rateLimiter({ 'max': 40, 'sec': 10, }), rateWs = rateLimiter({ 'max': 20, 'sec': 10, }), ico = `${fileWindows}/BAT/z_ICONES/websocket.ico`, h = 'Access-Control-Allow-'; let libs = { 'ws': {}, 'http': {}, };
+let rateHttp = rateLimiter({ 'max': 40, 'sec': 10, }), rateWs = rateLimiter({ 'max': 20, 'sec': 10, }), ico = `${fileWindows}/BAT/z_ICONES/websocket.ico`, h = 'Access-Control-Allow-';
+let libs = { 'ws': {}, 'http': {}, 'https': {}, 'url': {}, };
 
 async function serverRun(inf = {}) {
     let ret = { 'ret': false, }; e = inf.e || e;
     try {
-        /* IMPORTAR BIBLIOTECA [NODE] */ libs['ws'] = { 'WebSocket': 1, 'WebSocketServer': 1, 'pro': true, }; libs['http']['http'] = 1; libs = await importLibs(libs, 'serverRun [WebSocket]');
+        /* IMPORTAR BIBLIOTECA [NODE] */ libs['ws'] = { 'WebSocket': 1, 'WebSocketServer': 1, 'pro': true, }; libs['http']['http'] = 1; libs['https']['https'] = 1; libs['url']['URL'] = 1;
+        libs = await importLibs(libs, 'serverRun [WebSocket]');
 
         await logConsole({ e, ee, 'txt': `**************** SERVER **************** [${startupTime(startup, new Date())}]`, });
 
@@ -85,19 +87,43 @@ async function serverRun(inf = {}) {
             }, (gW.secLoop * 1000));
         }).on('error', (err) => { serverErr(err); });
 
+        // SERVER PROXY
+        try { // [GET/POST/PUT] → http://localhost:PROXY_PORT | HEADERS: { 'x-securityPass': 'AAA', 'x-url': 'www.msftconnecttest.com/redirect', }
+            let proxyPort = `${gW.par11}`; let proxyPass = `${gW.securityPass}`; _http.createServer((req, res) => {
+                try {
+                    function resErr({ code = 401, msg, }) { res.writeHead(code, { 'content-type': 'application/json', }); res.end(JSON.stringify({ 'ret': false, 'msg': `ERRO | ${msg}`, })); }
+                    if (req.headers['x-securitypass'] !== proxyPass) { resErr({ 'msg': `'x-securityPass' NÃO INFORMADO/INVÁLIDO`, }); return; }
+                    let target = req.headers['x-url']; if (!target) { resErr({ 'msg': `INFORMAR O 'x-url'`, }); return; } if (!/^https?:\/\//i.test(target)) { target = `https://${target}`; }
+                    delete req.headers['x-url']; delete req.headers['x-securitypass']; let u = new URL(target); let clientOk = u.protocol === 'https:' ? _https : _http; req.headers['host'] = u.host;
+                    let opts = { 'method': req.method, 'hostname': u.hostname, 'port': u.port || (u.protocol === 'https:' ? 443 : 80), 'path': u.pathname + u.search, 'headers': req.headers, };
+                    let proxyReq = clientOk.request(opts, (proxyRes) => { res.writeHead(proxyRes.statusCode, proxyRes.headers); proxyRes.pipe(res); });
+                    proxyReq.on('error', (err) => { resErr({ 'code': 502, 'msg': `AO CONECTAR AO DESTINO → ${err.message}`, }); }); req.pipe(proxyReq);
+                } catch (err) { res.writeHead(499, { 'content-type': 'application/json', }); res.end(JSON.stringify({ 'ret': false, 'msg': `ERRO | CATCH → ${err.message}`, })); }
+            }).listen(proxyPort, async () => { await logConsole({ e, ee, 'txt': `SERVIDOR PROXY RODANDO NA PORTA: ${proxyPort}`, }); });
+        } catch (catchErr) { let retRegexE = await regexE({ inf, 'e': catchErr, }); ret['msg'] = retRegexE.res; ret['ret'] = false; delete ret['res']; }
+
         //            60 SEGUNDOS APÓS INICIAR →                          APAGAR LOGS/TEMP ANTIGOS (APÓS INICIAR E A CADA x HORAS)
         await new Promise(r => { setTimeout(r, 60 * 1000); }); /*####*/ logsDel(); setInterval(() => { logsDel(); }, 25 * 3600000); /*###*/
 
         // SINCRONIZAR PLANILHAS
         if ((`${gW.devGet[0]}`).includes('ESTRELAR-')) {
-            logConsole({ e, ee, 'txt': `ACIONADO → SINCRONIZAR PLANILHAS`, });
-            setInterval(async () => {
-                let infGoogleSheets = {
-                    e, 'attempts': 1, 'action': 'syncRanges', 'linStart': 2, 'linEnd': 400,
-                    'idOrigin': '1UzSX3jUbmGxVT4UbrVIB70na3jJ5qYhsypUeDQsXmjc', 'tabOrigin': 'INDICAR_AUTOMATICO', 'colsOrigin': ['N', 'S',],
-                    'idDestination': '19itKQqFsvKp7Y8nlTycO1X5OqRz4r0ekHcg_FzTtz0Y', 'tabDestination': 'INDICACOES_STATUS', 'colsDestination': ['K', 'L',],
-                }; await googleSheets(infGoogleSheets);
-            }, 15 * 1000);
+            // logConsole({ e, ee, 'txt': `ACIONADO → SINCRONIZAR PLANILHAS`, });
+
+            // // [SCRIPT 1] <> [VENDAS]
+            // setInterval(async () => {
+            //     let infGoogleSheets = {
+            //         e, 'action': 'syncRanges', 'attempts': 1, 'linStart': 2, 'linEnd': 400, 'idOrigin': '1UzSX3jUbmGxVT4UbrVIB70na3jJ5qYhsypUeDQsXmjc', 'tabOrigin': 'INDICAR_AUTOMATICO', 'colsOrigin': ['N', 'S',],
+            //         'idDestination': '19itKQqFsvKp7Y8nlTycO1X5OqRz4r0ekHcg_FzTtz0Y', 'tabDestination': 'INDICACOES_STATUS', 'colsDestination': ['K', 'L',],
+            //     }; await googleSheets(infGoogleSheets);
+            // }, 15 * 1000); // APÓS x SEGUNDOS
+
+            // // [SCRIPT 1] <> [VENDAS]
+            // setInterval(async () => {
+            //     let infGoogleSheets = {
+            //         e, 'action': 'syncRanges', 'attempts': 1, 'linStart': 2, 'linEnd': 400, 'idOrigin': '1UzSX3jUbmGxVT4UbrVIB70na3jJ5qYhsypUeDQsXmjc', 'tabOrigin': 'INDICAR_AUTOMATICO', 'colsOrigin': ['N', 'S',],
+            //         'idDestination': '19itKQqFsvKp7Y8nlTycO1X5OqRz4r0ekHcg_FzTtz0Y', 'tabDestination': 'INDICACOES_STATUS', 'colsDestination': ['K', 'L',],
+            //     }; await googleSheets(infGoogleSheets);
+            // }, (2 * (60 * 1000))); // APÓS x MINUTOS
         }
 
         ret['ret'] = true;
