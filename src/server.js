@@ -92,8 +92,8 @@ async function serverRun(inf = {}) {
             let proxyPort = `${gW.par11}`; let proxyPass = `${gW.securityPass}`; _http.createServer((req, res) => {
                 try {
                     function resErr({ code = 401, msg, }) { res.writeHead(code, { 'content-type': 'application/json', }); res.end(JSON.stringify({ 'ret': false, 'msg': `ERRO | ${msg}`, })); }
-                    if (req.headers['x-securitypass'] !== proxyPass) { resErr({ 'msg': `'x-securityPass' NÃO INFORMADO/INVÁLIDO`, }); return; }
-                    let target = req.headers['x-url']; if (!target) { resErr({ 'msg': `INFORMAR O 'x-url'`, }); return; } if (!/^https?:\/\//i.test(target)) { target = `https://${target}`; }
+                    if (decodeURIComponent(req.headers['x-securitypass']) !== proxyPass) { resErr({ 'msg': `'x-securityPass' NÃO INFORMADO/INVÁLIDO`, }); return; }
+                    let target = decodeURIComponent(req.headers['x-url']); if (!target) { resErr({ 'msg': `INFORMAR O 'x-url'`, }); return; } if (!/^https?:\/\//i.test(target)) { target = `https://${target}`; }
                     delete req.headers['x-url']; delete req.headers['x-securitypass']; let u = new URL(target); let clientOk = u.protocol === 'https:' ? _https : _http; req.headers['host'] = u.host;
                     let opts = { 'method': req.method, 'hostname': u.hostname, 'port': u.port || (u.protocol === 'https:' ? 443 : 80), 'path': u.pathname + u.search, 'headers': req.headers, };
                     let proxyReq = clientOk.request(opts, (proxyRes) => { res.writeHead(proxyRes.statusCode, proxyRes.headers); proxyRes.pipe(res); });
