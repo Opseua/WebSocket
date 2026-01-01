@@ -19,7 +19,7 @@ async function performanceDev(inf = {}) {
             if (csvLogs.length) {
                 // ARQUIVOS DE LOGS: CAPTURAR | ORDENAR DE MAIS RECENTE PARA MAIS ANTIGO E CONVERTER PARA 'DD/MM HH:MM:SS'
                 let logsWithStats = await Promise.all(csvLogs.map(async file => {
-                    let fullPath = `${logDir}/${file}`; let stat = await _fs.promises.stat(fullPath); return { 'fileName': file.replace(filePattern, ''), fullPath, 'fileEdit': Math.floor(stat.mtimeMs), };
+                    let fullPath = `${logDir}/${file}`; let stat = await _fs.promises.stat(fullPath); return { 'fileName': file.replace(filePattern, ''), fullPath, 'fileEdit': Math.trunc(stat.mtimeMs), };
                 })); logsWithStats.sort((a, b) => b.fileEdit - a.fileEdit); logPaths = logsWithStats.map(l => ({ 'fileEdit': l.fileEdit, 'fileName': l.fileName, }));
 
                 // LOGS: CAPTURAR | ORDENAR DE MAIS RECENTE PARA MAIS ANTIGO E CONVERTER PARA 'DD/MM HH:MM:SS'
@@ -29,7 +29,7 @@ async function performanceDev(inf = {}) {
                     let indexes = Object.fromEntries(metrics.map(name => [name, header.indexOf(name),]));
                     for (let i = 2; i < lines.length; i++) {
                         let row = lines[i].split(','); let ts = new Date(row[0]).getTime(); let record = { 'data': ts, 'file': fileTag, };
-                        for (let metric of metrics) { record[metric] = indexes[metric] < 0 ? null : Math.floor(parseFloat(row[indexes[metric]])); } logPerformances.push(record);
+                        for (let metric of metrics) { record[metric] = indexes[metric] < 0 ? null : Math.trunc(parseFloat(row[indexes[metric]])); } logPerformances.push(record);
                     }
                 } logPerformances.sort((a, b) => b.data - a.data); logPaths = logPaths.map(lp => ({ ...lp, 'fileEdit': formatDate(lp.fileEdit), }));
                 logPerformances = logPerformances.map(lp => ({ ...lp, 'data': formatDate(lp.data), }));

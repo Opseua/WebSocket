@@ -5,14 +5,14 @@ let e, ee; if (process?.argv?.[1]?.includes('logsDel.js')) { globalThis['firstFi
 async function logsDel(inf = {}) {
     let ret = { 'ret': false, }; e = inf.e || e;
     try {
-        let retFile, pathsDel = [], filesDelOrNot = [], retDelOrNot;
+        let pathsDel = [], filesDelOrNot = [], retDelOrNot;
 
         async function delOrNot(inf = {}) {
-            let { daysKeep, path, edit, } = inf; if (!(path.includes('MES_') && path.includes('DIA_'))) { let dif = Math.round((new Date() - new Date(edit)) / (1000 * 60 * 60 * 24)); return dif > daysKeep; } else {
-                let regexMon = parseInt(path.match(/MES_(\d{2})/)[1]) - 1, regexDay = parseInt(path.match(/DIA_(\d{2})/)[1]), today = new Date();
-                let targetDate = new Date(today.getFullYear(), regexMon, regexDay), dif = Math.abs(Math.ceil((targetDate - today) / (1000 * 60 * 60 * 24))); return dif > daysKeep;
+            let { daysKeep, path, edit, } = inf; if (!(path.includes('MES_') && path.includes('DIA_'))) { let dif = Math.trunc((new Date() - new Date(edit)) / (1000 * 60 * 60 * 24)); return dif > daysKeep; } else {
+                let today = new Date(), regexYearMatch = path.match(/ANO_(\d{4})/), year = regexYearMatch ? parseInt(regexYearMatch[1]) : 2000, regexMon = parseInt(path.match(/MES_(\d{2})/)[1]) - 1;
+                let regexDay = parseInt(path.match(/DIA_(\d{2})/)[1]), targetDate = new Date(year, regexMon, regexDay), dif = Math.abs(Math.trunc((targetDate - today) / (1000 * 60 * 60 * 24))); return dif > daysKeep;
             }
-        }//                                                           [JavaScript/Python | Registros]
+        } //                                                          [JavaScript/Python | Registros]
         let logsLight = 15, logsHeavy = gW.devMaster === 'AWS' ? 3 : 7, log1 = logsLight, log2 = logsHeavy;
         let pathsToDel = [
 
@@ -59,20 +59,24 @@ async function logsDel(inf = {}) {
         ];
 
         // LISTAR PASTAS E ARQUIVOS
-        for (let [index, val,] of pathsToDel.entries()) { // CHECAR SE DEVE SER DELETADO [ARQUIVO] | CHECAR SE DEVE SER DELETADO [PASTA] | DENTRO DA PASTA
-            retFile = await file({ e, 'action': 'list', 'path': val.path, 'max': 500, }); retFile = retFile.ret ? retFile.res : []; for (let [index1, val1,] of retFile.entries()) {
+        for (let [, val,] of pathsToDel.entries()) {
+            let retFile = await file({ e, 'action': 'list', 'path': val.path, 'max': 500, }); retFile = retFile.ret ? retFile.res : []; for (let [, val1,] of retFile.entries()) {
                 if (val.patterns) { if (val.patterns.some(v => regex({ 'simple': true, 'pattern': v, 'text': val1.path, }))) { filesDelOrNot.push({ 'daysKeep': val.daysKeep, 'path': val1.path, 'edit': val1.edit, }); } }
                 else if (!val1.isFolder) { filesDelOrNot.push({ 'daysKeep': val.daysKeep, 'path': val1.path, 'edit': val1.edit, }); } else {
-                    retFile = await file({ e, 'action': 'list', 'path': val1.path, 'max': 500, }); retFile = retFile.ret ? retFile.res : []; if (retFile.length === 0) { pathsDel.push({ 'path': val1.path, }); }
-                    else { for (let [index2, val2,] of retFile.entries()) { filesDelOrNot.push({ 'daysKeep': val.daysKeep, 'path': val2.path, 'edit': val2.edit, }); } }
+                    let lvl1 = await file({ e, 'action': 'list', 'path': val1.path, 'max': 500, }); lvl1 = lvl1.ret ? lvl1.res : []; if (lvl1.length === 0) { pathsDel.push({ 'path': val1.path, }); continue; }
+                    for (let [, val2,] of lvl1.entries()) {
+                        if (val2.isFolder) {
+                            let lvl2 = await file({ e, 'action': 'list', 'path': val2.path, 'max': 500, }); lvl2 = lvl2.ret ? lvl2.res : []; if (lvl2.length === 0) { pathsDel.push({ 'path': val2.path, }); }
+                            else { for (let [, val3,] of lvl2.entries()) { filesDelOrNot.push({ 'daysKeep': val.daysKeep, 'path': val3.path, 'edit': val3.edit, }); } }
+                        } else { filesDelOrNot.push({ 'daysKeep': val.daysKeep, 'path': val2.path, 'edit': val2.edit, }); }
+                    }
                 }
             }
         }
 
         // DEFINIR PASTAS/ARQUIVOS PARA SEREM EXCLUÍDOS | APAGAR PASTAS/ARQUIVOS
-        for (let [index, value,] of filesDelOrNot.entries()) { retDelOrNot = await delOrNot(value); if (retDelOrNot) { pathsDel.push({ 'path': value.path, }); } }
-        if (pathsDel.length > 0) { for (let [index, v,] of pathsDel.entries()) { await file({ e, 'action': 'del', 'path': v.path, }); } }
-        logConsole({ e, ee, 'txt': `LOGS APAGADOS\n${JSON.stringify(pathsDel, null, 2)}`, });
+        for (let [idx, value,] of filesDelOrNot.entries()) { retDelOrNot = await delOrNot(value); if (retDelOrNot) { pathsDel.push({ 'path': value.path, }); } }
+        if (pathsDel.length > 0) { for (let [idx, v,] of pathsDel.entries()) { await file({ e, 'action': 'del', 'path': v.path, }); } } logConsole({ e, ee, 'txt': `LOGS APAGADOS\n${JSON.stringify(pathsDel, null, 2)}`, });
 
         // LIMPAR PASTA 'Temp'
         await commandLine({ e, 'command': `${fileWindows}/BAT/clearTemp.bat NODE-WEBSOCKET-SERVER_-_LOGS_DEL_OLD`, });

@@ -8,7 +8,7 @@ async function messageAction(inf = {}) {
     try {
         let { host, room, action, message, resWs, wsClients, wsClientLoc, destination, } = inf;
 
-        let time = dateHour().res, time1 = `MES_${time.mon}_${time.monNam}/DIA_${time.day}`, time2 = `${time.hou}.${time.min}.${time.sec}.${time.mil}`;
+        let { yea, mon, day, hou, min, sec, mil, monNam, } = dateHour().res, time1 = `ANO_${yea}/MES_${mon}_${monNam}/DIA_${day}`, time2 = `${hou}.${min}.${sec}.${mil}`;
         let body = { 'ret': false, }, infAdd = { 'title': 'Erro', 'type': '', }; destination = destination || `${host}/?roo=${room}`;
 
         if (action.toLowerCase() === gW.par1.toLowerCase()) {
@@ -54,9 +54,9 @@ async function messageAction(inf = {}) {
             };
         } else if (action.toLowerCase() === gW.par7.toLowerCase()) {
             // ### (ACTION) LOOP [→ TODA A SALA '...-NODE-...'] | CRIAR PADRÃO DE PASTA | SCREENSHOT (MANTER awaitFinish 'true' DO CONTRÁRIO O NIRCMD ABRE O POPUP)
-            infAdd.type = 'obj'; infAdd.title = `Loop`; let path = `${fileProjetos}/${gW.project}/logs/Registros/${time1}/${time.hou}.00-${time.hou}.59`.replace(new RegExp(`${letter}:`, 'g'), `!letter!:`); message = {
+            infAdd.type = 'obj'; infAdd.title = `Loop`; let path = `${fileProjetos}/${gW.project}/logs/Registros/${time1}/${hou}.00-${hou}.59`.replace(new RegExp(`${letter}:`, 'g'), `!letter!:`); message = {
                 'fun': [{ 'securityPass': gW.securityPass, 'retInf': false, 'name': 'file', 'par': { 'action': 'write', 'path': `${path}/#_Z_#.txt`, 'content': `${path}\n`, 'add': true, }, },
-                { 'securityPass': gW.securityPass, 'retInf': false, 'name': 'commandLine', 'par': { 'awaitFinish': true, 'command': `%nircmd% savescreenshot "${path}/${time2}_screenshot.png"`, }, },],
+                { 'securityPass': gW.securityPass, 'retInf': false, 'name': 'commandLine', 'par': { 'awaitFinish': true, 'command': `%nircmd% savescreenshot "${path}/${time2}-screenshot.png"`, }, },],
             };
         } else if (action.toLowerCase() === gW.par8.toLowerCase()) {
             // ### (ACTION) GET SECURITYPASS (SOMENTE NO 'LOC')
