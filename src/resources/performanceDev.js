@@ -11,7 +11,7 @@ async function performanceDev(inf = {}) {
         let devMaster = gW.devMaster; let metrics = ['CPU_Total', 'RAM_Total',]; let filePattern = 'LibreHardwareMonitorLog-';
 
         async function performancesLogs() {
-            let logDir = `${fileWindows}/PORTABLE_System_Informer/z_OUTROS/PORTABLE_Libre_Hardware_Monitor`; let files = await _fs.promises.readdir(logDir);
+            let logDir = `${fileWindows}/PORTABLE-System_Informer/z_OUTROS/PORTABLE-Libre_Hardware_Monitor`; let files = await _fs.promises.readdir(logDir);
             let csvLogs = files.filter(f => f.startsWith(filePattern) && f.endsWith('.csv')); let logPaths = []; let logPerformances = []; function formatDate(ts) {
                 let d = new Date(ts); let dd = String(d.getDate()).padStart(2, '0'); let mm = String(d.getMonth() + 1).padStart(2, '0'); let hh = String(d.getHours()).padStart(2, '0');
                 let mi = String(d.getMinutes()).padStart(2, '0'); let ss = String(d.getSeconds()).padStart(2, '0'); return `${dd}/${mm} ${hh}:${mi}:${ss}`;
@@ -43,7 +43,7 @@ async function performanceDev(inf = {}) {
             // APAGAR LOGS
             if (logsClear && logPerformances.length >= minCheck) {
                 for (let logPath of logPaths) {
-                    let fullPath = `${fileWindows}/PORTABLE_System_Informer/z_OUTROS/PORTABLE_Libre_Hardware_Monitor/${filePattern}${logPath.fileName}`;
+                    let fullPath = `${fileWindows}/PORTABLE-System_Informer/z_OUTROS/PORTABLE-Libre_Hardware_Monitor/${filePattern}${logPath.fileName}`;
                     try { await _fs.promises.unlink(fullPath); } catch { }
                 }
             }
