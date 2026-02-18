@@ -26,16 +26,6 @@ async function messageAction(inf = {}) {
                 { securityPass, 'name': 'commandLine', 'par': { 'command': `"C:\\Program Files (x86)\\AnyDesk\\AnyDesk.exe"`, }, },
                 { securityPass, 'name': 'commandLine', 'par': { 'command': `%fileWindows%\\BAT\\RECORRENTES\\zz_RUN_ADM.vbs %fileChrome_Extension%\\src\\scripts\\BAT\\z_COMMANDS.bat ATALHO_RESTART_`, }, },],
             };
-        } else if (action.toLowerCase() === gW.par3.toLowerCase()) {
-            // ### (ACTION) CHAT
-            infAdd.type = 'obj'; infAdd.title = `Chat`; try {
-                if (message !== '') { let retChat = await chat({ e, ...JSON.parse(message), }); body = retChat; } else {
-                    body['msg'] = `CHAT: ERRO | INFORMAR OS PARAMETROS
-                    provider → *JS       [nextWay]: gpt-3.5-turbo / gpt-4o-free / gemini-pro   ###   [openAi]: gpt-4o-mini
-                    provider → *PYTHON   [telegram]: gpt-4o   ###   [g4f]: gpt-4o   ###   [zukijourney]: gpt-4   ###   [naga]: gpt-4
-                    &mes={"provider":"nextWay","model":"gpt-3.5-turbo","input":"Qual a idade de Saturno"} `;
-                }
-            } catch { body['msg'] = `CHAT: ERRO | AO FAZER PARSE`; }
         } else if (action.toLowerCase() === gW.par4.toLowerCase()) {
             // ### (ACTION) API
             infAdd.type = 'obj'; infAdd.title = `API`; try {
@@ -48,13 +38,13 @@ async function messageAction(inf = {}) {
             message = { 'fun': [{ 'securityPass': gW.securityPass, 'retInf': true, 'name': 'file', 'par': { 'action': 'isFolder', 'max': 1000, path, 'listRead': true, }, },], };
         } else if (action.toLowerCase() === gW.par6.toLowerCase()) {
             // ### (ACTION) SCREENSHOT [→ TODA A SALA]
-            infAdd.type = 'arr'; infAdd.title = `screenshot`; let path = `${fileProjetos}/${gW.project}/logs/screenshot.png`.replace(new RegExp(`${letter}:`, 'g'), `!letter!:`); infAdd['path'] = path; message = {
+            infAdd.type = 'arr'; infAdd.title = `screenshot`; let path = `!fileProjetos!/${gW.project}/logs/screenshot.png`; infAdd['path'] = path; message = {
                 'fun': [{ 'securityPass': gW.securityPass, 'retInf': false, 'name': 'commandLine', 'par': { 'awaitFinish': true, 'command': `%nircmd% savescreenshot "${path}"`, }, },
                 { 'securityPass': gW.securityPass, 'retInf': true, 'name': 'file', 'par': { 'action': 'read', path, }, },],
             };
         } else if (action.toLowerCase() === gW.par7.toLowerCase()) {
             // ### (ACTION) LOOP [→ TODA A SALA '...-NODE-...'] | CRIAR PADRÃO DE PASTA | SCREENSHOT (MANTER awaitFinish 'true' DO CONTRÁRIO O NIRCMD ABRE O POPUP)
-            infAdd.type = 'obj'; infAdd.title = `Loop`; let path = `${fileProjetos}/${gW.project}/logs/Registros/${time1}/${hou}.00-${hou}.59`.replace(new RegExp(`${letter}:`, 'g'), `!letter!:`); message = {
+            infAdd.type = 'obj'; infAdd.title = `Loop`; let path = `!fileProjetos!/${gW.project}/logs/Registros/${time1}/${hou}.00-${hou}.59`; message = {
                 'fun': [{ 'securityPass': gW.securityPass, 'retInf': false, 'name': 'file', 'par': { 'action': 'write', 'path': `${path}/#_Z_#.txt`, 'content': `${path}\n`, 'add': true, }, },
                 { 'securityPass': gW.securityPass, 'retInf': false, 'name': 'commandLine', 'par': { 'awaitFinish': true, 'command': `%nircmd% savescreenshot "${path}/${time2}-screenshot.png"`, }, },],
             };

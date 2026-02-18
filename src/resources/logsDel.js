@@ -19,10 +19,16 @@ async function logsDel(inf = {}) {
             // [WINDOWS] BAT
             { 'daysKeep': 5, 'path': `${fileWindows}/BAT/z_logs`, }, // MÍNIMO DE 5 DIAS POR CAUSA DA RESTAURAÇÃO QUE É FEITA A CADA 3 DIAS
 
-            // [PROJETOS] Chat_Python
-            { 'daysKeep': log1, 'path': `${fileProjetos}/Chat_Python/logs/JavaScript`, },
-            { 'daysKeep': log2, 'path': `${fileProjetos}/Chat_Python/logs/Registros`, },
-            { 'daysKeep': log1, 'path': `${fileProjetos}/Chat_Python/logs/Python`, },
+
+
+            // [PROJETOS] Chat
+            { 'daysKeep': log1, 'path': `${fileProjetos}/Chat/logs/JavaScript`, },
+            { 'daysKeep': log2, 'path': `${fileProjetos}/Chat/logs/Registros`, },
+            { 'daysKeep': log1, 'path': `${fileProjetos}/Chat/logs/Python`, },
+
+            // [PROJETOS] Connection
+            { 'daysKeep': log1, 'path': `${fileProjetos}/Connection/logs/JavaScript`, },
+            { 'daysKeep': log2, 'path': `${fileProjetos}/Connection/logs/Registros`, },
 
             // [PROJETOS] Chrome_Extension
             { 'daysKeep': log1, 'path': `${fileProjetos}/Chrome_Extension/logs/JavaScript`, },
@@ -32,29 +38,23 @@ async function logsDel(inf = {}) {
             { 'daysKeep': log1, 'path': `${fileProjetos}/IPTV/logs/JavaScript`, },
             { 'daysKeep': log2, 'path': `${fileProjetos}/IPTV/logs/Registros`, },
 
-            // [PROJETOS] Sniffer_Python
-            { 'daysKeep': log1, 'path': `${fileProjetos}/Sniffer_Python/logs/JavaScript`, },
-            { 'daysKeep': log2, 'path': `${fileProjetos}/Sniffer_Python/logs/Registros`, },
-            { 'daysKeep': log1, 'path': `${fileProjetos}/Sniffer_Python/logs/Python`, },
-
-            // [PROJETOS] URA_Reversa
-            { 'daysKeep': log1, 'path': `${fileProjetos}/URA_Reversa/logs/JavaScript`, },
-            { 'daysKeep': log2, 'path': `${fileProjetos}/URA_Reversa/logs/Registros`, },
+            // [PROJETOS] Sniffer
+            { 'daysKeep': log1, 'path': `${fileProjetos}/Sniffer/logs/JavaScript`, },
+            { 'daysKeep': log2, 'path': `${fileProjetos}/Sniffer/logs/Registros`, },
+            { 'daysKeep': log1, 'path': `${fileProjetos}/Sniffer/logs/Python`, },
 
             // [PROJETOS] WebScraper
             { 'daysKeep': log1, 'path': `${fileProjetos}/WebScraper/logs/JavaScript`, },
             { 'daysKeep': log2, 'path': `${fileProjetos}/WebScraper/logs/Registros`, },
 
-            // [PROJETOS] WebSocket
-            { 'daysKeep': log1, 'path': `${fileProjetos}/WebSocket/logs/JavaScript`, },
-            { 'daysKeep': log2, 'path': `${fileProjetos}/WebSocket/logs/Registros`, },
+
 
             // [DISCO C] Program Files / Program Files (x86)
             { 'daysKeep': 2, 'path': `C:/Program Files`, 'patterns': [`*chrome_BITS_*`, `*chrome_url_fetcher_*`,], },
             { 'daysKeep': 2, 'path': `C:/Program Files (x86)`, 'patterns': [`*chrome_BITS_*`, `*chrome_url_fetcher_*`,], },
 
-            // [PROJETOS] PORTABLE_Libre_Hardware_Monitor
-            { 'daysKeep': 4, 'path': `${fileWindows}/PORTABLE_System_Informer/z_OUTROS/PORTABLE_Libre_Hardware_Monitor`, 'patterns': [`*LibreHardwareMonitorLog-*`,], },
+            // [PROJETOS] PORTABLE-Libre_Hardware_Monitor
+            { 'daysKeep': 4, 'path': `${fileWindows}/PORTABLE-System_Informer/z_OUTROS/PORTABLE-Libre_Hardware_Monitor`, 'patterns': [`*LibreHardwareMonitorLog-*`,], },
 
         ];
 
@@ -79,7 +79,7 @@ async function logsDel(inf = {}) {
         if (pathsDel.length > 0) { for (let [idx, v,] of pathsDel.entries()) { await file({ e, 'action': 'del', 'path': v.path, }); } } logConsole({ e, ee, 'txt': `LOGS APAGADOS\n${JSON.stringify(pathsDel, null, 2)}`, });
 
         // LIMPAR PASTA 'Temp'
-        await commandLine({ e, 'command': `${fileWindows}/BAT/clearTemp.bat NODE-WEBSOCKET-SERVER_-_LOGS_DEL_OLD`, });
+        await commandLine({ e, 'command': `${fileWindows}/BAT/clearTemp.bat NODE-CONNECTION-SERVER_-_LOGS_DEL_OLD`, });
 
         ret['res'] = pathsDel;
         ret['msg'] = `LOGS DEL OLD: OK`;
