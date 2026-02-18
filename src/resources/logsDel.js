@@ -30,9 +30,9 @@ async function logsDel(inf = {}) {
             { 'daysKeep': log1, 'path': `${fileProjetos}/Connection/logs/JavaScript`, },
             { 'daysKeep': log2, 'path': `${fileProjetos}/Connection/logs/Registros`, },
 
-            // [PROJETOS] Chrome_Extension
-            { 'daysKeep': log1, 'path': `${fileProjetos}/Chrome_Extension/logs/JavaScript`, },
-            { 'daysKeep': log2, 'path': `${fileProjetos}/Chrome_Extension/logs/Registros`, },
+            // [PROJETOS] Extension
+            { 'daysKeep': log1, 'path': `${fileProjetos}/Extension/logs/JavaScript`, },
+            { 'daysKeep': log2, 'path': `${fileProjetos}/Extension/logs/Registros`, },
 
             // [PROJETOS] IPTV
             { 'daysKeep': log1, 'path': `${fileProjetos}/IPTV/logs/JavaScript`, },

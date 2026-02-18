@@ -24,7 +24,7 @@ async function messageAction(inf = {}) {
                 'fun': [{ securityPass, 'name': 'commandLine', 'par': { 'awaitFinish': true, 'command': `taskkill /IM AnyDesk.exe /F`, }, }, // ← NÃO POR ENTRE ASPAS!!!
                 { securityPass, 'retInf': true, 'name': 'commandLine', 'par': { 'awaitFinish': true, 'command': `"C:\\Program Files (x86)\\AnyDesk\\AnyDesk.exe" --restart-service`, }, },
                 { securityPass, 'name': 'commandLine', 'par': { 'command': `"C:\\Program Files (x86)\\AnyDesk\\AnyDesk.exe"`, }, },
-                { securityPass, 'name': 'commandLine', 'par': { 'command': `%fileWindows%\\BAT\\RECORRENTES\\zz_RUN_ADM.vbs %fileChrome_Extension%\\src\\scripts\\BAT\\z_COMMANDS.bat ATALHO_RESTART_`, }, },],
+                { securityPass, 'name': 'commandLine', 'par': { 'command': `%fileWindows%\\BAT\\RECORRENTES\\zz_RUN_ADM.vbs %fileExtension%\\src\\scripts\\BAT\\z_COMMANDS.bat ATALHO_RESTART_`, }, },],
             };
         } else if (action.toLowerCase() === gW.par4.toLowerCase()) {
             // ### (ACTION) API

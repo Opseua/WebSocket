@@ -5,7 +5,7 @@ let devC = new Error().stack.split('\n'); devC = devC[devC.length - 1]; let devC
 if (eng) { devChildren = await new Promise((resolve) => { chrome.identity.getProfileUserInfo(u => { if (chrome.runtime.lastError) { resolve(null); return; } resolve(u.email || false); }); }); }
 
 // @functions
-await import(`../../../${process.env.fileChrome_Extension.split('PROJETOS\\')[1]}/src/resources/@functions.js`);
+await import(`../../../${process.env.fileExtension.split('PROJETOS\\')[1]}/src/resources/@functions.js`);
 
 // DEFINIR → LETTER | ROOT | FUNCTION | PROJECT | FILE | LINE
 await getPath({ 'e': new Error(), devChildren, });
