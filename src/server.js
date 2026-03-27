@@ -67,7 +67,7 @@ async function serverRun(inf = {}) {
             });
 
             // WEBSOCKET [CLIENT LOC] (NAO USAR!!!) ------------------------------------------------------------------------------------------
-            let ws = new _WebSocket(`ws://${devMaster === 'AWS' ? gW.serverWeb : devMaster === 'ESTRELAR' ? gW.serverWebEstrelar : '127.0.0.1'}:${gW.portLoc}/?roo=${devMaster}-${gW.par0}`);
+            let ws = new _WebSocket(`ws://${devMaster === 'ESTRELAR' ? gW.serverWeb : '127.0.0.1'}:${gW.portLoc}/?roo=${devMaster}-${gW.par0}`);
             let url = ws._url ? ws._url : ws.url, host = url.replace('ws://', '').split('/')[0], room = url.split(`${host}/`)[1].replace('?roo=', ''), hostRoom = url.replace('ws://', '');
             let locWeb = host.includes('127.0.0') ? `[LOC]` : `[WEB]`; ws['host'] = host; ws['room'] = room; ws['hostRoom'] = hostRoom; ws['locWeb'] = locWeb; ws['method'] = 'WEBSOCKET'; wsClientLoc = ws;
             ws.on('error', (data) => { logConsole({ e, ee, 'txt': `CLIENT LOC | ERRO\n${JSON.stringify(data.toString('utf-8'))}`, }); }); ws.on('message', async (data) => {
